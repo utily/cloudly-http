@@ -1,0 +1,52 @@
+{
+ "name": "template-library",
+ "version": "0.0.0",
+ "description": "Template for NPM library",
+ "author": "PayFunc",
+ "license": "MIT",
+ "repository": "https://github.com/payfunc/template-library",
+ "bugs": {
+  "url": "https://github.com/payfunc/template-library/issues"
+ },
+ "homepage": "https://payfunc.com/open-source/template-library",
+ "private": false,
+ "main": "dist/index.js",
+ "typings": "dist/index.d.ts",
+ "git": {
+  "tagName": "v${version}"
+ },
+ "github": {
+  "release": true
+ },
+ "jest": {
+  "testEnvironment": "node",
+  "testRegex": "((\\.|/)(test|spec))(\\.|\\/.+)(jsx?|tsx?)$",
+  "testPathIgnorePatterns": [
+   "node_modules/"
+  ]
+ },
+ "scripts": {
+  "dev": "watch 'npm run build' .",
+  "lint": "eslint '**/*.{js,ts,tsx,css,json,md}'",
+  "fix": "eslint '**/*.{js,ts,tsx,css,json,md}' --fix",
+  "build": "tsc -p .",
+  "test": "npm run transpile && jest",
+  "transpile": "tsc --project ./tsconfig.test.json",
+  "prepare": "npm run build",
+  "clean": "rm -rf dist node_modules coverage"
+ },
+ "dependencies": {},
+ "devDependencies": {
+  "@types/jest": "^26.0.14",
+  "@typescript-eslint/eslint-plugin": "4.1.1",
+  "@typescript-eslint/parser": "4.1.1",
+  "eslint": "7.9.0",
+  "eslint-plugin-prettierx": "github:nilssonemma/eslint-plugin-prettierx#master",
+  "jest": "^26.4.2",
+  "prettierx": "github:simonmika/prettierx#newline-before-clause",
+  "ts-jest": "^26.4.0",
+  "ts-loader": "^8.0.4",
+  "typescript": "^4.0.3",
+  "watch": "^1.0.2"
+ }
+}

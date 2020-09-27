@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "outDir": "../dist",
+    "target": "esnext",
+    "module": "commonjs",
+    "sourceMap": true,
+    "experimentalDecorators": true,
+		"lib": ["esnext", "webworker"]
+	},
+	"include": [
+		"**/*.spec.ts"
+	]
+}
