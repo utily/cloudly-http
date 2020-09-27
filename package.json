@@ -1,14 +1,14 @@
 {
- "name": "template-library",
+ "name": "cloud-parser",
  "version": "0.0.0",
- "description": "Template for NPM library",
+ "description": " Parses and stringifies requests and responses for CloudFlare Workers.",
  "author": "PayFunc",
  "license": "MIT",
- "repository": "https://github.com/payfunc/template-library",
+ "repository": "https://github.com/cogneco/cloud-parser",
  "bugs": {
-  "url": "https://github.com/payfunc/template-library/issues"
+  "url": "https://github.com/cogneco/cloud-parser/issues"
  },
- "homepage": "https://payfunc.com/open-source/template-library",
+ "homepage": "https://cogneco.com/open-source/cloud-parser",
  "private": false,
  "main": "dist/index.js",
  "typings": "dist/index.d.ts",

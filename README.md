@@ -1,2 +1,2 @@
-# template-library
-Template for NPM library.
+# Cloud Parser
+Parses and stringifies requests and responses for CloudFlare Workers. 
