@@ -1,14 +1,7 @@
 import { Response } from "."
 
-export function create<T>(response: Response<T> | any): Required<Response<T>> {
-	if (
-		typeof response.status == "number" &&
-		typeof response.response == "object" &&
-		response.response.status == response.status
-	)
-		// TODO: remove this once authly is changed to never include response property
-		delete response.response
-	const result: Required<Response<T>> = Response.is(response)
+export function create(response: Response | any): Required<Response> {
+	const result: Required<Response> = Response.is(response)
 		? { status: 200, header: {}, body: "", ...response }
 		: {
 				status: (typeof response == "object" && typeof response.status == "number" && response.status) || 200,

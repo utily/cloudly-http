@@ -1,52 +1,58 @@
 {
- "name": "cloud-parser",
- "version": "0.0.0",
- "description": " Parses and stringifies requests and responses for CloudFlare Workers.",
- "author": "PayFunc",
- "license": "MIT",
- "repository": "https://github.com/cogneco/cloud-parser",
- "bugs": {
-  "url": "https://github.com/cogneco/cloud-parser/issues"
- },
- "homepage": "https://cogneco.com/open-source/cloud-parser",
- "private": false,
- "main": "dist/index.js",
- "typings": "dist/index.d.ts",
- "git": {
-  "tagName": "v${version}"
- },
- "github": {
-  "release": true
- },
- "jest": {
-  "testEnvironment": "node",
-  "testRegex": "((\\.|/)(test|spec))(\\.|\\/.+)(jsx?|tsx?)$",
-  "testPathIgnorePatterns": [
-   "node_modules/"
-  ]
- },
- "scripts": {
-  "dev": "watch 'npm run build' .",
-  "lint": "eslint '**/*.{js,ts,tsx,css,json,md}'",
-  "fix": "eslint '**/*.{js,ts,tsx,css,json,md}' --fix",
-  "build": "tsc -p .",
-  "test": "npm run transpile && jest",
-  "transpile": "tsc --project ./tsconfig.test.json",
-  "prepare": "npm run build",
-  "clean": "rm -rf dist node_modules coverage"
- },
- "dependencies": {},
- "devDependencies": {
-  "@types/jest": "^26.0.14",
-  "@typescript-eslint/eslint-plugin": "4.1.1",
-  "@typescript-eslint/parser": "4.1.1",
-  "eslint": "7.9.0",
-  "eslint-plugin-prettierx": "github:nilssonemma/eslint-plugin-prettierx#master",
-  "jest": "^26.4.2",
-  "prettierx": "github:simonmika/prettierx#newline-before-clause",
-  "ts-jest": "^26.4.0",
-  "ts-loader": "^8.0.4",
-  "typescript": "^4.0.3",
-  "watch": "^1.0.2"
- }
+	"name": "cloud-http",
+	"version": "0.0.0",
+	"description": "Improved handling of HTTP Requests and Responses.",
+	"author": "Simon Mika <simon@mika.se>",
+	"license": "MIT",
+	"repository": "https://github.com/cogneco/cloud-http",
+	"bugs": {
+		"url": "https://github.com/cogneco/cloud-http/issues"
+	},
+	"homepage": "https://cogneco.com/open-source/cloud-http",
+	"private": false,
+	"main": "dist/index.js",
+	"typings": "dist/index.d.ts",
+	"browser": {
+		"./dist/api": "./dist/api.browser"
+	},
+	"git": {
+		"tagName": "v${version}"
+	},
+	"github": {
+		"release": true
+	},
+	"jest": {
+		"verbose": true,
+		"testEnvironment": "node",
+		"testRegex": "./dist/.*((\\.|/)(test|spec))(\\.|\\/.+)(jsx?)$",
+		"testPathIgnorePatterns": [
+			"node_modules/"
+		]
+	},
+	"scripts": {
+		"dev": "watch 'npm run build' .",
+		"lint": "eslint '**/*.{js,ts,tsx,css,json}'",
+		"fix": "eslint '**/*.{js,ts,tsx,css,json}' --fix",
+		"build": "tsc -p .",
+		"test": "npm run transpile && jest",
+		"transpile": "tsc --project ./tsconfig.test.json",
+		"prepare": "npm run build",
+		"clean": "rm -rf dist node_modules coverage"
+	},
+	"dependencies": {
+		"node-fetch": "^2.6.1"
+	},
+	"devDependencies": {
+		"@types/jest": "^26.0.14",
+		"@types/node-fetch": "^2.5.7",
+		"@typescript-eslint/eslint-plugin": "4.1.1",
+		"@typescript-eslint/parser": "4.1.1",
+		"eslint": "7.9.0",
+		"eslint-plugin-prettierx": "github:nilssonemma/eslint-plugin-prettierx#master",
+		"jest": "^26.4.2",
+		"prettierx": "github:simonmika/prettierx#newline-before-clause",
+		"ts-loader": "^8.0.4",
+		"typescript": "^4.0.3",
+		"watch": "^1.0.2"
+	}
 }

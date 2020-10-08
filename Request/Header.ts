@@ -1,3 +1,5 @@
+import * as api from "../api"
+
 export interface Header {
 	readonly aIM?: string
 	readonly accept?: string[]
@@ -53,305 +55,92 @@ export interface Header {
 	readonly xCorrelationID?: string
 	readonly saveData?: string
 }
-class HeaderDefault implements Header {
-	get aIM() {
-		return this.get("A-IM")
-	}
-	get accept() {
-		return this.getAll("Accept")
-	}
-	get acceptCharset() {
-		return this.getAll("Accept-Charset")
-	}
-	get acceptDatetime() {
-		return this.get("Accept-Datetime")
-	}
-	get acceptEncoding() {
-		return this.getAll("Accept-Encoding")
-	}
-	get acceptLanguage() {
-		return this.getAll("Accept-Language")
-	}
-	get accessControlRequestMethod() {
-		return this.get("Access-Control-Request-Method")
-	}
-	get accessControlRequestHeaders() {
-		return this.get("Access-Control-Request-Headers")
-	}
-	get authorization() {
-		return this.get("Authorization")
-	}
-	get cacheControl() {
-		return this.get("Cache-Control")
-	}
-	get connection() {
-		return this.get("Connection")
-	}
-	get contentLength() {
-		return this.get("Content-Length")
-	}
-	get contentMD5() {
-		return this.get("Content-MD5")
-	}
-	get contentType() {
-		return this.get("Content-Type")
-	}
-	get cookie() {
-		return this.get("Cookie")
-	}
-	get date() {
-		return this.get("Date")
-	}
-	get expect() {
-		return this.get("Expect")
-	}
-	get forwarded() {
-		return this.get("Forwarded")
-	}
-	get from() {
-		return this.get("From")
-	}
-	get host() {
-		return this.get("Host")
-	}
-	get http2Settings() {
-		return this.get("HTTP2-Settings")
-	}
-	get ifMatch() {
-		return this.getAll("If-Match")
-	}
-	get ifModifiedSince() {
-		return this.get("If-Modified-Since")
-	}
-	get ifNoneMatch() {
-		return this.getAll("If-None-Match")
-	}
-	get ifRange() {
-		return this.get("If-Range")
-	}
-	get ifUnmodifiedSince() {
-		return this.get("If-Unmodified-Since")
-	}
-	get maxForwards() {
-		return this.get("Max-Forwards")
-	}
-	get origin() {
-		return this.get("Origin")
-	}
-	get pragma() {
-		return this.get("Pragma")
-	}
-	get proxyAuthorization() {
-		return this.get("Proxy-Authorization")
-	}
-	get range() {
-		return this.get("Range")
-	}
-	get referer() {
-		return this.get("Referer")
-	}
-	get te() {
-		return this.getAll("TE")
-	}
-	get trailer() {
-		return this.get("Trailer")
-	}
-	get transferEncoding() {
-		return this.get("Transfer-Encoding")
-	}
-	get userAgent() {
-		return this.get("User-Agent")
-	}
-	get upgrade() {
-		return this.getAll("Upgrade")
-	}
-	get via() {
-		return this.getAll("Via")
-	}
-	get warning() {
-		return this.get("Warning")
-	}
-	get upgradeInsecureRequests() {
-		return this.get("Upgrade-Insecure-Requests")
-	}
-	get xRequestedWith() {
-		return this.get("X-Requested-With")
-	}
-	get dnt() {
-		return this.get("DNT")
-	}
-	get xForwardedFor() {
-		return this.get("X-Forwarded-For")
-	}
-	get xForwardedHost() {
-		return this.get("X-Forwarded-Host")
-	}
-	get xForwardedProto() {
-		return this.get("X-Forwarded-Proto")
-	}
-	get frontEndHttps() {
-		return this.get("Front-End-Https")
-	}
-	get xHttpMethodOverride() {
-		return this.get("X-Http-Method-Override")
-	}
-	get xAttDeviceId() {
-		return this.get("X-ATT-DeviceId")
-	}
-	get xWapProfile() {
-		return this.get("X-Wap-Profile")
-	}
-	get proxyConnection() {
-		return this.get("Proxy-Connection")
-	}
-	get xCsrfToken() {
-		return this.get("X-Csrf-Token")
-	}
-	get xCorrelationID() {
-		return this.get("X-Correlation-ID")
-	}
-	get saveData() {
-		return this.get("Save-Data")
-	}
-	constructor(private readonly data: { [header: string]: string }) {}
-	private getAll(field: string): undefined | string[] {
-		const result = this.get(field)
-		return (result && result.split(",").map(v => v.trim())) || undefined
-	}
-	private get(field: string): undefined | string {
-		return this.data[field] || this.data[field.toLowerCase()]
-	}
-	protected toJSON(): Header {
-		return this.data
-	}
-}
-function isString(value: any | string): value is string {
-	return value == undefined || typeof value == "string"
-}
-function isStringArray(value: any | string[]): value is string[] {
-	return value == undefined || (Array.isArray(value) && value.every(v => typeof v == "string"))
-}
+const fields: [keyof Header, string, number][] = [
+	["aIM", "A-IM", 1],
+	["accept", "Accept", 2],
+	["acceptCharset", "Accept-Charset", 2],
+	["acceptDatetime", "Accept-Datetime", 1],
+	["acceptEncoding", "Accept-Encoding", 2],
+	["acceptLanguage", "Accept-Language", 2],
+	["accessControlRequestMethod", "Access-Control-Request-Method", 1],
+	["accessControlRequestHeaders", "Access-Control-Request-Headers", 1],
+	["authorization", "Authorization", 1],
+	["cacheControl", "Cache-Control", 1],
+	["connection", "Connection", 1],
+	["contentLength", "Content-Length", 1],
+	["contentMD5", "Content-MD5", 1],
+	["contentType", "Content-Type", 1],
+	["cookie", "Cookie", 1],
+	["date", "Date", 1],
+	["expect", "Expect", 1],
+	["forwarded", "Forwarded", 1],
+	["from", "From", 1],
+	["host", "Host", 1],
+	["http2Settings", "HTTP2-Settings", 1],
+	["ifMatch", "If-Match", 2],
+	["ifModifiedSince", "If-Modified-Since", 1],
+	["ifNoneMatch", "If-None-Match", 2],
+	["ifRange", "If-Range", 1],
+	["ifUnmodifiedSince", "If-Unmodified-Since", 1],
+	["maxForwards", "Max-Forwards", 1],
+	["origin", "Origin", 1],
+	["pragma", "Pragma", 1],
+	["proxyAuthorization", "Proxy-Authorization", 1],
+	["range", "Range", 1],
+	["referer", "Referer", 1],
+	["te", "TE", 2],
+	["trailer", "Trailer", 1],
+	["transferEncoding", "Transfer-Encoding", 1],
+	["userAgent", "User-Agent", 1],
+	["upgrade", "Upgrade", 2],
+	["via", "Via", 2],
+	["warning", "Warning", 1],
+	["upgradeInsecureRequests", "Upgrade-Insecure-Requests", 1],
+	["xRequestedWith", "X-Requested-With", 1],
+	["dnt", "DNT", 1],
+	["xForwardedFor", "X-Forwarded-For", 1],
+	["xForwardedHost", "X-Forwarded-Host", 1],
+	["xForwardedProto", "X-Forwarded-Proto", 1],
+	["frontEndHttps", "Front-End-Https", 1],
+	["xHttpMethodOverride", "X-Http-Method-Override", 1],
+	["xAttDeviceId", "X-ATT-DeviceId", 1],
+	["xWapProfile", "X-Wap-Profile", 1],
+	["proxyConnection", "Proxy-Connection", 1],
+	["xCsrfToken", "X-Csrf-Token", 1],
+	["xCorrelationID", "X-Correlation-ID", 1],
+	["saveData", "Save-Data", 1],
+]
 export namespace Header {
 	export function is(value: any | Header): value is Header {
-		return (
-			typeof value == "object" &&
-			isString(value.aIM) &&
-			isStringArray(value.accept) &&
-			isStringArray(value.acceptCharset) &&
-			isString(value.acceptDatetime) &&
-			isStringArray(value.acceptEncoding) &&
-			isStringArray(value.acceptLanguage) &&
-			isString(value.accessControlRequestMethod) &&
-			isString(value.accessControlRequestHeaders) &&
-			isString(value.authorization) &&
-			isString(value.cacheControl) &&
-			isString(value.connection) &&
-			isString(value.contentLength) &&
-			isString(value.contentMD5) &&
-			isString(value.contentType) &&
-			isString(value.cookie) &&
-			isString(value.date) &&
-			isString(value.expect) &&
-			isString(value.forwarded) &&
-			isString(value.from) &&
-			isString(value.host) &&
-			isString(value.http2Settings) &&
-			isStringArray(value.ifMatch) &&
-			isString(value.ifModifiedSince) &&
-			isStringArray(value.ifNoneMatch) &&
-			isString(value.ifRange) &&
-			isString(value.ifUnmodifiedSince) &&
-			isString(value.maxForwards) &&
-			isString(value.origin) &&
-			isString(value.pragma) &&
-			isString(value.proxyAuthorization) &&
-			isString(value.range) &&
-			isString(value.referer) &&
-			isStringArray(value.te) &&
-			isString(value.trailer) &&
-			isString(value.transferEncoding) &&
-			isString(value.userAgent) &&
-			isStringArray(value.upgrade) &&
-			isStringArray(value.via) &&
-			isString(value.warning) &&
-			isString(value.upgradeInsecureRequests) &&
-			isString(value.xRequestedWith) &&
-			isString(value.dnt) &&
-			isString(value.xForwardedFor) &&
-			isString(value.xForwardedHost) &&
-			isString(value.xForwardedProto) &&
-			isString(value.frontEndHttps) &&
-			isString(value.xHttpMethodOverride) &&
-			isString(value.xAttDeviceId) &&
-			isString(value.xWapProfile) &&
-			isString(value.proxyConnection) &&
-			isString(value.xCsrfToken) &&
-			isString(value.xCorrelationID) &&
-			(value.saveData == undefined || typeof value.saveData == "string")
-		)
-	}
-	export function from(data: { [field: string]: string }): Header {
-		return new HeaderDefault(data)
-	}
-	function set(name: string, value: undefined | string | string[], result: { [field: string]: string }): void {
-		if (value)
-			result[name] = Array.isArray(value) ? value.join(", ") : value
+		function isString(value: any | string): value is string {
+			return value == undefined || typeof value == "string"
+		}
+		function isStringArray(value: any | string[]): value is string[] {
+			return value == undefined || (Array.isArray(value) && value.every(v => typeof v == "string"))
+		}
+		return typeof value == "object" && fields.every(field => (field[2] == 1 ? isString : isStringArray)(value[field[0]]))
 	}
 	export function to(header: Header): { [field: string]: string } {
-		const result: { [field: string]: string } = {}
-		set("A-IM", header.aIM, result)
-		set("Accept", header.accept, result)
-		set("Accept-Charset", header.acceptCharset, result)
-		set("Accept-Datetime", header.acceptDatetime, result)
-		set("Accept-Encoding", header.acceptEncoding, result)
-		set("Accept-Language", header.acceptLanguage, result)
-		set("Access-Control-Request-Method", header.accessControlRequestMethod, result)
-		set("Access-Control-Request-Headers", header.accessControlRequestHeaders, result)
-		set("Authorization", header.authorization, result)
-		set("Cache-Control", header.cacheControl, result)
-		set("Connection", header.connection, result)
-		set("Content-Length", header.contentLength, result)
-		set("Content-MD5", header.contentMD5, result)
-		set("Content-Type", header.contentType, result)
-		set("Cookie", header.cookie, result)
-		set("Date", header.date, result)
-		set("Expect", header.expect, result)
-		set("Forwarded", header.forwarded, result)
-		set("From", header.from, result)
-		set("Host", header.host, result)
-		set("HTTP2-Settings", header.http2Settings, result)
-		set("If-Match", header.ifMatch, result)
-		set("If-Modified-Since", header.ifModifiedSince, result)
-		set("If-None-Match", header.ifNoneMatch, result)
-		set("If-Range", header.ifRange, result)
-		set("If-Unmodified-Since", header.ifUnmodifiedSince, result)
-		set("Max-Forwards", header.maxForwards, result)
-		set("Origin", header.origin, result)
-		set("Pragma", header.pragma, result)
-		set("Proxy-Authorization", header.proxyAuthorization, result)
-		set("Range", header.range, result)
-		set("Referer", header.referer, result)
-		set("TE", header.te, result)
-		set("Trailer", header.trailer, result)
-		set("Transfer-Encoding", header.transferEncoding, result)
-		set("User-Agent", header.userAgent, result)
-		set("Upgrade", header.upgrade, result)
-		set("Via", header.via, result)
-		set("Warning", header.warning, result)
-		set("Upgrade-Insecure-Requests", header.upgradeInsecureRequests, result)
-		set("X-Requested-With", header.xRequestedWith, result)
-		set("DNT", header.dnt, result)
-		set("X-Forwarded-For", header.xForwardedFor, result)
-		set("X-Forwarded-Host", header.xForwardedHost, result)
-		set("X-Forwarded-Proto", header.xForwardedProto, result)
-		set("Front-End-Https", header.frontEndHttps, result)
-		set("X-Http-Method-Override", header.xHttpMethodOverride, result)
-		set("X-ATT-DeviceId", header.xAttDeviceId, result)
-		set("X-Wap-Profile", header.xWapProfile, result)
-		set("Proxy-Connection", header.proxyConnection, result)
-		set("X-Csrf-Token", header.xCsrfToken, result)
-		set("X-Correlation-ID", header.xCorrelationID, result)
-		set("Save-Data", header.saveData, result)
-		return result
+		return Object.fromEntries(
+			fields
+			.map(([property, field, count]) => [field, header[property]])
+			.filter(([field, value]) => value)
+			.map(([field, value]) => [field, Array.isArray(value) ? value.join(", ") : value])
+		)
+	}
+	export function from(headers: api.HeadersInit): Header {
+		const entries = Array.isArray(headers)
+		? headers.map<[string, string]>(([field, ...value]) => [field, value.join(", ")])
+		: typeof headers.entries == "function"
+		? Array.from(headers.entries())
+		: Object.entries(headers)
+		const data: { [field: string]: string } = Object.fromEntries(entries.map(([field, value]) => [field.toLowerCase(), value]))
+		return Object.fromEntries(
+			fields.map(field => [field[0], data[field[1].toLowerCase()], field[2]]).filter(field => field[1]).map(field => [
+					field[0], 
+					field[2] == 1 || typeof field[1] != "string" ? field[1] : field[1].split(",").map(v => v.trim())
+				]
+			)
+		)
 	}
 }

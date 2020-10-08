@@ -1,3 +1,5 @@
 describe("library", () => {
-	it("true", () => expect(true).toBeTruthy())
+	it("true", () => {
+		expect(true).toBeTruthy()
+	})
 })

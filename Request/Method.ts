@@ -15,4 +15,7 @@ export namespace Method {
 				value == "CONNECT")
 		)
 	}
+	export function parse(value: string): Method | undefined {
+		return is(value) ? value : undefined
+	}
 }

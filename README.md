@@ -1,2 +1,3 @@
-# Cloud Parser
-Parses and stringifies requests and responses for CloudFlare Workers. 
+# Cloud HTTP
+
+Improved handling of HTTP Requests and Responses.

@@ -1,38 +1,34 @@
-import { Method } from "../Method"
+import * as api from "../api"
+import * as Parser from "../Parser"
+import { Method as RequestMethod } from "./Method"
 import { Header as RequestHeader } from "./Header"
-import { getBaseUrl } from "./getBaseUrl"
-import { parse as parseBody } from "./parse"
 
 export interface Request {
-	readonly method?: Method
-	readonly url: string
-	readonly baseUrl: string
-	readonly query: { [key: string]: string }
-	readonly parameter: { [key: string]: string }
+	readonly method: RequestMethod
+	readonly url: URL
+	readonly parameter: { readonly [key: string]: string }
 	readonly remote?: string
 	readonly header: RequestHeader
-	readonly body?: Promise<any>
-	readonly raw?: Promise<any>
+	readonly body?: any | Promise<any>
 }
 
 export namespace Request {
-	// eslint-disable-next-line @typescript-eslint/ban-types
-	export function create(request: Omit<Partial<Request>, "body"> & { body?: Promise<any> | object | any }): Request {
-		let result: Request = {
-			url: "",
-			baseUrl: getBaseUrl(request.url) || "",
-			query: {},
+	export function is(value: any | Request): value is Request {
+		return (
+			typeof value == "object" &&
+			Object.keys(value).every(key => ["method", "url", "parameter", "remote", "header", "body"].some(k => k == key)) &&
+			(value.status == undefined || typeof value.status == "number") &&
+			(value.header == undefined || RequestHeader.is(value.header))
+		)
+	}
+	export function from(request: api.Request): Request {
+		return {
+			method: RequestMethod.parse(request.method) ?? "GET",
+			url: new URL(request.url),
+			header: RequestHeader.from(request.headers),
 			parameter: {},
-			header: {},
-			...request,
-			remote: request.remote,
+			body: Parser.parse(request),
 		}
-		if (result.raw) {
-			if (!result.body)
-				result = { ...result, body: result.raw.then(data => parse(result.header, data)) }
-		} else if (!result.body?.then)
-			result = { ...result, body: Promise.resolve(result.body) }
-		return result
 	}
 	export type Header = RequestHeader
 	export namespace Header {
@@ -40,5 +36,9 @@ export namespace Request {
 		export const from = RequestHeader.from
 		export const to = RequestHeader.to
 	}
-	export const parse = parseBody
+	export type Method = RequestMethod
+	export namespace Method {
+		export const is = RequestMethod.is
+		export const parse = RequestMethod.parse
+	}
 }

@@ -1,13 +1,11 @@
 {
-  "compilerOptions": {
-    "outDir": "../dist",
-    "target": "esnext",
-    "module": "commonjs",
-    "sourceMap": true,
-    "experimentalDecorators": true,
-		"lib": ["esnext", "webworker"]
+	"compilerOptions": {
+		"outDir": "dist",
+		"target": "es2019",
+		"module": "commonjs",
+		"inlineSourceMap": true,
+		"experimentalDecorators": true,
+		"lib": ["es2019", "webworker"]
 	},
-	"include": [
-		"**/*.spec.ts"
-	]
+	"include": ["**/*.spec.ts"]
 }

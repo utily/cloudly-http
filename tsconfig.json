@@ -1,18 +1,16 @@
 {
-  "compilerOptions": {
-    "outDir": "./dist",
-    "module": "commonjs",
-    "target": "esnext",
-    "lib": ["esnext", "webworker"],
-    "sourceMap": true,
+	"compilerOptions": {
+		"outDir": "./dist",
+		"module": "commonjs",
+		"target": "es2019",
+		"lib": ["es2019", "webworker"],
+		"sourceMap": true,
 		"declaration": true,
-    "alwaysStrict": true,
-    "strict": true,
-    "preserveConstEnums": true,
-    "moduleResolution": "node",
+		"alwaysStrict": true,
+		"strict": true,
+		"preserveConstEnums": true,
+		"moduleResolution": "node",
 		"esModuleInterop": true
-  },
-  "include": [
-		"index.ts"
-  ]
+	},
+	"include": ["index.ts"]
 }

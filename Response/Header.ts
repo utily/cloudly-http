@@ -1,149 +1,158 @@
+import * as api from "../api"
+
 export interface Header {
-	accessControlAllowOrigin?: string | string[] | number
-	accessControlAllowCredentials?: string | string[] | number
-	accessControlExposeHeaders?: string | string[] | number
-	accessControlMaxAge?: string | string[] | number
-	accessControlAllowMethods?: string | string[] | number
-	accessControlAllowHeaders?: string | string[] | number
-	acceptPatch?: string | string[] | number
-	acceptRanges?: string | string[] | number
-	age?: string | string[] | number
-	allow?: string | string[] | number
-	altSvc?: string | string[] | number
-	cacheControl?: string | string[] | number
-	connection?: string | string[] | number
-	contentDisposition?: string | string[] | number
-	contentEncoding?: string | string[] | number
-	contentLanguage?: string | string[] | number
-	contentLength?: string | string[] | number
-	contentLocation?: string | string[] | number
-	contentMD5?: string | string[] | number
-	contentRange?: string | string[] | number
-	contentType?: string | string[] | number
-	date?: string | string[] | number
-	deltaBase?: string | string[] | number
+	accessControlAllowOrigin?: string
+	accessControlAllowCredentials?: string
+	accessControlExposeHeaders?: string[]
+	accessControlMaxAge?: string
+	accessControlAllowMethods?: string[]
+	accessControlAllowHeaders?: string[]
+	acceptPatch?: string
+	acceptRanges?: string
+	age?: string
+	allow?: string[]
+	altSvc?: string
+	cacheControl?: string
+	connection?: string
+	contentDisposition?: string
+	contentEncoding?: string
+	contentLanguage?: string[]
+	contentLength?: string
+	contentLocation?: string
+	contentMD5?: string
+	contentRange?: string
+	contentSecurityPolicy?: string
+	contentType?: string
+	date?: string
+	deltaBase?: string
 	eTag?: string
-	expires?: string | string[] | number
-	iM?: string | string[] | number
-	lastModified?: string | string[] | number
-	link?: string | string[] | number
-	location?: string | string[] | number
-	p3P?: string | string[] | number
-	pragma?: string | string[] | number
-	proxyAuthenticate?: string | string[] | number
-	publicKeyPins?: string | string[] | number
-	retryAfter?: string | string[] | number
-	server?: string | string[] | number
-	setCookie?: string | string[] | number
-	strictTransportSecurity?: string | string[] | number
-	trailer?: string | string[] | number
-	transferEncoding?: string | string[] | number
-	tk?: string | string[] | number
-	upgrade?: string | string[] | number
-	vary?: string | string[] | number
-	via?: string | string[] | number
-	warning?: string | string[] | number
-	wwwAuthenticate?: string | string[] | number
-	xFrameOptions?: string | string[] | number
-	contentSecurityPolicy?: string | string[] | number
-	xContentSecurityPolicy?: string | string[] | number
-	xWebKitCSP?: string | string[] | number
-	refresh?: string | string[] | number
-	status?: string | string[] | number
-	timingAllowOrigin?: string | string[] | number
-	xContentDuration?: string | string[] | number
-	xContentTypeOptions?: string | string[] | number
-	xPoweredBy?: string | string[] | number
-	xRequestID?: string | string[] | number
-	xCorrelationID?: string | string[] | number
-	xUACompatible?: string | string[] | number
-	xXSSProtection?: string | string[] | number
+	expires?: string
+	iM?: string
+	lastModified?: string
+	link?: string
+	location?: string
+	p3P?: string
+	pragma?: string
+	proxyAuthenticate?: string
+	publicKeyPins?: string
+	refresh?: string
+	retryAfter?: string
+	server?: string
+	setCookie?: string
+	status?: string
+	strictTransportSecurity?: string
+	timingAllowOrigin?: string[]
+	trailer?: string
+	transferEncoding?: string
+	tk?: string
+	upgrade?: string[]
+	vary?: string[]
+	via?: string
+	warning?: string
+	wwwAuthenticate?: string
+	xContentSecurityPolicy?: string
+	xFrameOptions?: string
+	xWebkitCsp?: string
+	xContentDuration?: string
+	xContentTypeOptions?: string
+	xCorrelationId?: string
+	xPoweredBy?: string
+	xRequestId?: string
+	xUACompatible?: string
+	xXssProtection?: string
 }
+const fields: [keyof Header, string, number][] = [
+	["accessControlAllowOrigin", "Access-Control-Allow-Origin", 1],
+	["accessControlAllowCredentials", "Access-Control-Allow-Credentials", 1],
+	["accessControlExposeHeaders", "Access-Control-Expose-Headers", 2],
+	["accessControlMaxAge", "Access-Control-Max-Age", 1],
+	["accessControlAllowMethods", "Access-Control-Allow-Methods", 2],
+	["accessControlAllowHeaders", "Access-Control-Allow-Headers", 2],
+	["acceptPatch", "Accept-Patch", 1],
+	["acceptRanges", "Accept-Ranges", 1],
+	["age", "Age", 1],
+	["allow", "Allow", 2],
+	["altSvc", "Alt-Svc", 1],
+	["cacheControl", "Cache-Control", 1],
+	["connection", "Connection", 1],
+	["contentDisposition", "Content-Disposition", 1],
+	["contentEncoding", "Content-Encoding", 1],
+	["contentLanguage", "Content-Language", 2],
+	["contentLength", "Content-Length", 1],
+	["contentLocation", "Content-Location", 1],
+	["contentMD5", "Content-MD5", 1],
+	["contentRange", "Content-Range", 1],
+	["contentSecurityPolicy", "Content-Security-Policy", 1],
+	["contentType", "Content-Type", 1],
+	["date", "Date", 1],
+	["deltaBase", "Delta-Base", 1],
+	["eTag", "ETag", 1],
+	["expires", "Expires", 1],
+	["iM", "IM", 1],
+	["lastModified", "Last-Modified", 1],
+	["link", "Link", 1],
+	["location", "Location", 1],
+	["p3P", "P3P", 1],
+	["pragma", "Pragma", 1],
+	["proxyAuthenticate", "Proxy-Authenticate", 1],
+	["publicKeyPins", "Public-Key-Pins", 1],
+	["refresh", "Refresh", 1],
+	["retryAfter", "Retry-After", 1],
+	["server", "Server", 1],
+	["setCookie", "Set-Cookie", 1],
+	["status", "Status", 1],
+	["strictTransportSecurity", "Strict-Transport-Security", 1],
+	["timingAllowOrigin", "Timing-Allow-Origin", 2],
+	["trailer", "Trailer", 1],
+	["transferEncoding", "Transfer-Encoding", 1],
+	["tk", "Tk", 1],
+	["upgrade", "Upgrade", 2],
+	["vary", "Vary", 2],
+	["via", "Via", 1],
+	["warning", "Warning", 1],
+	["wwwAuthenticate", "WWW-Authenticate", 1],
+	["xContentDuration", "X-Content-Duration", 1],
+	["xContentSecurityPolicy", "X-Content-Security-Policy", 1],
+	["xContentTypeOptions", "X-Content-Type-Options", 1],
+	["xCorrelationId", "X-Correlation-ID", 1],
+	["xFrameOptions", "X-Frame-Options", 1],
+	["xPoweredBy", "X-Powered-By", 1],
+	["xRequestId", "X-Request-ID", 1],
+	["xUACompatible", "X-UA-Compatible", 1],
+	["xWebkitCsp", "X-WebKit-CSP", 1],
+	["xXssProtection", "X-XSS-Protection", 1],
+]
 export namespace Header {
-	export const fields = Object.freeze({
-		accessControlAllowOrigin: "Access-Control-Allow-Origin",
-		accessControlAllowCredentials: "Access-Control-Allow-Credentials",
-		accessControlExposeHeaders: "Access-Control-Expose-Headers",
-		accessControlMaxAge: "Access-Control-Max-Age",
-		accessControlAllowMethods: "Access-Control-Allow-Methods",
-		accessControlAllowHeaders: "Access-Control-Allow-Headers",
-		acceptPatch: "Accept-Patch",
-		acceptRanges: "Accept-Ranges",
-		age: "Age",
-		allow: "Allow",
-		altSvc: "Alt-Svc",
-		cacheControl: "Cache-Control",
-		connection: "Connection",
-		contentDisposition: "Content-Disposition",
-		contentEncoding: "Content-Encoding",
-		contentLanguage: "Content-Language",
-		contentLength: "Content-Length",
-		contentLocation: "Content-Location",
-		contentMD5: "Content-MD5",
-		contentRange: "Content-Range",
-		contentType: "Content-Type",
-		date: "Date",
-		deltaBase: "Delta-Base",
-		etag: "ETag",
-		expires: "Expires",
-		im: "IM",
-		lastModified: "Last-Modified",
-		link: "Link",
-		location: "Location",
-		p3p: "P3P",
-		pragma: "Pragma",
-		proxyAuthenticate: "Proxy-Authenticate",
-		publicKeyPins: "Public-Key-Pins",
-		retryAfter: "Retry-After",
-		server: "Server",
-		setCookie: "Set-Cookie",
-		strictTransportSecurity: "Strict-Transport-Security",
-		trailer: "Trailer",
-		transferEncoding: "Transfer-Encoding",
-		tk: "Tk",
-		upgrade: "Upgrade",
-		vary: "Vary",
-		via: "Via",
-		warning: "Warning",
-		wwwAuthenticate: "WWW-Authenticate",
-		xFrameOptions: "X-Frame-Options",
-		contentSecurityPolicy: "Content-Security-Policy",
-		xContentSecurityPolicy: "X-Content-Security-Policy",
-		xWebkitCsp: "X-WebKit-CSP",
-		refresh: "Refresh",
-		status: "Status",
-		timingAllowOrigin: "Timing-Allow-Origin",
-		xContentDuration: "X-Content-Duration",
-		xContentTypeOptions: "X-Content-Type-Options",
-		xPoweredBy: "X-Powered-By",
-		xRequestId: "X-Request-ID",
-		xCorrelationId: "X-Correlation-ID",
-		xUaCompatible: "X-UA-Compatible",
-		xXssProtection: "X-XSS-Protection",
-	})
-	export function to(header: Header): { [field: string]: string | number | string[] | undefined } {
-		return Object.entries(header)
-			.map<[string, string | number | string[] | undefined]>(h => [
-				(fields as { [field: string]: string | undefined })[h[0]] || h[0],
-				h[1],
-			])
-			.reduce<{ [field: string]: string | number | string[] | undefined }>((r, f) => {
-				r[f[0]] = f[1]
-				return r
-			}, {})
+	export function is(value: any | Header): value is Header {
+		function isString(value: any | string): value is string {
+			return value == undefined || typeof value == "string"
+		}
+		function isStringArray(value: any | string[]): value is string[] {
+			return value == undefined || (Array.isArray(value) && value.every(v => typeof v == "string"))
+		}
+		return typeof value == "object" && fields.every(field => (field[2] == 1 ? isString : isStringArray)(value[field[0]]))
 	}
-	export function from(data: { [field: string]: string | string[] }): Header {
-		data = Object.entries(data)
-			.map<[string, string | string[]]>(p => [p[0].toLowerCase(), p[1]])
-			.reduce<{ [field: string]: string | string[] }>((r, p) => {
-				r[p[0]] = p[1]
-				return r
-			}, {})
-		return Object.entries(fields).reduce<Header & { [header: string]: string | string[] }>((r, h) => {
-			const d = data[h[1].toLowerCase()]
-			if (d && d.length > 0)
-				r[h[0]] = Array.isArray(d) && d.length == 1 ? d[0] : d
-			return r
-		}, {})
+	export function to(header: Header): { [field: string]: string | undefined } {
+		return Object.fromEntries(
+			fields
+			.map(([property, field, count]) => [field, header[property]])
+			.filter(([field, value]) => value)
+			.map(([field, value]) => [field, Array.isArray(value) ? value.join(", ") : value])
+		)
+	}
+	export function from(headers: api.HeadersInit): Header {
+		const entries = Array.isArray(headers)
+		? headers.map<[string, string]>(([field, ...value]) => [field, value.join(", ")])
+		: typeof headers.entries == "function"
+		? Array.from(headers.entries())
+		: Object.entries(headers)
+		const data: { [field: string]: string } = Object.fromEntries(entries.map(([field, value]) => [field.toLowerCase(), value]))
+		return Object.fromEntries(
+			fields.map(field => [field[0], data[field[1].toLowerCase()], field[2]]).filter(field => field[1]).map(field => [
+					field[0], 
+					field[2] == 1 || typeof field[1] != "string" ? field[1] : field[1].split(",").map(v => v.trim())
+				]
+			)
+		)
 	}
 }
