@@ -1,10 +1,13 @@
+import * as api from "../api"
+import * as Parser from "../Parser"
+import * as Serializer from "../Serializer"
 import { Header as ResponseHeader } from "./Header"
-import { create as createResponse } from "./create"
+import { Like as ResponseLike } from "./Like"
 
 export interface Response {
-	status?: number
-	header?: ResponseHeader
-	body?: any | Promise<any>
+	readonly status: number
+	readonly header: Readonly<ResponseHeader>
+	readonly body?: any | Promise<any>
 }
 
 export namespace Response {
@@ -16,10 +19,54 @@ export namespace Response {
 			(value.header == undefined || ResponseHeader.is(value.header))
 		)
 	}
-	export const create = createResponse
+	export async function to(request: Response): Promise<api.Response> {
+		return new api.Response(await Serializer.serialize(await request.body, request.header.contentType), {
+			status: request.status,
+			headers: new api.Headers(ResponseHeader.to(request.header)),
+		})
+	}
+	export function from(response: api.Response): Response {
+		return {
+			status: response.status,
+			header: ResponseHeader.from(response.headers),
+			body: Parser.parse(response),
+		}
+	}
+	export function create(response: ResponseLike | any, contentType?: string): Response {
+		const result: Required<ResponseLike> = ResponseLike.is(response)
+			? { status: 200, header: {}, body: "", ...response }
+			: {
+					status: (typeof response == "object" && typeof response.status == "number" && response.status) || 200,
+					header:
+						(response.status == 301 || response.status == 302) && response.location
+							? { location: response.location }
+							: {},
+					body: response,
+			  }
+		if (!result.header.contentType)
+			switch (typeof result.body) {
+				default:
+				case "object":
+					result.body = Serializer.serialize(
+						result.body,
+						(result.header.contentType = contentType ?? "application/json; charset=utf-8")
+					)
+					break
+				case "string":
+					result.header.contentType =
+						result.body.slice(0, 9).toLowerCase() == "<!doctype"
+							? "text/html; charset=utf-8"
+							: /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/.test(result.body)
+							? "application/jwt; charset=utf-8"
+							: "text/plain; charset=utf-8"
+					break
+			}
+		return result
+	}
 	export type Header = ResponseHeader
 	export namespace Header {
 		export const to = ResponseHeader.to
 		export const from = ResponseHeader.from
 	}
+	export type Like = ResponseLike
 }

@@ -132,7 +132,7 @@ export namespace Header {
 		}
 		return typeof value == "object" && fields.every(field => (field[2] == 1 ? isString : isStringArray)(value[field[0]]))
 	}
-	export function to(header: Header): { [field: string]: string | undefined } {
+	export function to(header: Header): { [field: string]: string } {
 		return Object.fromEntries(
 			fields
 			.map(([property, field, count]) => [field, header[property]])

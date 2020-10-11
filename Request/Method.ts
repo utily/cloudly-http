@@ -15,7 +15,8 @@ export namespace Method {
 				value == "CONNECT")
 		)
 	}
-	export function parse(value: string): Method | undefined {
+	export function parse(value: string | undefined): Method | undefined {
+		value = value?.toUpperCase()
 		return is(value) ? value : undefined
 	}
 }

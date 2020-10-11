@@ -1,6 +1,6 @@
 import { Method } from "./Request/Method"
 import * as Parser from "./Parser"
-import * as Stringifier from "./Stringifier"
+import * as Stringifier from "./Serializer"
 import { Request } from "./Request"
 import { Response } from "./Response"
 import { fetch } from "./fetch"
