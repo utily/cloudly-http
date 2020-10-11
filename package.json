@@ -39,12 +39,9 @@
 		"prepare": "npm run build",
 		"clean": "rm -rf dist node_modules coverage"
 	},
-	"dependencies": {
-		"node-fetch": "^2.6.1"
-	},
+	"dependencies": {},
 	"devDependencies": {
 		"@types/jest": "^26.0.14",
-		"@types/node-fetch": "^2.5.7",
 		"@typescript-eslint/eslint-plugin": "4.4.0",
 		"@typescript-eslint/parser": "4.4.0",
 		"eslint": "7.11.0",

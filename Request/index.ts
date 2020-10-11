@@ -1,4 +1,3 @@
-import * as api from "../api"
 import * as Parser from "../Parser"
 import { Method as RequestMethod } from "./Method"
 import { Header as RequestHeader } from "./Header"
@@ -23,14 +22,14 @@ export namespace Request {
 			(value.header == undefined || RequestHeader.is(value.header))
 		)
 	}
-	export async function to(request: Request): Promise<api.Request> {
-		return new api.Request(request.url.toString(), {
+	export async function to(request: Request): Promise<globalThis.Request> {
+		return new globalThis.Request(request.url.toString(), {
 			method: request.method ?? "GET",
 			headers: RequestHeader.to(request.header),
 			body: await Stringifier.serialize(request),
 		})
 	}
-	export function from(request: api.Request): Request {
+	export function from(request: globalThis.Request): Request {
 		return {
 			method: RequestMethod.parse(request.method) ?? "GET",
 			url: new URL(request.url),

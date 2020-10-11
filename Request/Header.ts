@@ -1,5 +1,3 @@
-import * as api from "../api"
-
 export interface Header {
 	readonly aIM?: string
 	readonly accept?: string[]
@@ -128,11 +126,11 @@ export namespace Header {
 			.map(([field, value]) => [field, Array.isArray(value) ? value.join(", ") : value])
 		)
 	}
-	export function from(headers: api.HeadersInit): Header {
+	export function from(headers: globalThis.HeadersInit): Header {
 		const entries = Array.isArray(headers)
 		? headers.map<[string, string]>(([field, ...value]) => [field, value.join(", ")])
-		: typeof headers.entries == "function"
-		? Array.from(headers.entries())
+		: isHeaders(headers)
+		? getEntries(headers)
 		: Object.entries(headers)
 		const data: { [field: string]: string } = Object.fromEntries(entries.map(([field, value]) => [field.toLowerCase(), value]))
 		return Object.fromEntries(
@@ -142,5 +140,13 @@ export namespace Header {
 				]
 			)
 		)
+	}
+	function isHeaders(value: globalThis.Headers | any): value is globalThis.Headers {
+		return typeof value.forEach == "function"
+	}
+	function getEntries(headers: globalThis.Headers): [string, string][] {
+		const result: [string, string][] = []
+		headers.forEach((value, key) => result.push([key, value]))
+		return result
 	}
 }

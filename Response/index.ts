@@ -1,4 +1,3 @@
-import * as api from "../api"
 import * as Parser from "../Parser"
 import * as Serializer from "../Serializer"
 import { Header as ResponseHeader } from "./Header"
@@ -19,13 +18,13 @@ export namespace Response {
 			(value.header == undefined || ResponseHeader.is(value.header))
 		)
 	}
-	export async function to(request: Response): Promise<api.Response> {
-		return new api.Response(await Serializer.serialize(await request.body, request.header.contentType), {
+	export async function to(request: Response): Promise<globalThis.Response> {
+		return new globalThis.Response(await Serializer.serialize(await request.body, request.header.contentType), {
 			status: request.status,
-			headers: new api.Headers(ResponseHeader.to(request.header)),
+			headers: new globalThis.Headers(ResponseHeader.to(request.header)),
 		})
 	}
-	export function from(response: api.Response): Response {
+	export function from(response: globalThis.Response): Response {
 		return {
 			status: response.status,
 			header: ResponseHeader.from(response.headers),
