@@ -42,7 +42,7 @@ describe("Response", () => {
 		expect(http.Response.create(object, "application/x-www-form-urlencoded")).toEqual({
 			...output,
 			header: { contentType: "application/x-www-form-urlencoded" },
-			body: Promise.resolve(object),
+			body: object,
 		})
 	})
 })
