@@ -24,4 +24,4 @@ function isRequest(
 ): value is globalThis.Request | globalThis.Response {
 	return typeof value.formData == "function"
 }
-export { Method, Request, Response, fetch }
+export { Method, Parser, Stringifier, Request, Response, Query, fetch }
