@@ -10,6 +10,7 @@
 	},
 	"homepage": "https://cogneco.com/open-source/cloud-http",
 	"private": false,
+	"type": "module",
 	"main": "dist/index.js",
 	"typings": "dist/index.d.ts",
 	"browser": {
