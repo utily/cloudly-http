@@ -28,14 +28,14 @@ describe("Response", () => {
 		expect(http.Response.create(object)).toEqual({
 			...output,
 			header: { contentType: "application/json; charset=utf-8" },
-			body: Promise.resolve(object),
+			body: object,
 		})
 	})
 	it("create object json", () => {
 		expect(http.Response.create(object, "application/json; charset=utf-8")).toEqual({
 			...output,
 			header: { contentType: "application/json; charset=utf-8" },
-			body: Promise.resolve(object),
+			body: object,
 		})
 	})
 	it("create object urlencoded", () => {

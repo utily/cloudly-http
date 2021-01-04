@@ -2,10 +2,30 @@
 	"compilerOptions": {
 		"outDir": "dist",
 		"target": "es2019",
-		"module": "commonjs",
-		"inlineSourceMap": true,
+		"module": "es6",
 		"experimentalDecorators": true,
-		"lib": ["es2019", "webworker"]
+		"lib": ["es2019", "webworker"],
+		"esModuleInterop": true,
+		"allowJs": true,
+		"noImplicitAny": true,
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"forceConsistentCasingInFileNames": true,
+		"noImplicitThis": true,
+		"strictNullChecks": true,
+		"sourceMap": true,
+		"moduleResolution": "node",
+		"resolveJsonModule": true,
+		"plugins": [
+			{
+				"name": "typescript-tslint-plugin",
+				"alwaysShowRuleFailuresAsWarnings": false,
+				"ignoreDefinitionFiles": true,
+				"configFile": "tslint.json",
+				"suppressWhileTypeErrorsPresent": false,
+				"mockTypeScriptVersion": false
+			}
+		]
 	},
 	"include": ["**/*.spec.ts"]
 }
