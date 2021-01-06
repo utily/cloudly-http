@@ -10,7 +10,6 @@
 	},
 	"homepage": "https://cogneco.com/open-source/cloud-http",
 	"private": false,
-	"type": "module",
 	"main": "dist/index.js",
 	"typings": "dist/index.d.ts",
 	"browser": {
@@ -23,12 +22,24 @@
 		"release": true
 	},
 	"jest": {
-		"verbose": true,
+		"globals": {
+			"ts-jest": {
+				"tsconfig": "tsconfig.test.json"
+			}
+		},
 		"testEnvironment": "node",
-		"testRegex": "./dist/.*((\\.|/)(test|spec))(\\.|\\/.+)(jsx?)$",
+		"testRegex": "((\\.|/)(test|spec))(\\.|\\/.+)(jsx?|tsx?)$",
 		"testPathIgnorePatterns": [
-			"node_modules/"
-		]
+			"node_modules/",
+			"dist/"
+		],
+		"collectCoverageFrom": [
+			"**/*.{ts,tsx,js,jsx}",
+			"!**/node_modules/**",
+			"!**/dist/**"
+		],
+		"preset": "ts-jest",
+		"testMatch": null
 	},
 	"scripts": {
 		"dev": "watch 'npm run build' .",
@@ -49,6 +60,7 @@
 		"eslint-plugin-prettierx": "github:nilssonemma/eslint-plugin-prettierx#master",
 		"jest": "^26.5.2",
 		"prettierx": "github:simonmika/prettierx#newline-before-clause",
+		"ts-jest": "^26.4.4",
 		"ts-loader": "^8.0.4",
 		"typescript": "^4.0.3",
 		"watch": "^1.0.2"

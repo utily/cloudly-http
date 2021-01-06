@@ -46,10 +46,7 @@ export namespace Response {
 			switch (typeof result.body) {
 				default:
 				case "object":
-					result.body = Serializer.serialize(
-						result.body,
-						(result.header.contentType = contentType ?? "application/json; charset=utf-8")
-					)
+					result.header.contentType = contentType ?? "application/json; charset=utf-8"
 					break
 				case "string":
 					result.header.contentType =
