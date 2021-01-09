@@ -43,11 +43,12 @@
 	},
 	"scripts": {
 		"dev": "watch 'npm run build' .",
-		"lint": "eslint '**/*.{js,ts,tsx,css,json}'",
-		"fix": "eslint '**/*.{js,ts,tsx,css,json}' --fix",
+		"lint": "eslint '**/*.{js,ts,tsx}'",
+		"fix": "eslint '**/*.{js,ts,tsx}' --fix",
 		"build": "tsc -p .",
-		"test": "npm run transpile && jest",
-		"transpile": "tsc --project ./tsconfig.test.json",
+		"pretest": "npm run build",
+		"test": "jest",
+		"test:watch": "watch jest",
 		"prepare": "npm run build",
 		"clean": "rm -rf dist node_modules coverage"
 	},
