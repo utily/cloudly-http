@@ -1,13 +1,15 @@
+/// <reference lib="webworker.iterable" />
 import * as Parser from "../Parser"
 import { Method as RequestMethod } from "./Method"
 import { Header as RequestHeader } from "./Header"
 import { Like as RequestLike } from "./Like"
-import * as Stringifier from "../Serializer"
+import * as Serializer from "../Serializer"
 
 export interface Request {
 	readonly method: RequestMethod
 	readonly url: URL
 	readonly parameter: { readonly [key: string]: string }
+	readonly search: { readonly [key: string]: string }
 	readonly remote?: string
 	readonly header: Readonly<RequestHeader>
 	readonly body?: any | Promise<any>
@@ -26,29 +28,37 @@ export namespace Request {
 		return new globalThis.Request(request.url.toString(), {
 			method: request.method ?? "GET",
 			headers: RequestHeader.to(request.header),
-			body: await Stringifier.serialize(request),
+			body: await Serializer.serialize(request),
 		})
 	}
 	export function from(request: globalThis.Request): Request {
+		const url = new URL(request.url)
 		return {
 			method: RequestMethod.parse(request.method) ?? "GET",
-			url: new URL(request.url),
+			url,
 			header: RequestHeader.from(request.headers),
 			parameter: {},
+			search: Object.fromEntries(url.searchParams.entries()),
 			body: Parser.parse(request),
 		}
 	}
 	export function create(request: string | RequestLike): Request {
-		return typeof request == "string"
-			? create({ url: request })
-			: {
-					method: RequestMethod.parse(request.method) ?? "GET",
-					url: typeof request.url == "string" ? new URL(request.url) : request.url,
-					parameter: request.parameter ?? {},
-					remote: request.remote,
-					header: request.header ?? {},
-					body: request.body,
-			  }
+		let result: Request
+		if (typeof request == "string")
+			result = create({ url: request })
+		else {
+			const url = typeof request.url == "string" ? new URL(request.url) : request.url
+			result = {
+				method: RequestMethod.parse(request.method) ?? "GET",
+				url,
+				parameter: request.parameter ?? {},
+				search: Object.fromEntries(url.searchParams.entries()),
+				remote: request.remote,
+				header: request.header ?? {},
+				body: request.body,
+			}
+		}
+		return result
 	}
 	export type Header = RequestHeader
 	export namespace Header {
