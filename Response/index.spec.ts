@@ -45,4 +45,28 @@ describe("Response", () => {
 			body: object,
 		})
 	})
+	const error = {
+		status: 400,
+		type: "missing query argument",
+		argument: {
+			name: "argument",
+			type: "string",
+			description: "description of argument",
+		},
+	}
+	it("create error json", () => {
+		expect(http.Response.create(error)).toEqual({
+			status: 400,
+			header: { contentType: "application/json; charset=utf-8" },
+			body: {
+				status: 400,
+				type: "missing query argument",
+				argument: {
+					name: "argument",
+					type: "string",
+					description: "description of argument",
+				},
+			},
+		})
+	})
 })
