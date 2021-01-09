@@ -5,6 +5,7 @@ describe("Request", () => {
 		method: "GET",
 		url: new URL("http://example.com/collection/resource"),
 		parameter: {},
+		search: {},
 		header: {},
 		remote: undefined,
 		body: undefined,
