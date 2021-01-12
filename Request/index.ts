@@ -20,7 +20,7 @@ export namespace Request {
 		return (
 			typeof value == "object" &&
 			Object.keys(value).every(key =>
-				["method", "url", "parameter", "remote", "header", "body", "search"].some(k => k == key)
+				["method", "url", "parameter", "search", "remote", "header", "body"].some(k => k == key)
 			) &&
 			(value.status == undefined || typeof value.status == "number") &&
 			(value.header == undefined || RequestHeader.is(value.header))
