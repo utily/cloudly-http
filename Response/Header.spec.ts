@@ -1,6 +1,6 @@
 import * as parser from "../index"
 
-describe("servly.Response.Header", () => {
+describe("Response.Header", () => {
 	it("from array", async () =>
 		expect(
 			parser.Response.Header.from([
