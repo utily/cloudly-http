@@ -35,4 +35,15 @@ describe("Request", () => {
 			body: { property: "value" },
 		})
 	})
+	it("is", () => {
+		expect(http.Request.is(output)).toEqual(true)
+		const request = http.Request.create({
+			method: "POST",
+			url: new URL("http://example.com/collection/resource?key=value"),
+			header: { contentType: "application/json; charset=utf-8" },
+			body: { resource: "resource", name: "Resource" },
+		})
+		expect(request).toEqual({ ...request, search: { key: "value" } })
+		expect(http.Request.is(request)).toEqual(true)
+	})
 })

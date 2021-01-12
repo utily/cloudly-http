@@ -19,16 +19,27 @@ export namespace Request {
 	export function is(value: any | Request): value is Request {
 		return (
 			typeof value == "object" &&
-			Object.keys(value).every(key => ["method", "url", "parameter", "remote", "header", "body"].some(k => k == key)) &&
-			(value.status == undefined || typeof value.status == "number") &&
+			Object.keys(value).every(key =>
+				["method", "url", "parameter", "search", "remote", "header", "body"].some(k => k == key)
+			) &&
+			RequestMethod.is(value.method) &&
+			value.url instanceof URL &&
+			typeof value.parameter == "object" &&
+			Object.entries(value.parameter).every(
+				([parameter, value]) => typeof parameter == "string" && typeof value == "string"
+			) &&
+			typeof value.search == "object" &&
+			Object.entries(value.search).every(([key, value]) => typeof key == "string" && typeof value == "string") &&
+			(value.remote == undefined || typeof value.remote == "string") &&
 			(value.header == undefined || RequestHeader.is(value.header))
 		)
 	}
-	export async function to(request: Request): Promise<globalThis.Request> {
-		return new globalThis.Request(request.url.toString(), {
-			method: request.method ?? "GET",
-			headers: RequestHeader.to(request.header),
-			body: await Serializer.serialize(request),
+	export async function to(request: RequestLike): Promise<globalThis.Request> {
+		const r = is(request) ? request : create(request)
+		return new globalThis.Request(r.url.toString(), {
+			method: r.method,
+			headers: RequestHeader.to(r.header),
+			body: await Serializer.serialize(r),
 		})
 	}
 	export function from(request: globalThis.Request): Request {
@@ -52,7 +63,7 @@ export namespace Request {
 				method: RequestMethod.parse(request.method) ?? "GET",
 				url,
 				parameter: request.parameter ?? {},
-				search: Object.fromEntries(url.searchParams.entries()),
+				search: { ...request.search, ...Object.fromEntries(url.searchParams.entries()) },
 				remote: request.remote,
 				header: request.header ?? {},
 				body: request.body,
