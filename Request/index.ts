@@ -9,7 +9,7 @@ export interface Request {
 	readonly method: RequestMethod
 	readonly url: URL
 	readonly parameter: { readonly [key: string]: string }
-	readonly search: { readonly [key: string]: string }
+	readonly search?: { readonly [key: string]: string }
 	readonly remote?: string
 	readonly header: Readonly<RequestHeader>
 	readonly body?: any | Promise<any>
@@ -19,7 +19,9 @@ export namespace Request {
 	export function is(value: any | Request): value is Request {
 		return (
 			typeof value == "object" &&
-			Object.keys(value).every(key => ["method", "url", "parameter", "remote", "header", "body"].some(k => k == key)) &&
+			Object.keys(value).every(key =>
+				["method", "url", "parameter", "remote", "header", "body", "search"].some(k => k == key)
+			) &&
 			(value.status == undefined || typeof value.status == "number") &&
 			(value.header == undefined || RequestHeader.is(value.header))
 		)
