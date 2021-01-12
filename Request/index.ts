@@ -9,7 +9,7 @@ export interface Request {
 	readonly method: RequestMethod
 	readonly url: URL
 	readonly parameter: { readonly [key: string]: string }
-	readonly search?: { readonly [key: string]: string }
+	readonly search: { readonly [key: string]: string }
 	readonly remote?: string
 	readonly header: Readonly<RequestHeader>
 	readonly body?: any | Promise<any>
