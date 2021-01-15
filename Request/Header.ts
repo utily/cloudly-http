@@ -130,7 +130,7 @@ export namespace Header {
 		const entries = Array.isArray(headers)
 		? headers.map<[string, string]>(([field, ...value]) => [field, value.join(", ")])
 		: isHeaders(headers)
-		? getEntries(headers)
+		? [...headers]
 		: Object.entries(headers)
 		const data: { [field: string]: string } = Object.fromEntries(entries.map(([field, value]) => [field.toLowerCase(), value]))
 		return Object.fromEntries(
@@ -142,11 +142,6 @@ export namespace Header {
 		)
 	}
 	function isHeaders(value: globalThis.Headers | any): value is globalThis.Headers {
-		return typeof value.forEach == "function"
-	}
-	function getEntries(headers: globalThis.Headers): [string, string][] {
-		const result: [string, string][] = []
-		headers.forEach((value, key) => result.push([key, value]))
-		return result
+		return typeof value.entries == "function"
 	}
 }
