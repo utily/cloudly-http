@@ -1,6 +1,6 @@
 {
 	"name": "cloud-http",
-	"version": "0.0.17",
+	"version": "0.0.18",
 	"description": "Improved handling of HTTP Requests and Responses.",
 	"author": "Simon Mika <simon@mika.se>",
 	"license": "MIT",
