@@ -2,7 +2,7 @@ import { Request } from "./Request"
 import { Response } from "./Response"
 
 type Fetch = (request: Request.Like | string) => Promise<Response>
-type GlobalFetch = (input: globalThis.RequestInfo, init?: globalThis.RequestInit) => Promise<globalThis.Response>
+type GlobalFetch = (url: string, init: globalThis.RequestInit) => Promise<globalThis.Response>
 
 export const fetch = create(globalThis.fetch) as Fetch & {
 	create: (fetch: GlobalFetch) => Fetch
