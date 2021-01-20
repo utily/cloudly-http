@@ -39,7 +39,7 @@ export namespace Request {
 		return new globalThis.Request(r.url.toString(), {
 			method: r.method,
 			headers: RequestHeader.to(r.header),
-			body: await Serializer.serialize(r),
+			body: r.method != "GET" ? await Serializer.serialize(r) : undefined,
 		})
 	}
 	export function from(request: globalThis.Request): Request {
