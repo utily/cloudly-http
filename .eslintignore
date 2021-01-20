@@ -2,3 +2,4 @@ node_modules
 dist
 Request/Header.ts
 Response/Header.ts
+Search.ts
