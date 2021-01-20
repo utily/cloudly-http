@@ -1,7 +1,17 @@
 import { Request } from "./Request"
 import { Response } from "./Response"
 
-export async function fetch(request: Request.Like | string): Promise<Response> {
-	const r = Request.create(request)
-	return Response.from(await globalThis.fetch(r.url.toString(), await Request.to(r)))
+type Fetch = (request: Request.Like | string) => Promise<Response>
+type GlobalFetch = (input: globalThis.RequestInfo, init?: globalThis.RequestInit) => Promise<globalThis.Response>
+
+export const fetch = create(globalThis.fetch) as Fetch & {
+	create: (fetch: GlobalFetch) => Fetch
+}
+fetch.create = create
+
+function create(fetch: GlobalFetch): Fetch {
+	return async (request: Request.Like | string): Promise<Response> => {
+		const r = Request.create(request)
+		return Response.from(await fetch(r.url.toString(), await Request.to(r)))
+	}
 }
