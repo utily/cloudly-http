@@ -39,7 +39,9 @@ export namespace Request {
 		return new globalThis.Request(r.url.toString(), {
 			method: r.method,
 			headers: RequestHeader.to(r.header),
-			body: ["GET", "HEAD"].some(v => v == r.method) ? undefined : await Serializer.serialize(r),
+			body: ["GET", "HEAD"].some(v => v == r.method)
+				? undefined
+				: await Serializer.serialize(await r.body, r.header.contentType),
 		})
 	}
 	export function from(request: globalThis.Request): Request {
