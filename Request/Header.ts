@@ -44,6 +44,7 @@ export interface Header {
 	readonly xForwardedFor?: string
 	readonly xForwardedHost?: string
 	readonly xForwardedProto?: string
+	readonly xMsContinuation?: string
 	readonly frontEndHttps?: string
 	readonly xHttpMethodOverride?: string
 	readonly xAttDeviceId?: string
@@ -99,6 +100,7 @@ const fields: [keyof Header, string, number][] = [
 	["xForwardedFor", "X-Forwarded-For", 1],
 	["xForwardedHost", "X-Forwarded-Host", 1],
 	["xForwardedProto", "X-Forwarded-Proto", 1],
+	["xMsContinuation", "X-Ms-Continuation", 1],
 	["frontEndHttps", "Front-End-Https", 1],
 	["xHttpMethodOverride", "X-Http-Method-Override", 1],
 	["xAttDeviceId", "X-ATT-DeviceId", 1],
