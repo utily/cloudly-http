@@ -54,6 +54,7 @@ export interface Header {
 	xContentDuration?: string
 	xContentTypeOptions?: string
 	xCorrelationId?: string
+	xMsContinuation?: string
 	xPoweredBy?: string
 	xRequestId?: string
 	xUACompatible?: string
@@ -114,6 +115,7 @@ const fields: [keyof Header, string, number][] = [
 	["xContentTypeOptions", "X-Content-Type-Options", 1],
 	["xCorrelationId", "X-Correlation-ID", 1],
 	["xFrameOptions", "X-Frame-Options", 1],
+	["xMsContinuation", "X-Ms-Continuation", 1],
 	["xPoweredBy", "X-Powered-By", 1],
 	["xRequestId", "X-Request-ID", 1],
 	["xUACompatible", "X-UA-Compatible", 1],
