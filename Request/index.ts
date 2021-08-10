@@ -34,15 +34,16 @@ export namespace Request {
 			(value.header == undefined || RequestHeader.is(value.header))
 		)
 	}
-	export async function to(request: RequestLike): Promise<globalThis.Request> {
+	export async function to(request: RequestLike): Promise<globalThis.RequestInit & { url: string }> {
 		const r = is(request) ? request : create(request)
-		return new globalThis.Request(r.url.toString(), {
+		return {
+			url: r.url.toString(),
 			method: r.method,
 			headers: RequestHeader.to(r.header),
 			body: ["GET", "HEAD"].some(v => v == r.method)
 				? undefined
 				: await Serializer.serialize(await r.body, r.header.contentType),
-		})
+		}
 	}
 	export function from(request: globalThis.Request): Request {
 		const url = new URL(request.url)
