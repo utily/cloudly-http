@@ -1,12 +1,12 @@
 /// <reference lib="webworker.iterable" />
 import * as Parser from "../Parser"
-import { Method as RequestMethod } from "./Method"
+import { Method } from "../Method"
 import { Header as RequestHeader } from "./Header"
 import { Like as RequestLike } from "./Like"
 import * as Serializer from "../Serializer"
 
 export interface Request {
-	readonly method: RequestMethod
+	readonly method: Method
 	readonly url: URL
 	readonly parameter: { readonly [key: string]: string }
 	readonly search: { readonly [key: string]: string }
@@ -22,7 +22,7 @@ export namespace Request {
 			Object.keys(value).every(key =>
 				["method", "url", "parameter", "search", "remote", "header", "body"].some(k => k == key)
 			) &&
-			RequestMethod.is(value.method) &&
+			Method.is(value.method) &&
 			value.url instanceof URL &&
 			typeof value.parameter == "object" &&
 			Object.entries(value.parameter).every(
@@ -48,7 +48,7 @@ export namespace Request {
 	export function from(request: globalThis.Request): Request {
 		const url = new URL(request.url)
 		return {
-			method: RequestMethod.parse(request.method) ?? "GET",
+			method: Method.parse(request.method) ?? "GET",
 			url,
 			header: RequestHeader.from(request.headers),
 			parameter: {},
@@ -63,7 +63,7 @@ export namespace Request {
 		else {
 			const url = typeof request.url == "string" ? new URL(request.url) : request.url
 			result = {
-				method: RequestMethod.parse(request.method) ?? "GET",
+				method: Method.parse(request.method) ?? "GET",
 				url,
 				parameter: request.parameter ?? {},
 				search: { ...request.search, ...Object.fromEntries(url.searchParams.entries()) },
@@ -79,11 +79,6 @@ export namespace Request {
 		export const is = RequestHeader.is
 		export const from = RequestHeader.from
 		export const to = RequestHeader.to
-	}
-	export type Method = RequestMethod
-	export namespace Method {
-		export const is = RequestMethod.is
-		export const parse = RequestMethod.parse
 	}
 	export type Like = RequestLike
 }

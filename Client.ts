@@ -1,4 +1,5 @@
 import { fetch } from "./fetch"
+import { Method } from "./Method"
 import { Request } from "./Request"
 import { Response } from "./Response"
 
@@ -7,12 +8,7 @@ export class Client<Error = void> {
 	onUnauthorized?: (connection: Client<Error>) => Promise<boolean>
 	constructor(public url?: string, public key?: string) {}
 
-	private async fetch<R>(
-		path: string,
-		method: Request.Method,
-		body?: any,
-		header?: Request.Header
-	): Promise<R | Error> {
+	private async fetch<R>(path: string, method: Method, body?: any, header?: Request.Header): Promise<R | Error> {
 		const request = await this.preProcess(Request.create({ url: `${this.url ?? ""}/${path}`, method, header, body }))
 		const response = await this.postProcess(
 			await fetch(request).catch(error => Response.create({ status: 601, body: error }))

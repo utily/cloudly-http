@@ -1,4 +1,4 @@
-import { Method } from "./Method"
+import { Method } from "../Method"
 import { Header } from "./Header"
 
 export interface Like {

@@ -1,5 +1,5 @@
 import { Client } from "./Client"
-import { Method } from "./Request/Method"
+import { Method } from "./Method"
 import * as Parser from "./Parser"
 import * as Serializer from "./Serializer"
 import { Request } from "./Request"
