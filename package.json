@@ -52,7 +52,6 @@
 		"prepare": "npm run build",
 		"clean": "rm -rf dist node_modules coverage"
 	},
-	"dependencies": {},
 	"devDependencies": {
 		"@types/isomorphic-fetch": "0.0.35",
 		"@types/jest": "^26.0.20",
