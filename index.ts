@@ -1,3 +1,4 @@
+import { Client } from "./Client"
 import { Method } from "./Request/Method"
 import * as Parser from "./Parser"
 import * as Serializer from "./Serializer"
@@ -15,4 +16,4 @@ Serializer.add(async body => (typeof body == "string" ? body : body.toString()),
 Serializer.add(async body => JSON.stringify(body), "application/json")
 Serializer.add(async body => Search.stringify(body), "application/x-www-form-urlencoded")
 
-export { Method, Parser, Serializer, Request, Response, fetch, Search }
+export { Client, Method, Parser, Serializer, Request, Response, fetch, Search }
