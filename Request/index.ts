@@ -9,7 +9,7 @@ export interface Request {
 	readonly method: Method
 	readonly url: URL
 	readonly parameter: { readonly [key: string]: string }
-	readonly search: { readonly [key: string]: string }
+	readonly search: { readonly [key: string]: string | string[] }
 	readonly remote?: string
 	readonly header: Readonly<RequestHeader>
 	readonly body?: any | Promise<any>
@@ -29,7 +29,11 @@ export namespace Request {
 				([parameter, value]) => typeof parameter == "string" && typeof value == "string"
 			) &&
 			typeof value.search == "object" &&
-			Object.entries(value.search).every(([key, value]) => typeof key == "string" && typeof value == "string") &&
+			Object.entries(value.search).every(
+				([key, value]) =>
+					typeof key == "string" &&
+					(typeof value == "string" || (Array.isArray(value) && value.every(e => typeof e == "string")))
+			) &&
 			(value.remote == undefined || typeof value.remote == "string") &&
 			(value.header == undefined || RequestHeader.is(value.header))
 		)
@@ -62,11 +66,18 @@ export namespace Request {
 			result = create({ url: request })
 		else {
 			const url = typeof request.url == "string" ? new URL(request.url) : request.url
+			const searchKeys = url.searchParams.keys()
+			let search: { readonly [key: string]: string | string[] } = {}
+			for (const key of searchKeys) {
+				const value = key.endsWith("[]") ? url.searchParams.getAll(key) : url.searchParams.get(key)
+				if (!search[key] && value)
+					search = { ...search, ...{ [key]: value } }
+			}
 			result = {
 				method: Method.parse(request.method) ?? "GET",
 				url,
 				parameter: request.parameter ?? {},
-				search: { ...request.search, ...Object.fromEntries(url.searchParams.entries()) },
+				search,
 				remote: request.remote,
 				header: request.header ?? {},
 				body: request.body,
