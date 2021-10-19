@@ -20,8 +20,13 @@ describe("Search", () => {
 		expect(result).toEqual({ value: "1337", nested: { value: "42", string: "The power of attraction." } })
 	})
 	it("parse nested", async () => {
-		const result = Search.parse("value=1337&nested%5Bvalue%5D=42&nested%5Bstring%5D=The%20power%20of%20attraction.&nested%5Bobject%5D%5Bvalue%5D=Deepest%20level.")
-		expect(result).toEqual({ value: "1337", nested: { value: "42", string: "The power of attraction.", object: { value: "Deepest level."} } })
+		const result = Search.parse(
+			"value=1337&nested%5Bvalue%5D=42&nested%5Bstring%5D=The%20power%20of%20attraction.&nested%5Bobject%5D%5Bvalue%5D=Deepest%20level."
+		)
+		expect(result).toEqual({
+			value: "1337",
+			nested: { value: "42", string: "The power of attraction.", object: { value: "Deepest level." } },
+		})
 	})
 	it("parse 2", async () => {
 		const result = Search.parse(
