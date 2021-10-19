@@ -26,6 +26,8 @@ export function parse(data: string): { [key: string]: any } {
 		target[key[0]] = key.length > 1 ? insert(target[key[0]] ?? {}, key.slice(1), value) : value
 		return target
 	}
-	const entries = data.split("&").map<[string, string]>(d => d.split("=", 2) as [string, string]).map<[string[], string]>(([k, v]) => [k.split("[").map(p => p.replace("]", "")), decodeURIComponent(v)])
+	const entries = data.split("&")
+		.map<[string, string]>(d => d.split("=", 2) as [string, string])
+		.map<[string[], string]>(([k, v]) => [decodeURIComponent(k).split("[").map(p => p.replace("]", "")), decodeURIComponent(v)])
 	return entries.reduce<{ [key: string]: any }>((result, [key, value]) => insert(result, key, value), {})
 }
