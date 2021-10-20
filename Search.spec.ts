@@ -19,6 +19,21 @@ describe("Search", () => {
 		const result = Search.parse("value=1337&nested[value]=42&nested[string]=The%20power%20of%20attraction.")
 		expect(result).toEqual({ value: "1337", nested: { value: "42", string: "The power of attraction." } })
 	})
+	it("parse nested", async () => {
+		const result = Search.parse(
+			"value=1337&nested%5Bvalue%5D=42&nested%5Bstring%5D=The%20power%20of%20attraction.&nested%5Bobject%5D%5Bvalue%5D=Deepest%20level."
+		)
+		expect(result).toEqual({
+			value: "1337",
+			nested: { value: "42", string: "The power of attraction.", object: { value: "Deepest level." } },
+		})
+	})
+	it("parse space seperatly +", async () => {
+		const result = Search.parse("value=Some+nice+pants+and+an+Iphone%2B")
+		expect(result).toEqual({
+			value: "Some nice pants and an Iphone+",
+		})
+	})
 	it("parse 2", async () => {
 		const result = Search.parse(
 			"threeDSSessionData=&cres=eyJhY3NUcmFuc0lEIjoiZjE5MjEwMWYtYjJlYi00YjBlLThkMzYtY2ZlZjJmOWM1NWY4IiwiY2hhbGxlbmdlQ29tcGxldGlvbkluZCI6IlkiLCJtZXNzYWdlVHlwZSI6IkNSZXMiLCJtZXNzYWdlVmVyc2lvbiI6IjIuMS4wIiwidGhyZWVEU1NlcnZlclRyYW5zSUQiOiI4YmZkZDQ2MC1mZDc3LTRlZWYtOWE4Ny1hOTc4ZTJlMzAzY2YiLCJ0cmFuc1N0YXR1cyI6IlkifQ%3D%3D"
