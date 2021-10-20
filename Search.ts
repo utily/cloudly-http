@@ -28,6 +28,6 @@ export function parse(data: string): { [key: string]: any } {
 	}
 	const entries = data.split("&")
 		.map<[string, string]>(d => d.split("=", 2) as [string, string])
-		.map<[string[], string]>(([k, v]) => [decodeURIComponent(k).split("[").map(p => p.replace("]", "")), decodeURIComponent(v)])
+		.map<[string[], string]>(([k, v]) => [decodeURIComponent(k).split("[").map(p => p.replace("]", "")), decodeURIComponent(v.replace(/\+/g, " "))])
 	return entries.reduce<{ [key: string]: any }>((result, [key, value]) => insert(result, key, value), {})
 }

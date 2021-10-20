@@ -28,6 +28,12 @@ describe("Search", () => {
 			nested: { value: "42", string: "The power of attraction.", object: { value: "Deepest level." } },
 		})
 	})
+	it("parse space seperatly +", async () => {
+		const result = Search.parse("value=Some+nice+pants+and+an+Iphone%2B")
+		expect(result).toEqual({
+			value: "Some nice pants and an Iphone+",
+		})
+	})
 	it("parse 2", async () => {
 		const result = Search.parse(
 			"threeDSSessionData=&cres=eyJhY3NUcmFuc0lEIjoiZjE5MjEwMWYtYjJlYi00YjBlLThkMzYtY2ZlZjJmOWM1NWY4IiwiY2hhbGxlbmdlQ29tcGxldGlvbkluZCI6IlkiLCJtZXNzYWdlVHlwZSI6IkNSZXMiLCJtZXNzYWdlVmVyc2lvbiI6IjIuMS4wIiwidGhyZWVEU1NlcnZlclRyYW5zSUQiOiI4YmZkZDQ2MC1mZDc3LTRlZWYtOWE4Ny1hOTc4ZTJlMzAzY2YiLCJ0cmFuc1N0YXR1cyI6IlkifQ%3D%3D"
