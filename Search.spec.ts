@@ -44,4 +44,26 @@ describe("Search", () => {
 				"eyJhY3NUcmFuc0lEIjoiZjE5MjEwMWYtYjJlYi00YjBlLThkMzYtY2ZlZjJmOWM1NWY4IiwiY2hhbGxlbmdlQ29tcGxldGlvbkluZCI6IlkiLCJtZXNzYWdlVHlwZSI6IkNSZXMiLCJtZXNzYWdlVmVyc2lvbiI6IjIuMS4wIiwidGhyZWVEU1NlcnZlclRyYW5zSUQiOiI4YmZkZDQ2MC1mZDc3LTRlZWYtOWE4Ny1hOTc4ZTJlMzAzY2YiLCJ0cmFuc1N0YXR1cyI6IlkifQ==",
 		})
 	})
+	it("parse with nested arrays", async () => {
+		const result = Search.parse(
+			"values[0]=first&values[1]=second&values[2]=the+third&" +
+				"nested[people][0][fname]=John&nested[people][0][lname]=Smith&" +
+				"nested[people][2][fname]=Nick&nested[people][2][lname]=Cage&" +
+				"nested[people][2][kittens][0][name]=purry&nested[people][2][kittens][0][age]=3&nested[people][2][kittens][1][name]=furry&" +
+				"nested[people][1][fname]=foo&nested[people][1][lname]=bar&" +
+				"nested[people][1][puppies][0]=snowy&nested[people][1][puppies][1]=sunny&nested[people][1][puppies][2]=rainy&nested[people][1][puppies][3]=cloudy&" +
+				"nested[groupname]=Random+People"
+		)
+		expect(result).toEqual({
+			values: ["first", "second", "the third"],
+			nested: {
+				people: [
+					{ fname: "John", lname: "Smith" },
+					{ fname: "foo", lname: "bar", puppies: ["snowy", "sunny", "rainy", "cloudy"] },
+					{ fname: "Nick", lname: "Cage", kittens: [{ name: "purry", age: "3" }, { name: "furry" }] },
+				],
+				groupname: "Random People",
+			},
+		})
+	})
 })

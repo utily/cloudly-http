@@ -22,6 +22,11 @@ export function stringify(data: { [key: string]: any }): string {
 	return result.join("&")
 }
 export function parse(data: string): { [key: string]: any } {
+	const convertArrays =( target: Record<string, any> ): Record<string, any> | any[] => {
+	return (typeof target == "object" && Object.keys(target).sort().every((k, i) => `${k}` == `${i}`)) 
+			? (Object.entries(target).sort().map(entry => typeof entry[1] == "object" ? convertArrays(entry[1]) : entry[1]) )
+			: (typeof target == "object" ? Object.fromEntries(Object.entries(target).map(entry => [entry[0], convertArrays(entry[1])])) : target)
+	}
 	const insert = (target: { [key: string]: any }, key: string[], value: string): any => {
 		target[key[0]] = key.length > 1 ? insert(target[key[0]] ?? {}, key.slice(1), value) : value
 		return target
@@ -29,5 +34,5 @@ export function parse(data: string): { [key: string]: any } {
 	const entries = data.split("&")
 		.map<[string, string]>(d => d.split("=", 2) as [string, string])
 		.map<[string[], string]>(([k, v]) => [decodeURIComponent(k).split("[").map(p => p.replace("]", "")), decodeURIComponent(v.replace(/\+/g, " "))])
-	return entries.reduce<{ [key: string]: any }>((result, [key, value]) => insert(result, key, value), {})
+	return entries.reduce<{ [key: string]: any }>((result, [key, value]) => convertArrays(insert(result, key, value)), {})
 }
