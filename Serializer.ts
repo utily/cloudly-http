@@ -9,5 +9,5 @@ export function add(
 }
 export function serialize(body: any, contentType?: string): Promise<globalThis.BodyInit | undefined> {
 	const serializer = serializers[contentType?.split(";")[0] ?? ""]
-	return serializer ? serializer(body, contentType) : body
+	return serializer ? serializer(body, contentType) : body != "" ? body : undefined
 }
