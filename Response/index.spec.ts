@@ -69,4 +69,25 @@ describe("Response", () => {
 			},
 		})
 	})
+	it("gracely authenticate", () => {
+		expect(
+			http.Response.create({
+				status: 401,
+				header: {
+					wwwAuthenticate: "Basic realm=Administration",
+				},
+				type: "not authorized",
+			})
+		).toEqual({
+			status: 401,
+			header: {
+				contentType: "application/json; charset=utf-8",
+				wwwAuthenticate: "Basic realm=Administration",
+			},
+			body: {
+				status: 401,
+				type: "not authorized",
+			},
+		})
+	})
 })
