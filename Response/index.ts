@@ -33,14 +33,19 @@ export namespace Response {
 	}
 	export function create(response: ResponseLike | any, contentType?: string): Response {
 		const result: Required<ResponseLike> = ResponseLike.is(response)
-			? { status: 200, header: {}, body: "", ...response }
+			? { status: 200, header: {}, body: undefined, ...response }
 			: {
 					status: (typeof response == "object" && typeof response.status == "number" && response.status) || 200,
 					header:
-						(response.status == 301 || response.status == 302) && response.location
-							? { location: response.location }
+						typeof response == "object"
+							? {
+									...response.header,
+									...((response.status == 301 || response.status == 302) && response.location
+										? { location: response.location }
+										: {}),
+							  }
 							: {},
-					body: response,
+					body: typeof response == "object" ? (({ header, ...body }) => body)(response) : response,
 			  }
 		if (!result.header.contentType)
 			switch (typeof result.body) {
