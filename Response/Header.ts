@@ -11,6 +11,8 @@ export interface Header {
 	allow?: string[]
 	altSvc?: string
 	cacheControl?: string
+	cfConnectionIp?: string,
+	cfIpCountry?: string,
 	connection?: string
 	contentDisposition?: string
 	contentEncoding?: string
@@ -73,6 +75,8 @@ const fields: [keyof Header, string, number][] = [
 	["allow", "Allow", 2],
 	["altSvc", "Alt-Svc", 1],
 	["cacheControl", "Cache-Control", 1],
+	["cfConnectionIp", "CF-Connecting-IP", 1],
+	["cfIpCountry", "CF-IPCountry", 1],
 	["connection", "Connection", 1],
 	["contentDisposition", "Content-Disposition", 1],
 	["contentEncoding", "Content-Encoding", 1],
@@ -149,7 +153,7 @@ export namespace Header {
 		const data: { [field: string]: string } = Object.fromEntries(entries.map(([field, value]) => [field.toLowerCase(), value]))
 		return Object.fromEntries(
 			fields.map(field => [field[0], data[field[1].toLowerCase()], field[2]]).filter(field => field[1]).map(field => [
-					field[0], 
+					field[0],
 					field[2] == 1 || typeof field[1] != "string" ? field[1] : field[1].split(",").map(v => v.trim())
 				]
 			)
