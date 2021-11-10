@@ -53,6 +53,7 @@ export interface Header {
 	readonly xCsrfToken?: string
 	readonly xCorrelationID?: string
 	readonly saveData?: string
+	readonly cfRay?: string
 }
 const fields: [keyof Header, string, number][] = [
 	["aIM", "A-IM", 1],
@@ -109,6 +110,7 @@ const fields: [keyof Header, string, number][] = [
 	["xCsrfToken", "X-Csrf-Token", 1],
 	["xCorrelationID", "X-Correlation-ID", 1],
 	["saveData", "Save-Data", 1],
+	["cfRay", "CF-RAY", 1],
 ]
 export namespace Header {
 	export function is(value: any | Header): value is Header {
