@@ -9,6 +9,8 @@ export interface Header {
 	readonly accessControlRequestHeaders?: string
 	readonly authorization?: string
 	readonly cacheControl?: string
+	readonly cfConnectionIp?: string,
+	readonly cfIpCountry?: string,
 	readonly connection?: string
 	readonly contentLength?: string
 	readonly contentMD5?: string
@@ -65,6 +67,8 @@ const fields: [keyof Header, string, number][] = [
 	["accessControlRequestHeaders", "Access-Control-Request-Headers", 1],
 	["authorization", "Authorization", 1],
 	["cacheControl", "Cache-Control", 1],
+	["cfConnectionIp", "CF-Connecting-IP", 1],
+	["cfIpCountry", "CF-IPCountry", 1],
 	["connection", "Connection", 1],
 	["contentLength", "Content-Length", 1],
 	["contentMD5", "Content-MD5", 1],
@@ -137,7 +141,7 @@ export namespace Header {
 		const data: { [field: string]: string } = Object.fromEntries(entries.map(([field, value]) => [field.toLowerCase(), value]))
 		return Object.fromEntries(
 			fields.map(field => [field[0], data[field[1].toLowerCase()], field[2]]).filter(field => field[1]).map(field => [
-					field[0], 
+					field[0],
 					field[2] == 1 || typeof field[1] != "string" ? field[1] : field[1].split(",").map(v => v.trim())
 				]
 			)
