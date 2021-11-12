@@ -10,6 +10,7 @@ describe("Response", () => {
 	const jwt =
 		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5ceyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
 	const object = { property: "value" }
+	const array = ["first", "second", "third"]
 	it("create html", () => {
 		expect(http.Response.create(html)).toEqual({
 			...output,
@@ -29,6 +30,13 @@ describe("Response", () => {
 			...output,
 			header: { contentType: "application/json; charset=utf-8" },
 			body: object,
+		})
+	})
+	it("create array", () => {
+		expect(http.Response.create(array)).toEqual({
+			...output,
+			header: { contentType: "application/json; charset=utf-8" },
+			body: array,
 		})
 	})
 	it("create object json", () => {
