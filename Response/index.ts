@@ -45,7 +45,10 @@ export namespace Response {
 										: {}),
 							  }
 							: {},
-					body: typeof response == "object" ? (({ header, ...body }) => body)(response) : response,
+					body:
+						typeof response == "object" && !Array.isArray(response)
+							? (({ header, ...body }) => body)(response)
+							: response,
 			  }
 		if (!result.header.contentType)
 			switch (typeof result.body) {
