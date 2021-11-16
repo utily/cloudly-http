@@ -52,6 +52,8 @@ export namespace Response {
 			  }
 		if (!result.header.contentType)
 			switch (typeof result.body) {
+				case "undefined":
+					break
 				default:
 				case "object":
 					result.header.contentType = contentType ?? "application/json; charset=utf-8"
