@@ -8,7 +8,7 @@ import { fetch } from "./fetch"
 import * as Search from "./Search"
 
 Parser.add(async request => await request.text(), "text/plain", "text/html")
-Parser.add(async request => await request.json(), "application/json")
+Parser.add(async request => (await request.json()).catch((e: any) => e), "application/json")
 Parser.add(async request => Object.fromEntries((await request.formData()).entries()), "multipart/form-data")
 Parser.add(async request => Search.parse(await request.text()), "application/x-www-form-urlencoded")
 
