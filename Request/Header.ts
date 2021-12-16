@@ -54,6 +54,8 @@ export interface Header {
 	readonly proxyConnection?: string
 	readonly xCsrfToken?: string
 	readonly xCorrelationID?: string
+	readonly xModNonce?: string
+	readonly xModRetry?: string
 	readonly saveData?: string
 }
 const fields: [keyof Header, string, number][] = [
@@ -112,6 +114,8 @@ const fields: [keyof Header, string, number][] = [
 	["proxyConnection", "Proxy-Connection", 1],
 	["xCsrfToken", "X-Csrf-Token", 1],
 	["xCorrelationID", "X-Correlation-ID", 1],
+	["xModNonce", "x-mod-nonce", 1],
+	["xModRetry", "x-mod-retry", 1],
 	["saveData", "Save-Data", 1],
 ]
 export namespace Header {
