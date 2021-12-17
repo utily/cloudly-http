@@ -64,6 +64,8 @@ export namespace Response {
 							? "text/html; charset=utf-8"
 							: /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/.test(result.body)
 							? "application/jwt; charset=utf-8"
+							: /^<\?xml version=(.|\n)*\?>(.|\n)*<svg(.|\n)*<\/svg>$/.test(result.body)
+							? "image/svg+xml"
 							: "text/plain; charset=utf-8"
 					break
 			}
