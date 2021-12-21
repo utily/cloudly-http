@@ -1,6 +1,6 @@
 {
   "name": "cloudly-http",
-  "version": "0.0.38",
+  "version": "0.0.39",
   "description": "Improved handling of HTTP Requests and Responses.",
   "author": "Simon Mika <simon@mika.se>",
   "license": "MIT",
@@ -62,11 +62,10 @@
     "isomorphic-fetch": "^3.0.0",
     "jest": "^27.4.5",
     "prettierx": "github:utily/prettierx#utily-20211221",
-		"rimraf": "^3.0.2",
+    "rimraf": "^3.0.2",
     "ts-jest": "^27.1.2",
     "typescript": "^4.5.4",
     "watch": "^0.13.0",
-		"eslint-plugin-simple-import-sort": "^7.0.0"
-
+    "eslint-plugin-simple-import-sort": "^7.0.0"
   }
 }
