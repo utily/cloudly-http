@@ -1,14 +1,14 @@
 {
-  "name": "cloud-http",
+  "name": "cloudly-http",
   "version": "0.0.37",
   "description": "Improved handling of HTTP Requests and Responses.",
   "author": "Simon Mika <simon@mika.se>",
   "license": "MIT",
-  "repository": "https://github.com/cogneco/cloud-http",
+  "repository": "https://github.com/utily/cloudly-http",
   "bugs": {
-    "url": "https://github.com/cogneco/cloud-http/issues"
+    "url": "https://github.com/utily/cloudly-http/issues"
   },
-  "homepage": "https://cogneco.com/open-source/cloud-http",
+  "homepage": "https://github.com/utily/cloudly-http",
   "private": false,
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
