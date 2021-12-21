@@ -50,7 +50,7 @@
     "test": "jest",
     "test:watch": "watch jest",
     "prepare": "npm run build",
-    "clean": "rm -rf dist node_modules coverage"
+    "clean": "rimraf dist node_modules coverage"
   },
   "devDependencies": {
     "@types/isomorphic-fetch": "0.0.35",
@@ -58,13 +58,15 @@
     "@typescript-eslint/eslint-plugin": "5.8.0",
     "@typescript-eslint/parser": "5.8.0",
     "eslint": "7.32.0",
-    "eslint-plugin-prettierx": "github:utily/eslint-plugin-prettierx#utily-20211220",
+    "eslint-plugin-prettierx": "github:utily/eslint-plugin-prettierx#utily-20211221",
     "isomorphic-fetch": "^3.0.0",
     "jest": "^27.4.5",
-    "prettierx": "github:utily/prettierx#utily-20211220",
+    "prettierx": "github:utily/prettierx#utily-20211221",
+		"rimraf": "^3.0.2",
     "ts-jest": "^27.1.2",
-    "ts-loader": "^9.2.6",
     "typescript": "^4.5.4",
-    "watch": "^0.13.0"
+    "watch": "^0.13.0",
+		"eslint-plugin-simple-import-sort": "^7.0.0"
+
   }
 }
