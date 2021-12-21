@@ -11,8 +11,8 @@ export interface Header {
 	allow?: string[]
 	altSvc?: string
 	cacheControl?: string
-	cfConnectionIp?: string,
-	cfIpCountry?: string,
+	cfConnectionIp?: string
+	cfIpCountry?: string
 	connection?: string
 	contentDisposition?: string
 	contentEncoding?: string
@@ -134,29 +134,35 @@ export namespace Header {
 		function isStringArray(value: any | string[]): value is string[] {
 			return value == undefined || (Array.isArray(value) && value.every(v => typeof v == "string"))
 		}
-		return typeof value == "object" && fields.every(field => (field[2] == 1 ? isString : isStringArray)(value[field[0]]))
+		return (
+			typeof value == "object" && fields.every(field => (field[2] == 1 ? isString : isStringArray)(value[field[0]]))
+		)
 	}
 	export function to(header: Header): { [field: string]: string } {
 		return Object.fromEntries(
 			fields
-			.map(([property, field, count]) => [field, header[property]])
-			.filter(([field, value]) => value)
-			.map(([field, value]) => [field, Array.isArray(value) ? value.join(", ") : value])
+				.map(([property, field, count]) => [field, header[property]])
+				.filter(([field, value]) => value)
+				.map(([field, value]) => [field, Array.isArray(value) ? value.join(", ") : value])
 		)
 	}
 	export function from(headers: globalThis.HeadersInit): Header {
 		const entries = Array.isArray(headers)
-		? headers.map<[string, string]>(([field, ...value]) => [field, value.join(", ")])
-		: isHeaders(headers)
-		? getEntries(headers)
-		: Object.entries(headers)
-		const data: { [field: string]: string } = Object.fromEntries(entries.map(([field, value]) => [field.toLowerCase(), value]))
+			? headers.map<[string, string]>(([field, ...value]) => [field, value.join(", ")])
+			: isHeaders(headers)
+			? getEntries(headers)
+			: Object.entries(headers)
+		const data: { [field: string]: string } = Object.fromEntries(
+			entries.map(([field, value]) => [field.toLowerCase(), value])
+		)
 		return Object.fromEntries(
-			fields.map(field => [field[0], data[field[1].toLowerCase()], field[2]]).filter(field => field[1]).map(field => [
+			fields
+				.map(field => [field[0], data[field[1].toLowerCase()], field[2]])
+				.filter(field => field[1])
+				.map(field => [
 					field[0],
-					field[2] == 1 || typeof field[1] != "string" ? field[1] : field[1].split(",").map(v => v.trim())
-				]
-			)
+					field[2] == 1 || typeof field[1] != "string" ? field[1] : field[1].split(",").map(v => v.trim()),
+				])
 		)
 	}
 	function isHeaders(value: globalThis.Headers | any): value is globalThis.Headers {
