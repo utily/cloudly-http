@@ -3,7 +3,7 @@ import { Method } from "./Method"
 import { Request } from "./Request"
 import { Response } from "./Response"
 
-export class Client<Error = void> {
+export class Client<Error = never> {
 	onError?: (request: Request, response: Response) => Promise<boolean>
 	onUnauthorized?: (connection: Client<Error>) => Promise<boolean>
 	constructor(public url?: string, public key?: string) {}
