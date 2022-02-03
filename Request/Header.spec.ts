@@ -37,4 +37,28 @@ describe("Request.Header", () => {
 			cfIpCountry: "SE",
 		})
 	})
+	it("paxpay headers", () => {
+		expect(
+			parser.Request.Header.to({
+				xModNonce: "some_session_id",
+				xModRetry: "true",
+				xAuthToken: "tOkEnStRiNg",
+			})
+		).toEqual({
+			"x-mod-nonce": "some_session_id",
+			"x-mod-retry": "true",
+			"X-Auth-Token": "tOkEnStRiNg",
+		})
+		expect(
+			parser.Request.Header.from({
+				"x-mod-nonce": "some_session_id",
+				"x-mod-retry": "true",
+				"X-Auth-Token": "tOkEnStRiNg",
+			})
+		).toEqual({
+			xModNonce: "some_session_id",
+			xModRetry: "true",
+			xAuthToken: "tOkEnStRiNg",
+		})
+	})
 })
