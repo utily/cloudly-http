@@ -57,6 +57,8 @@ export interface Header {
 	readonly xModNonce?: string
 	readonly xModRetry?: string
 	readonly saveData?: string
+	readonly xAuthToken?: string
+	readonly xTrackingId?: string
 }
 const fields: [keyof Header, string, number][] = [
 	["aIM", "A-IM", 1],
@@ -117,6 +119,8 @@ const fields: [keyof Header, string, number][] = [
 	["xModNonce", "x-mod-nonce", 1],
 	["xModRetry", "x-mod-retry", 1],
 	["saveData", "Save-Data", 1],
+	["xAuthToken", "X-Auth-Token", 1],
+	["xTrackingId", "x-tracking-id", 1],
 ]
 export namespace Header {
 	export function is(value: any | Header): value is Header {
