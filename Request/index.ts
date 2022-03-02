@@ -39,7 +39,7 @@ export namespace Request {
 		return {
 			url: r.url.toString(),
 			method: r.method,
-			headers: RequestHeader.to(r.header),
+			headers: RequestHeader.to(r.header) as Record<string, string>,
 			body: ["GET", "HEAD"].some(v => v == r.method)
 				? undefined
 				: await Serializer.serialize(await r.body, r.header.contentType),

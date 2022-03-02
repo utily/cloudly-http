@@ -43,4 +43,24 @@ describe("Response.Header", () => {
 			"CF-Connecting-IP": "127.0.0.1",
 			"CF-IPCountry": "SE",
 		}))
+	it("unknown headers", () => {
+		expect(
+			parser.Response.Header.to({
+				contentType: "application/json; charset=utf-8",
+				fooBar: "Foo Bar",
+			})
+		).toEqual({
+			"Content-Type": "application/json; charset=utf-8",
+			"Foo-Bar": "Foo Bar",
+		})
+		expect(
+			parser.Response.Header.from({
+				"Content-Type": "application/json; charset=utf-8",
+				"Foo-Bar": "Foo Bar",
+			})
+		).toEqual({
+			contentType: "application/json; charset=utf-8",
+			fooBar: "Foo Bar",
+		})
+	})
 })

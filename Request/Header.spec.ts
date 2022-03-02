@@ -65,4 +65,24 @@ describe("Request.Header", () => {
 			xTrackingId: "some_tracking_id",
 		})
 	})
+	it("unknown headers", () => {
+		expect(
+			parser.Request.Header.to({
+				contentType: "application/json; charset=utf-8",
+				fooBar: "Foo Bar",
+			})
+		).toEqual({
+			"Content-Type": "application/json; charset=utf-8",
+			"Foo-Bar": "Foo Bar",
+		})
+		expect(
+			parser.Request.Header.from({
+				"Content-Type": "application/json; charset=utf-8",
+				"Foo-Bar": "Foo Bar",
+			})
+		).toEqual({
+			contentType: "application/json; charset=utf-8",
+			fooBar: "Foo Bar",
+		})
+	})
 })

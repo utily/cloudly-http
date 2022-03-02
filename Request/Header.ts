@@ -1,65 +1,69 @@
-export interface Header {
-	readonly aIM?: string
-	readonly accept?: string[]
-	readonly acceptCharset?: string[]
-	readonly acceptDatetime?: string
-	readonly acceptEncoding?: string[]
-	readonly acceptLanguage?: string[]
-	readonly accessControlRequestMethod?: string
-	readonly accessControlRequestHeaders?: string
-	readonly authorization?: string
-	readonly cacheControl?: string
-	readonly cfConnectionIp?: string
-	readonly cfIpCountry?: string
-	readonly connection?: string
-	readonly contentLength?: string
-	readonly contentMD5?: string
-	readonly contentType?: string
-	readonly cookie?: string
-	readonly date?: string
-	readonly expect?: string
-	readonly forwarded?: string
-	readonly from?: string
-	readonly host?: string
-	readonly http2Settings?: string
-	readonly ifMatch?: string[]
-	readonly ifModifiedSince?: string
-	readonly ifNoneMatch?: string[]
-	readonly ifRange?: string
-	readonly ifUnmodifiedSince?: string
-	readonly maxForwards?: string
-	readonly origin?: string
-	readonly pragma?: string
-	readonly proxyAuthorization?: string
-	readonly range?: string
-	readonly referer?: string
-	readonly te?: string[]
-	readonly trailer?: string
-	readonly transferEncoding?: string
-	readonly userAgent?: string
-	readonly upgrade?: string[]
-	readonly via?: string[]
-	readonly warning?: string
-	readonly upgradeInsecureRequests?: string
-	readonly xRequestedWith?: string
-	readonly dnt?: string
-	readonly xForwardedFor?: string
-	readonly xForwardedHost?: string
-	readonly xForwardedProto?: string
-	readonly xMsContinuation?: string
-	readonly frontEndHttps?: string
-	readonly xHttpMethodOverride?: string
-	readonly xAttDeviceId?: string
-	readonly xWapProfile?: string
-	readonly proxyConnection?: string
-	readonly xCsrfToken?: string
-	readonly xCorrelationID?: string
-	readonly xModNonce?: string
-	readonly xModRetry?: string
-	readonly saveData?: string
-	readonly xAuthToken?: string
-	readonly xTrackingId?: string
-}
+import * as CamelCase from "../CamelCase"
+
+export type Header =
+	| Record<string, string | undefined>
+	| {
+			readonly aIM?: string
+			readonly accept?: string[]
+			readonly acceptCharset?: string[]
+			readonly acceptDatetime?: string
+			readonly acceptEncoding?: string[]
+			readonly acceptLanguage?: string[]
+			readonly accessControlRequestMethod?: string
+			readonly accessControlRequestHeaders?: string
+			readonly authorization?: string
+			readonly cacheControl?: string
+			readonly cfConnectionIp?: string
+			readonly cfIpCountry?: string
+			readonly connection?: string
+			readonly contentLength?: string
+			readonly contentMD5?: string
+			readonly contentType?: string
+			readonly cookie?: string
+			readonly date?: string
+			readonly expect?: string
+			readonly forwarded?: string
+			readonly from?: string
+			readonly host?: string
+			readonly http2Settings?: string
+			readonly ifMatch?: string[]
+			readonly ifModifiedSince?: string
+			readonly ifNoneMatch?: string[]
+			readonly ifRange?: string
+			readonly ifUnmodifiedSince?: string
+			readonly maxForwards?: string
+			readonly origin?: string
+			readonly pragma?: string
+			readonly proxyAuthorization?: string
+			readonly range?: string
+			readonly referer?: string
+			readonly te?: string[]
+			readonly trailer?: string
+			readonly transferEncoding?: string
+			readonly userAgent?: string
+			readonly upgrade?: string[]
+			readonly via?: string[]
+			readonly warning?: string
+			readonly upgradeInsecureRequests?: string
+			readonly xRequestedWith?: string
+			readonly dnt?: string
+			readonly xForwardedFor?: string
+			readonly xForwardedHost?: string
+			readonly xForwardedProto?: string
+			readonly xMsContinuation?: string
+			readonly frontEndHttps?: string
+			readonly xHttpMethodOverride?: string
+			readonly xAttDeviceId?: string
+			readonly xWapProfile?: string
+			readonly proxyConnection?: string
+			readonly xCsrfToken?: string
+			readonly xCorrelationID?: string
+			readonly xModNonce?: string
+			readonly xModRetry?: string
+			readonly saveData?: string
+			readonly xAuthToken?: string
+			readonly xTrackingId?: string
+	  }
 const fields: [keyof Header, string, number][] = [
 	["aIM", "A-IM", 1],
 	["accept", "Accept", 2],
@@ -134,31 +138,27 @@ export namespace Header {
 			typeof value == "object" && fields.every(field => (field[2] == 1 ? isString : isStringArray)(value[field[0]]))
 		)
 	}
-	export function to(header: Header): { [field: string]: string } {
+	export function to(header: Header): Record<string, string | undefined> {
 		return Object.fromEntries(
-			fields
-				.map(([property, field, count]) => [field, header[property]])
-				.filter(([field, value]) => value)
-				.map(([field, value]) => [field, Array.isArray(value) ? value.join(", ") : value])
+			Object.entries(header).map(([name, value]) => {
+				const field = fields.find(([camelCase, n, l]) => camelCase == name)
+				return [field ? field[1] : CamelCase.from(name), Array.isArray(value) ? value.join(", ") : value]
+			})
 		)
 	}
 	export function from(headers: globalThis.HeadersInit): Header {
-		const entries = Array.isArray(headers)
-			? headers.map<[string, string]>(([field, ...value]) => [field, value.join(", ")])
-			: isHeaders(headers)
-			? [...headers]
-			: Object.entries(headers)
-		const data: { [field: string]: string } = Object.fromEntries(
-			entries.map(([field, value]) => [field.toLowerCase(), value])
-		)
 		return Object.fromEntries(
-			fields
-				.map(field => [field[0], data[field[1].toLowerCase()], field[2]])
-				.filter(field => field[1])
-				.map(field => [
-					field[0],
-					field[2] == 1 || typeof field[1] != "string" ? field[1] : field[1].split(",").map(v => v.trim()),
-				])
+			(Array.isArray(headers)
+				? headers.map<[string, string]>(([field, ...value]) => [field, value.join(", ")])
+				: isHeaders(headers)
+				? [...headers]
+				: Object.entries(headers)
+			).map(([name, value]) => {
+				const field = fields.find(([c, n, l]) => name.toLowerCase() == n.toLowerCase())
+				return field
+					? [field[0], field[2] == 1 || typeof value != "string" ? value : value.split(",").map(v => v.trim())]
+					: [CamelCase.to(name), value]
+			})
 		)
 	}
 	function isHeaders(value: globalThis.Headers | any): value is globalThis.Headers {
