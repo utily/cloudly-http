@@ -21,7 +21,7 @@ export namespace Response {
 	export async function to(request: Response): Promise<globalThis.Response> {
 		return new globalThis.Response(await Serializer.serialize(await request.body, request.header.contentType), {
 			status: request.status,
-			headers: new globalThis.Headers(ResponseHeader.to(request.header)),
+			headers: new globalThis.Headers(ResponseHeader.to(request.header) as Record<string, string>),
 		})
 	}
 	export function from(response: globalThis.Response): Response {

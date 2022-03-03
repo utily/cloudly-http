@@ -1,67 +1,70 @@
-export interface Header {
-	accessControlAllowOrigin?: string
-	accessControlAllowCredentials?: string
-	accessControlExposeHeaders?: string[]
-	accessControlMaxAge?: string
-	accessControlAllowMethods?: string[]
-	accessControlAllowHeaders?: string[]
-	acceptPatch?: string
-	acceptRanges?: string
-	age?: string
-	allow?: string[]
-	altSvc?: string
-	cacheControl?: string
-	cfConnectionIp?: string
-	cfIpCountry?: string
-	connection?: string
-	contentDisposition?: string
-	contentEncoding?: string
-	contentLanguage?: string[]
-	contentLength?: string
-	contentLocation?: string
-	contentMD5?: string
-	contentRange?: string
-	contentSecurityPolicy?: string
-	contentType?: string
-	date?: string
-	deltaBase?: string
-	eTag?: string
-	expires?: string
-	iM?: string
-	lastModified?: string
-	link?: string
-	location?: string
-	p3P?: string
-	pragma?: string
-	proxyAuthenticate?: string
-	publicKeyPins?: string
-	refresh?: string
-	retryAfter?: string
-	server?: string
-	setCookie?: string
-	status?: string
-	strictTransportSecurity?: string
-	timingAllowOrigin?: string[]
-	trailer?: string
-	transferEncoding?: string
-	tk?: string
-	upgrade?: string[]
-	vary?: string[]
-	via?: string
-	warning?: string
-	wwwAuthenticate?: string
-	xContentSecurityPolicy?: string
-	xFrameOptions?: string
-	xWebkitCsp?: string
-	xContentDuration?: string
-	xContentTypeOptions?: string
-	xCorrelationId?: string
-	xMsContinuation?: string
-	xPoweredBy?: string
-	xRequestId?: string
-	xUACompatible?: string
-	xXssProtection?: string
-}
+import * as CamelCase from "../CamelCase"
+export type Header =
+	| {
+			accessControlAllowOrigin?: string
+			accessControlAllowCredentials?: string
+			accessControlExposeHeaders?: string[]
+			accessControlMaxAge?: string
+			accessControlAllowMethods?: string[]
+			accessControlAllowHeaders?: string[]
+			acceptPatch?: string
+			acceptRanges?: string
+			age?: string
+			allow?: string[]
+			altSvc?: string
+			cacheControl?: string
+			cfConnectionIp?: string
+			cfIpCountry?: string
+			connection?: string
+			contentDisposition?: string
+			contentEncoding?: string
+			contentLanguage?: string[]
+			contentLength?: string
+			contentLocation?: string
+			contentMD5?: string
+			contentRange?: string
+			contentSecurityPolicy?: string
+			contentType?: string
+			date?: string
+			deltaBase?: string
+			eTag?: string
+			expires?: string
+			iM?: string
+			lastModified?: string
+			link?: string
+			location?: string
+			p3P?: string
+			pragma?: string
+			proxyAuthenticate?: string
+			publicKeyPins?: string
+			refresh?: string
+			retryAfter?: string
+			server?: string
+			setCookie?: string
+			status?: string
+			strictTransportSecurity?: string
+			timingAllowOrigin?: string[]
+			trailer?: string
+			transferEncoding?: string
+			tk?: string
+			upgrade?: string[]
+			vary?: string[]
+			via?: string
+			warning?: string
+			wwwAuthenticate?: string
+			xContentSecurityPolicy?: string
+			xFrameOptions?: string
+			xWebkitCsp?: string
+			xContentDuration?: string
+			xContentTypeOptions?: string
+			xCorrelationId?: string
+			xMsContinuation?: string
+			xPoweredBy?: string
+			xRequestId?: string
+			xUACompatible?: string
+			xXssProtection?: string
+	  }
+	| Record<string, string | undefined>
 const fields: [keyof Header, string, number][] = [
 	["accessControlAllowOrigin", "Access-Control-Allow-Origin", 1],
 	["accessControlAllowCredentials", "Access-Control-Allow-Credentials", 1],
@@ -138,31 +141,27 @@ export namespace Header {
 			typeof value == "object" && fields.every(field => (field[2] == 1 ? isString : isStringArray)(value[field[0]]))
 		)
 	}
-	export function to(header: Header): { [field: string]: string } {
+	export function to(header: Header): Record<string, string | undefined> {
 		return Object.fromEntries(
-			fields
-				.map(([property, field, count]) => [field, header[property]])
-				.filter(([field, value]) => value)
-				.map(([field, value]) => [field, Array.isArray(value) ? value.join(", ") : value])
+			Object.entries(header).map(([name, value]) => {
+				const field = fields.find(([camelCase, ..._]) => camelCase == name)
+				return [field ? field[1] : CamelCase.from(name), Array.isArray(value) ? value.join(", ") : value]
+			})
 		)
 	}
 	export function from(headers: globalThis.HeadersInit): Header {
-		const entries = Array.isArray(headers)
-			? headers.map<[string, string]>(([field, ...value]) => [field, value.join(", ")])
-			: isHeaders(headers)
-			? getEntries(headers)
-			: Object.entries(headers)
-		const data: { [field: string]: string } = Object.fromEntries(
-			entries.map(([field, value]) => [field.toLowerCase(), value])
-		)
 		return Object.fromEntries(
-			fields
-				.map(field => [field[0], data[field[1].toLowerCase()], field[2]])
-				.filter(field => field[1])
-				.map(field => [
-					field[0],
-					field[2] == 1 || typeof field[1] != "string" ? field[1] : field[1].split(",").map(v => v.trim()),
-				])
+			(Array.isArray(headers)
+				? headers.map<[string, string]>(([field, ...value]) => [field, value.join(", ")])
+				: isHeaders(headers)
+				? getEntries(headers)
+				: Object.entries(headers)
+			).map(([name, value]) => {
+				const field = fields.find(([c, n, l]) => name.toLowerCase() == n.toLowerCase())
+				return field
+					? [field[0], field[2] == 1 || typeof value != "string" ? value : value.split(",").map(v => v.trim())]
+					: [CamelCase.to(name), value]
+			})
 		)
 	}
 	function isHeaders(value: globalThis.Headers | any): value is globalThis.Headers {
