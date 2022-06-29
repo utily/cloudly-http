@@ -7,33 +7,43 @@ export interface Response {
 	readonly status: number
 	readonly header: Readonly<ResponseHeader>
 	readonly body?: any | Promise<any>
+	readonly webSocket?: WebSocket
 }
 
 export namespace Response {
 	export function is(value: any | Response): value is Response {
 		return (
 			typeof value == "object" &&
-			Object.keys(value).every(key => ["status", "header", "body"].some(k => k == key)) &&
+			Object.keys(value).every(key => ["status", "header", "body", "webSocket"].some(k => k == key)) &&
 			(value.status == undefined || typeof value.status == "number") &&
-			(value.header == undefined || ResponseHeader.is(value.header))
+			(value.header == undefined || ResponseHeader.is(value.header)) &&
+			(value.webSocket == undefined || value.webSocket instanceof WebSocket)
 		)
 	}
 	export async function to(request: Response): Promise<globalThis.Response> {
 		return new globalThis.Response(await Serializer.serialize(await request.body, request.header.contentType), {
 			status: request.status,
 			headers: new globalThis.Headers(ResponseHeader.to(request.header) as Record<string, string>),
-		})
+			webSocket: request.webSocket,
+		} as ResponseInit & Partial<{ webSocket: WebSocket }>)
 	}
-	export function from(response: globalThis.Response): Response {
+	export function from(response: globalThis.Response & Partial<{ webSocket?: WebSocket }>): Response {
 		return {
 			status: response.status,
 			header: ResponseHeader.from(response.headers),
 			body: Parser.parse(response),
+			webSocket: response.webSocket ?? undefined,
 		}
 	}
 	export function create(response: ResponseLike | any, contentType?: string): Response {
-		const result: Required<ResponseLike> = ResponseLike.is(response)
-			? { status: 200, header: {}, body: undefined, ...response }
+		const result: Required<Omit<ResponseLike, "webSocket">> = ResponseLike.is(response)
+			? {
+					status: 200,
+					header: {},
+					body: undefined,
+					...(response.webSocket && { webSocket: response.webSocket }),
+					...response,
+			  }
 			: {
 					status: (typeof response == "object" && typeof response.status == "number" && response.status) || 200,
 					header:
@@ -49,6 +59,7 @@ export namespace Response {
 						typeof response == "object" && !Array.isArray(response)
 							? (({ header, ...body }) => body)(response)
 							: response,
+					...(response.webSocket && { webSocket: response.webSocket }),
 			  }
 		if (!result.header.contentType)
 			switch (typeof result.body) {
@@ -77,4 +88,5 @@ export namespace Response {
 		export const from = ResponseHeader.from
 	}
 	export type Like = ResponseLike
+	export const Like = ResponseLike
 }

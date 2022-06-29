@@ -1,4 +1,6 @@
 import * as http from "../index"
+import WebSocket from "ws"
+;(global.WebSocket as any) = WebSocket
 
 describe("Response", () => {
 	const output = {
@@ -118,5 +120,17 @@ describe("Response", () => {
 				type: "not authorized",
 			},
 		})
+	})
+	it("is", () => {
+		const socket = new WebSocket("wss://localhost")
+		socket.onerror = error => error
+		expect(
+			http.Response.is({
+				status: 101,
+				header: { contentType: "application/json" },
+				webSocket: socket,
+			})
+		).toEqual(true)
+		expect(http.Response.is({ status: 200, header: { contentType: "application/json" } })).toEqual(true)
 	})
 })
