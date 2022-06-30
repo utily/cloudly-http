@@ -1,15 +1,15 @@
 /// <reference lib="webworker.iterable" />
-import * as Parser from "../Parser"
 import { Method } from "../Method"
+import * as Parser from "../Parser"
+import * as Serializer from "../Serializer"
 import { Header as RequestHeader } from "./Header"
 import { Like as RequestLike } from "./Like"
-import * as Serializer from "../Serializer"
 
 export interface Request {
 	readonly method: Method
 	readonly url: URL
-	readonly parameter: { readonly [key: string]: string }
-	readonly search: { readonly [key: string]: string }
+	readonly parameter: { readonly [key: string]: string | undefined }
+	readonly search: { readonly [key: string]: string | undefined }
 	readonly remote?: string
 	readonly header: Readonly<RequestHeader>
 	readonly body?: any | Promise<any>

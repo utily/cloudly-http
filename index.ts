@@ -1,11 +1,11 @@
 import { Client } from "./Client"
+import { fetch } from "./fetch"
 import { Method } from "./Method"
 import * as Parser from "./Parser"
-import * as Serializer from "./Serializer"
 import { Request } from "./Request"
 import { HttpResponse as Response } from "./Response"
-import { fetch } from "./fetch"
 import * as Search from "./Search"
+import * as Serializer from "./Serializer"
 
 Parser.add(async request => await request.text(), "text/plain", "text/html")
 Parser.add(async request => await request.json(), "application/json")
