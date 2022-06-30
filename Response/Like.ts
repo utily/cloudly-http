@@ -5,16 +5,20 @@ export interface Like {
 	header?: Header
 	body?: any | Promise<any>
 	webSocket?: WebSocket
+	socket?: WebSocket
 }
 
 export namespace Like {
 	export function is(value: Like | any): value is Like {
 		return (
 			typeof value == "object" &&
-			Object.keys(value).every(key => ["status", "header", "body", "webSocket"].some(property => property == key)) &&
+			Object.keys(value).every(key =>
+				["status", "header", "body", "webSocket", "socket"].some(property => property == key)
+			) &&
 			(value.status == undefined || typeof value.status == "number") &&
 			(value.header == undefined || Header.is(value.header)) &&
 			(value.webSocket == undefined || value.webSocket instanceof WebSocket) &&
+			(value.webSocket == undefined || value.socket instanceof WebSocket) &&
 			(value.status != undefined || value.header != undefined || value.body != undefined)
 		)
 	}
