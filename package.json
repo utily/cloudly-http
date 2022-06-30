@@ -1,6 +1,6 @@
 {
 	"name": "cloudly-http",
-	"version": "0.0.48",
+	"version": "0.0.49",
 	"description": "Improved handling of HTTP Requests and Responses.",
 	"author": "Simon Mika <simon@mika.se>",
 	"license": "MIT",
