@@ -1,12 +1,14 @@
 {
 	"compilerOptions": {
-		"outDir": "dist",
-		"target": "es2019",
-		"module": "es2015",
-		"experimentalDecorators": true,
-		"lib": ["es2019", "webworker"],
-		"esModuleInterop": true,
+		"target": "es2021",
+		"module": "es2020",
+		"lib": [
+			"es2021",
+			"webworker"
+		],
 		"allowJs": true,
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
 		"noImplicitAny": true,
 		"removeComments": true,
 		"preserveConstEnums": true,
@@ -14,8 +16,20 @@
 		"noImplicitThis": true,
 		"strictNullChecks": true,
 		"sourceMap": true,
+		"outDir": "dist",
 		"moduleResolution": "node",
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"paths": {
+			"*": [
+				"types/*"
+			]
+		},
+		"types": ["jest"]
 	},
-	"include": ["**/*.spec.ts"]
+	"files": [
+		"index.ts"
+	],
+	"typeAcquisition": {
+		"enable": true
+	}
 }
