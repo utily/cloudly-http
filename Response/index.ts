@@ -3,15 +3,15 @@ import * as Serializer from "../Serializer"
 import { Header as ResponseHeader } from "./Header"
 import { Like as ResponseLike } from "./Like"
 
-export interface Response {
+export interface HttpResponse {
 	readonly status: number
 	readonly header: Readonly<ResponseHeader>
 	readonly body?: any | Promise<any>
-	readonly webSocket?: WebSocket
+	readonly webSocket?: WebSocket | null
 }
 
-export namespace Response {
-	export function is(value: any | Response): value is Response {
+export namespace HttpResponse {
+	export function is(value: any | HttpResponse): value is HttpResponse {
 		return (
 			typeof value == "object" &&
 			Object.keys(value).every(key => ["status", "header", "body", "webSocket"].some(k => k == key)) &&
@@ -20,22 +20,22 @@ export namespace Response {
 			(value.webSocket == undefined || value.webSocket instanceof WebSocket)
 		)
 	}
-	export async function to(request: Response): Promise<globalThis.Response> {
-		return new globalThis.Response(await Serializer.serialize(await request.body, request.header.contentType), {
+	export async function to(request: HttpResponse): Promise<Response> {
+		return new Response(await Serializer.serialize(await request.body, request.header.contentType), {
 			status: request.status,
-			headers: new globalThis.Headers(ResponseHeader.to(request.header) as Record<string, string>),
+			headers: new Headers(ResponseHeader.to(request.header) as Record<string, string>),
 			webSocket: request.webSocket,
 		} as ResponseInit & Partial<{ webSocket: WebSocket }>)
 	}
-	export function from(response: globalThis.Response & Partial<{ webSocket?: WebSocket }>): Response {
+	export function from(response: Response & Partial<{ webSocket?: WebSocket }>): HttpResponse {
 		return {
 			status: response.status,
 			header: ResponseHeader.from(response.headers),
-			body: Parser.parse(response),
+			body: response.status == 101 ? null : Parser.parse(response),
 			webSocket: response.webSocket ?? undefined,
 		}
 	}
-	export function create(response: ResponseLike | any, contentType?: string): Response {
+	export function create(response: ResponseLike | any, contentType?: string): HttpResponse {
 		const result: Required<Omit<ResponseLike, "webSocket">> = ResponseLike.is(response)
 			? {
 					status: 200,

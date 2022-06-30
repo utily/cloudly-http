@@ -3,7 +3,7 @@ import { Method } from "./Method"
 import * as Parser from "./Parser"
 import * as Serializer from "./Serializer"
 import { Request } from "./Request"
-import { Response } from "./Response"
+import { HttpResponse as Response } from "./Response"
 import { fetch } from "./fetch"
 import * as Search from "./Search"
 
