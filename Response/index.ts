@@ -25,9 +25,9 @@ export namespace HttpResponse {
 			status: request.status,
 			headers: new Headers(ResponseHeader.to(request.header) as Record<string, string>),
 			webSocket: request.webSocket,
-		} as ResponseInit & Partial<{ webSocket: WebSocket }>)
+		} as ResponseInit & Partial<{ webSocket: WebSocket | null }>)
 	}
-	export function from(response: Response & Partial<{ webSocket?: WebSocket }>): HttpResponse {
+	export function from(response: Response & Partial<{ webSocket?: WebSocket | null }>): HttpResponse {
 		return {
 			status: response.status,
 			header: ResponseHeader.from(response.headers),
