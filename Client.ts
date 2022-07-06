@@ -1,17 +1,17 @@
 import { fetch } from "./fetch"
 import { Method } from "./Method"
 import { Request } from "./Request"
-import { HttpResponse } from "./Response"
+import { Response } from "./Response"
 
 export class Client<Error = never> {
-	onError?: (request: Request, response: HttpResponse) => Promise<boolean>
+	onError?: (request: Request, response: Response) => Promise<boolean>
 	onUnauthorized?: (connection: Client<Error>) => Promise<boolean>
 	constructor(public url?: string, public key?: string) {}
 
 	private async fetch<R>(path: string, method: Method, body?: any, header?: Request.Header): Promise<R | Error> {
 		const request = await this.preProcess(Request.create({ url: `${this.url ?? ""}/${path}`, method, header, body }))
 		const response = await this.postProcess(
-			await fetch(request).catch(error => HttpResponse.create({ status: 601, body: error }))
+			await fetch(request).catch(error => Response.create({ status: 601, body: error }))
 		)
 		return (response.status == 401 && this.onUnauthorized && (await this.onUnauthorized(this))) ||
 			(response.status >= 300 && this.onError && (await this.onError(request, response)))
@@ -28,7 +28,7 @@ export class Client<Error = never> {
 			},
 		}
 	}
-	protected async postProcess(response: HttpResponse): Promise<HttpResponse> {
+	protected async postProcess(response: Response): Promise<Response> {
 		return response
 	}
 	async get<R>(path: string, header?: Request.Header): Promise<R | Error> {

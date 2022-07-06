@@ -1,3 +1,4 @@
+import "isomorphic-fetch"
 import * as parser from "../index"
 
 describe("Request.Header", () => {

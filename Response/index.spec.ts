@@ -1,3 +1,8 @@
+import "isomorphic-fetch"
+import WebSocket from "jest-websocket-mock"
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-ignore
+global.WebSocket = WebSocket
 import * as http from "../index"
 
 describe("Response", () => {

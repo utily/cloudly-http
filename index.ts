@@ -3,9 +3,10 @@ import { fetch } from "./fetch"
 import { Method } from "./Method"
 import * as Parser from "./Parser"
 import { Request } from "./Request"
-import { HttpResponse as Response } from "./Response"
+import { Response } from "./Response"
 import * as Search from "./Search"
 import * as Serializer from "./Serializer"
+import { Socket } from "./Socket"
 
 Parser.add(async request => await request.text(), "text/plain", "text/html")
 Parser.add(async request => await request.json(), "application/json")
@@ -16,4 +17,4 @@ Serializer.add(async body => (typeof body == "string" ? body : body.toString()),
 Serializer.add(async body => JSON.stringify(body), "application/json")
 Serializer.add(async body => Search.stringify(body), "application/x-www-form-urlencoded")
 
-export { Client, Method, Parser, Serializer, Request, Response, fetch, Search }
+export { Client, Method, Parser, Serializer, Request, Response, fetch, Search, Socket }
