@@ -1,8 +1,12 @@
+import type { Response } from "../Response"
 import { ArrayBuffer as SocketArrayBuffer } from "./ArrayBuffer"
 import { Json as SocketJson } from "./Json"
 import { String as SocketString } from "./String"
 
 export class Socket {
+	get state(): "created" | "opened" | "closed" {
+		return this.arrayBuffer.state
+	}
 	#json?: SocketJson
 	get json(): SocketJson {
 		if (!this.#json)
@@ -20,10 +24,14 @@ export class Socket {
 	#arrayBuffer?: SocketArrayBuffer
 	get arrayBuffer(): SocketArrayBuffer {
 		if (!this.#arrayBuffer)
-			this.#arrayBuffer = new SocketArrayBuffer(this.socket, this.isOpen)
+			this.#arrayBuffer = new SocketArrayBuffer(this.backend, this.isOpen)
 		return this.#arrayBuffer
 	}
-	constructor(private readonly socket: WebSocket, private readonly isOpen?: boolean) {}
+	constructor(private readonly backend: WebSocket, private readonly isOpen?: boolean) {}
+
+	upgrade(header?: Response.Header): Response {
+		return { status: 101, socket: this.backend, header: header ?? {} }
+	}
 }
 export namespace Socket {
 	export type ArrayBuffer = SocketArrayBuffer

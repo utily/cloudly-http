@@ -8,8 +8,8 @@ export class ArrayBuffer {
 		if (isOpen)
 			this.#sendQueue = undefined
 		this.#backend.addEventListener("open", () => {
-			if (this.#onopen)
-				this.#onopen()
+			if (this.#onOpen)
+				this.#onOpen()
 			this.#handleOpen.bind(this)
 		})
 		this.#backend.addEventListener("message", async (event: MessageEvent) => {
@@ -20,43 +20,43 @@ export class ArrayBuffer {
 				data = await (data as Blob).arrayBuffer()
 			console.log("received message")
 			this.#handleOpen()
-			if (this.#listen)
-				this.#listen(data)
+			if (this.#onMessage)
+				this.#onMessage(data)
 			else
 				this.#receiveQueue?.push(data)
 		})
 		this.#backend.addEventListener("close", () => {
-			if (this.#onclose)
-				this.#onclose()
+			if (this.#onClose)
+				this.#onClose()
 			this.#closed = true
 		})
 	}
 	get state(): "created" | "opened" | "closed" {
 		return this.#closed ? "closed" : this.#sendQueue ? "opened" : "opened"
 	}
-	#listen?: (buffer: globalThis.ArrayBuffer) => void
-	set listen(value: ((buffer: globalThis.ArrayBuffer) => void) | undefined) {
+	#onMessage?: (buffer: globalThis.ArrayBuffer) => void
+	set onMessage(value: ((buffer: globalThis.ArrayBuffer) => void) | undefined) {
 		if (this.#receiveQueue.length && value) {
 			this.#receiveQueue.forEach(value)
 			this.#receiveQueue = []
 		}
-		this.#listen = value
+		this.#onMessage = value
 	}
-	#onclose?: () => void
-	set onclose(value: (() => void) | undefined) {
+	#onClose?: () => void
+	set onClose(value: (() => void) | undefined) {
 		if (this.state == "closed" && value)
 			value()
-		this.#onclose = value
+		this.#onClose = value
 	}
 	#handleOpen() {
 		this.#sendQueue?.forEach(buffer => this.#backend.send(buffer))
 		this.#sendQueue = undefined
 	}
-	#onopen?: () => void
-	set onopen(value: (() => void) | undefined) {
+	#onOpen?: () => void
+	set onOpen(value: (() => void) | undefined) {
 		if (this.state == "opened" && value)
 			value()
-		this.#onopen = value
+		this.#onOpen = value
 	}
 	send(buffer: globalThis.ArrayBuffer): void {
 		if (this.#sendQueue)

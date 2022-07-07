@@ -5,13 +5,13 @@ export class String {
 		return this.backend.state
 	}
 	set listen(value: ((string: string) => void) | undefined) {
-		this.backend.listen = value && (string => value(new TextDecoder().decode(string)))
+		this.backend.onMessage = value && (string => value(new TextDecoder().decode(string)))
 	}
 	set onclose(value: () => void) {
-		this.backend.onclose = value
+		this.backend.onClose = value
 	}
 	set onopen(value: () => void) {
-		this.backend.onopen = value
+		this.backend.onOpen = value
 	}
 	constructor(private readonly backend: ArrayBuffer) {}
 	send(string: string): void {
