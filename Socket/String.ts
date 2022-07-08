@@ -1,20 +1,15 @@
-import { ArrayBuffer } from "./ArrayBuffer"
+import { Message } from "./Backend/Message"
+import { Socket } from "./Socket"
 
-export class String {
-	get state(): "created" | "opened" | "closed" {
-		return this.backend.state
+export class String extends Socket<string> {
+	protected processReceived(data: Message | any): string {
+		return data?.arrayBuffer
+			? new TextDecoder().decode(data.arrayBuffer())
+			: typeof data != "string"
+			? new TextDecoder().decode(data)
+			: data
 	}
-	set listen(value: ((string: string) => void) | undefined) {
-		this.backend.onMessage = value && (string => value(new TextDecoder().decode(string)))
-	}
-	set onclose(value: () => void) {
-		this.backend.onClose = value
-	}
-	set onopen(value: () => void) {
-		this.backend.onOpen = value
-	}
-	constructor(private readonly backend: ArrayBuffer) {}
-	send(string: string): void {
-		this.backend.send(new TextEncoder().encode(string))
+	protected processSend(data: string): string {
+		return data
 	}
 }
