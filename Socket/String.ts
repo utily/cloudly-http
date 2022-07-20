@@ -1,4 +1,4 @@
-import { Message } from "./Backend/Message"
+import { Message } from "./Message"
 import { Socket } from "./Socket"
 
 export class String extends Socket<string> {

@@ -2,6 +2,7 @@ import * as Parser from "../Parser"
 import * as Platform from "../Platform"
 import * as Serializer from "../Serializer"
 import { Socket } from "../Socket"
+import { Factory } from "../Socket/Factory"
 import { Header as ResponseHeader } from "./Header"
 import { Like as ResponseLike } from "./Like"
 
@@ -9,9 +10,8 @@ export interface Response {
 	readonly status: number
 	readonly header: Readonly<ResponseHeader>
 	readonly body?: any | Promise<any>
-	readonly socket?: WebSocket
+	readonly socket?: Socket.Factory
 }
-
 export namespace Response {
 	export function is(value: any | Response): value is Response {
 		return (
@@ -26,7 +26,9 @@ export namespace Response {
 		return new Platform.Response(await Serializer.serialize(await request.body, request.header.contentType), {
 			status: request.status,
 			headers: new Headers(ResponseHeader.to(request.header) as Record<string, string>),
-			...(request.socket && { webSocket: request.socket }),
+			...(request.socket && {
+				webSocket: ({ ...request.socket.createResponse().socket } as Record<string, string | undefined>)?.backend,
+			}),
 		} as ResponseInit & { webSocket?: WebSocket | null })
 	}
 	export function from(response: Platform.Response & { webSocket?: WebSocket | null }): Response {
@@ -34,11 +36,11 @@ export namespace Response {
 			status: response.status,
 			header: ResponseHeader.from(response.headers),
 			body: response.status == 101 ? undefined : Parser.parse(response),
-			...(response.webSocket && { socket: response.webSocket }),
+			...(response.webSocket && { socket: new Factory(response.webSocket) }),
 		}
 	}
-	export function create(response: ResponseLike | Socket | any, contentType?: ResponseHeader | string): Response {
-		const result: Required<Omit<ResponseLike, "webSocket" | "socket">> = ResponseLike.is(response)
+	export function create(response: ResponseLike | Factory | any, contentType?: ResponseHeader | string): Response {
+		const result: Required<Omit<ResponseLike, "socket">> = ResponseLike.is(response)
 			? {
 					status: 200,
 					header: {},
@@ -46,10 +48,8 @@ export namespace Response {
 					...(response.socket && { socket: response.socket }),
 					...response,
 			  }
-			: (response instanceof Socket ||
-					(typeof response?.upgrade == "function" && response?.backend instanceof WebSocket)) &&
-			  (contentType == undefined || ResponseHeader.is(contentType))
-			? response.upgrade(contentType)
+			: typeof response?.createResponse == "function" && (contentType == undefined || ResponseHeader.is(contentType))
+			? (response as Factory).createResponse(contentType as ResponseHeader)
 			: {
 					status: (typeof response == "object" && typeof response.status == "number" && response.status) || 200,
 					header:
@@ -65,7 +65,7 @@ export namespace Response {
 						typeof response == "object" && !Array.isArray(response)
 							? (({ header, ...body }) => body)(response)
 							: response,
-					...((response.webSocket && { socket: response.webSocket }) ||
+					...((response.webSocket && { socket: new Factory(response.webSocket) }) ||
 						(response.socket && { socket: response.socket })),
 			  }
 		if (!result.header.contentType)

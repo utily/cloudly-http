@@ -1,5 +1,5 @@
 import { Backend } from "./Backend"
-import { Message } from "./Backend/Message"
+import { Message } from "./Message"
 
 export abstract class Socket<T> {
 	#receiveQueue: T[] = []

@@ -1,4 +1,4 @@
-import { Message } from "./Backend/Message"
+import { Message } from "./Message"
 import { Socket } from "./Socket"
 
 export class ArrayBuffer extends Socket<globalThis.ArrayBuffer> {
