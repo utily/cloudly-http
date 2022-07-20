@@ -27,7 +27,6 @@ export class Factory {
 	createResponse(header: Response.Header = {}): Response {
 		return { status: 101, socket: this, header }
 	}
-	
 	close(code?: number, reason?: string): void {
 		this.backend.close(code, reason)
 	}
