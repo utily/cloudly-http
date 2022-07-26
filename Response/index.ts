@@ -56,7 +56,11 @@ export namespace Response {
 					break
 				default:
 				case "object":
-					result.header.contentType = contentType ?? "application/json; charset=utf-8"
+					result.header.contentType =
+						contentType ??
+						(result.body instanceof ArrayBuffer || result.body instanceof WritableStream || result.body instanceof Blob
+							? "application/octet-stream"
+							: "application/json; charset=utf-8")
 					break
 				case "string":
 					result.header.contentType =
