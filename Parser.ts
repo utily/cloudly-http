@@ -7,9 +7,8 @@ export function add(
 ): void {
 	contentType.forEach(t => (parsers[t] = parser))
 }
-export function parse(request: globalThis.Request | globalThis.Response): Promise<any> {
-	const contentType = request.headers.get("Content-Type")
-	const type = contentType && contentType.split(";")
-	const parser = parsers[type?.[0] ?? "plain/text"]
-	return parser ? parser(request) : request.text()
+export function parse(request: globalThis.Request | globalThis.Response, type?: string): Promise<any> {
+	return (
+		parsers[type ?? request.headers.get("Content-Type")?.split(";", 2)?.[0] ?? "plain/text"] ?? (r => r.arrayBuffer())
+	)(request)
 }
