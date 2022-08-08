@@ -1,7 +1,7 @@
 import { Backend } from "./Backend"
 import { Message } from "./Message"
 
-export abstract class Socket<T> {
+export abstract class Socket<T = any> {
 	#receiveQueue: T[] = []
 	#sendQueue?: Message[] = []
 	#closed = false
