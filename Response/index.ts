@@ -74,7 +74,8 @@ export namespace Response {
 					break
 				default:
 				case "object":
-					result.header.contentType = typeof contentType == "string" ? contentType : "application/json; charset=utf-8"
+					result.header.contentType =
+						typeof contentType == "string" ? contentType : contentType?.contentType ?? "application/json; charset=utf-8"
 					break
 				case "string":
 					result.header.contentType =
