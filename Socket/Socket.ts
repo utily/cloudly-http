@@ -6,8 +6,6 @@ export abstract class Socket<T> {
 	#sendQueue?: Message[] = []
 	#closed = false
 	#backend: Backend
-	protected abstract processReceived(data: Message): T
-	protected abstract processSend(data: T): Message
 	constructor(backend: Backend, isOpen?: boolean) {
 		this.#backend = backend
 		if (isOpen)
@@ -31,6 +29,8 @@ export abstract class Socket<T> {
 			this.#closed = true
 		})
 	}
+	protected abstract processReceived(data: Message): T
+	protected abstract processSend(data: T): Message
 
 	get state(): "opened" | "closed" {
 		return this.#closed ? "closed" : "opened"
