@@ -32,8 +32,8 @@ export abstract class Socket<T> {
 		})
 	}
 
-	get state(): "created" | "opened" | "closed" {
-		return this.#closed ? "closed" : this.#sendQueue ? "opened" : "opened"
+	get state(): "opened" | "closed" {
+		return this.#closed ? "closed" : "opened"
 	}
 	#onMessage?: (message: T) => void
 	set onMessage(value: ((message: T) => void) | undefined) {
