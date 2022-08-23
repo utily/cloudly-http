@@ -1,5 +1,7 @@
 import * as Parser from "../Parser"
+import * as Platform from "../Platform"
 import * as Serializer from "../Serializer"
+import { Socket } from "../Socket"
 import { Header as ResponseHeader } from "./Header"
 import { Like as ResponseLike } from "./Like"
 
@@ -7,33 +9,49 @@ export interface Response {
 	readonly status: number
 	readonly header: Readonly<ResponseHeader>
 	readonly body?: any | Promise<any>
+	readonly socket?: Socket.Factory
 }
-
 export namespace Response {
 	export function is(value: any | Response): value is Response {
 		return (
 			typeof value == "object" &&
-			Object.keys(value).every(key => ["status", "header", "body"].some(k => k == key)) &&
+			Object.keys(value).every(key => ["status", "header", "body", "socket"].some(k => k == key)) &&
 			(value.status == undefined || typeof value.status == "number") &&
-			(value.header == undefined || ResponseHeader.is(value.header))
+			(value.header == undefined || ResponseHeader.is(value.header)) &&
+			(value.socket == undefined || value.socket instanceof WebSocket)
 		)
 	}
-	export async function to(request: Response): Promise<globalThis.Response> {
-		return new globalThis.Response(await Serializer.serialize(await request.body, request.header.contentType), {
+	export async function to(request: Response): Promise<Platform.Response> {
+		return new Platform.Response(await Serializer.serialize(await request.body, request.header.contentType), {
 			status: request.status,
-			headers: new globalThis.Headers(ResponseHeader.to(request.header) as Record<string, string>),
-		})
+			headers: new Headers(ResponseHeader.to(request.header) as Record<string, string>),
+			...(request.socket && {
+				webSocket: ({ ...request.socket.createResponse().socket } as Record<string, string | undefined>)?.backend,
+			}),
+		} as ResponseInit & { webSocket?: WebSocket | null })
 	}
-	export function from(response: globalThis.Response): Response {
+	export function from(response: Platform.Response & { webSocket?: WebSocket | null }): Response {
 		return {
 			status: response.status,
 			header: ResponseHeader.from(response.headers),
-			body: Parser.parse(response),
+			body: response.status == 101 ? undefined : Parser.parse(response),
+			...(response.webSocket && { socket: new Socket.Factory(response.webSocket) }),
 		}
 	}
-	export function create(response: ResponseLike | any, contentType?: string): Response {
-		const result: Required<ResponseLike> = ResponseLike.is(response)
-			? { status: 200, header: {}, body: undefined, ...response }
+	export function create(
+		response: ResponseLike | Socket.Factory | any,
+		contentType?: ResponseHeader | string
+	): Response {
+		const result: Required<Omit<ResponseLike, "socket">> = ResponseLike.is(response)
+			? {
+					status: 200,
+					header: {},
+					body: undefined,
+					...(response.socket && { socket: response.socket }),
+					...response,
+			  }
+			: typeof response?.createResponse == "function" && (contentType == undefined || ResponseHeader.is(contentType))
+			? (response as Socket.Factory).createResponse(contentType as ResponseHeader)
 			: {
 					status: (typeof response == "object" && typeof response.status == "number" && response.status) || 200,
 					header:
@@ -49,6 +67,8 @@ export namespace Response {
 						typeof response == "object" && !Array.isArray(response)
 							? (({ header, ...body }) => body)(response)
 							: response,
+					...((response.webSocket && { socket: new Socket.Factory(response.webSocket) }) ||
+						(response.socket && { socket: response.socket })),
 			  }
 		if (!result.header.contentType)
 			switch (typeof result.body) {
@@ -56,7 +76,8 @@ export namespace Response {
 					break
 				default:
 				case "object":
-					result.header.contentType = contentType ?? "application/json; charset=utf-8"
+					result.header.contentType =
+						typeof contentType == "string" ? contentType : contentType?.contentType ?? "application/json; charset=utf-8"
 					break
 				case "string":
 					result.header.contentType =
@@ -71,10 +92,9 @@ export namespace Response {
 			}
 		return result
 	}
+
 	export type Header = ResponseHeader
-	export namespace Header {
-		export const to = ResponseHeader.to
-		export const from = ResponseHeader.from
-	}
+	export const Header = ResponseHeader
 	export type Like = ResponseLike
+	export const Like = ResponseLike
 }

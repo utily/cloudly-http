@@ -7,7 +7,7 @@ export function add(
 ): void {
 	contentType.forEach(t => (serializers[t] = serializer))
 }
-export function serialize(body: any, contentType?: string): Promise<globalThis.BodyInit | undefined> {
+export function serialize(body: any, contentType?: string): Promise<string | undefined> {
 	const serializer = serializers[contentType?.split(";")[0] ?? ""]
 	return serializer ? serializer(body, contentType) : body
 }

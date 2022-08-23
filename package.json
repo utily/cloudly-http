@@ -65,6 +65,7 @@
 		"eslint-plugin-simple-import-sort": "^7.0.0",
 		"isomorphic-fetch": "^3.0.0",
 		"jest": "^28.1.2",
+		"jest-websocket-mock": "^2.3.0",
 		"prettierx": "github:utily/prettierx#utily-20220323",
 		"rimraf": "^3.0.2",
 		"ts-jest": "^28.0.5",

@@ -159,6 +159,11 @@ export namespace Header {
 			})
 		)
 	}
+	export function toString(header: Header) {
+		return Object.entries(header)
+			.map(([header, value]) => header + ": " + value)
+			.join("\n")
+	}
 	function isHeaders(value: globalThis.Headers | any): value is globalThis.Headers {
 		return typeof value.entries == "function"
 	}
