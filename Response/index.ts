@@ -64,7 +64,9 @@ export namespace Response {
 							  }
 							: {},
 					body:
-						typeof response == "object" && !Array.isArray(response)
+						response instanceof ArrayBuffer || ArrayBuffer.isView(response)
+							? response
+							: typeof response == "object" && !Array.isArray(response)
 							? (({ header, ...body }) => body)(response)
 							: response,
 					...((response.webSocket && { socket: new Socket.Factory(response.webSocket) }) ||
@@ -76,8 +78,17 @@ export namespace Response {
 					break
 				default:
 				case "object":
-					result.header.contentType =
-						typeof contentType == "string" ? contentType : contentType?.contentType ?? "application/json; charset=utf-8"
+					if (typeof contentType == "string")
+						result.header.contentType = contentType
+					else if (contentType?.contentType)
+						result.header.contentType = contentType.contentType
+					else if (result.body instanceof ArrayBuffer || ArrayBuffer.isView(result.body)) {
+						const bytes = new Uint8Array(ArrayBuffer.isView(result.body) ? result.body.buffer : result.body).slice(0, 4)
+						;[37, 80, 68, 70].every((current, index) => current == bytes[index])
+							? (result.header.contentType = "application/pdf")
+							: (result.header.contentType = "application/octet-stream")
+					} else
+						result.header.contentType = "application/json; charset=utf-8"
 					break
 				case "string":
 					result.header.contentType =
