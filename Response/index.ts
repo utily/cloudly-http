@@ -64,11 +64,11 @@ export namespace Response {
 							  }
 							: {},
 					body:
-						response instanceof ArrayBuffer || ArrayBuffer.isView(response)
+						!(typeof response == "object" && !Array.isArray(response)) ||
+						response instanceof ArrayBuffer ||
+						ArrayBuffer.isView(response)
 							? response
-							: typeof response == "object" && !Array.isArray(response)
-							? (({ header, ...body }) => body)(response)
-							: response,
+							: (({ header, ...body }) => body)(response),
 					...((response.webSocket && { socket: new Socket.Factory(response.webSocket) }) ||
 						(response.socket && { socket: response.socket })),
 			  }
@@ -78,17 +78,12 @@ export namespace Response {
 					break
 				default:
 				case "object":
-					if (typeof contentType == "string")
-						result.header.contentType = contentType
-					else if (contentType?.contentType)
-						result.header.contentType = contentType.contentType
-					else if (result.body instanceof ArrayBuffer || ArrayBuffer.isView(result.body)) {
-						const bytes = new Uint8Array(ArrayBuffer.isView(result.body) ? result.body.buffer : result.body).slice(0, 4)
-						;[37, 80, 68, 70].every((current, index) => current == bytes[index])
-							? (result.header.contentType = "application/pdf")
-							: (result.header.contentType = "application/octet-stream")
-					} else
-						result.header.contentType = "application/json; charset=utf-8"
+					result.header.contentType =
+						typeof contentType == "string"
+							? contentType
+							: contentType?.contentType
+							? contentType.contentType
+							: bodyContentType(result.body)
 					break
 				case "string":
 					result.header.contentType =
@@ -101,6 +96,17 @@ export namespace Response {
 							: "text/plain; charset=utf-8"
 					break
 			}
+		return result
+	}
+	export function bodyContentType(body: object | any): string {
+		let result: string
+		if (body instanceof ArrayBuffer || ArrayBuffer.isView(body)) {
+			const bytes = new Uint8Array(ArrayBuffer.isView(body) ? body.buffer : body).slice(0, 4)
+			result = [37, 80, 68, 70].every((current, index) => current == bytes[index])
+				? "application/pdf"
+				: "application/octet-stream"
+		} else
+			result = "application/json; charset=utf-8"
 		return result
 	}
 
