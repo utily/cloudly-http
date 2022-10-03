@@ -137,4 +137,9 @@ describe("Response", () => {
 			},
 		})
 	})
+	it("bodyContentType", () => {
+		expect(http.Response.bodyContentType(pdf)).toEqual("application/pdf")
+		expect(http.Response.bodyContentType(new Uint8Array([50, 67, 97, 82]))).toEqual("application/octet-stream")
+		expect(http.Response.bodyContentType({ foo: "bar" })).toEqual("application/json; charset=utf-8")
+	})
 })
