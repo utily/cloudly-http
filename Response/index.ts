@@ -83,7 +83,11 @@ export namespace Response {
 							? contentType
 							: contentType?.contentType
 							? contentType.contentType
-							: bodyContentType(result.body)
+							: result.body instanceof ArrayBuffer || ArrayBuffer.isView(result.body)
+							? isPdf(result.body)
+								? "application/pdf"
+								: "application/octet-stream"
+							: "application/json; charset=utf-8"
 					break
 				case "string":
 					result.header.contentType =
@@ -98,16 +102,9 @@ export namespace Response {
 			}
 		return result
 	}
-	export function bodyContentType(body: object | any): string {
-		let result: string
-		if (body instanceof ArrayBuffer || ArrayBuffer.isView(body)) {
-			const bytes = new Uint8Array(ArrayBuffer.isView(body) ? body.buffer : body).slice(0, 4)
-			result = [37, 80, 68, 70].every((current, index) => current == bytes[index])
-				? "application/pdf"
-				: "application/octet-stream"
-		} else
-			result = "application/json; charset=utf-8"
-		return result
+	export function isPdf(body: ArrayBuffer | ArrayBufferView): boolean {
+		const bytes = new Uint8Array(ArrayBuffer.isView(body) ? body.buffer : body).slice(0, 4)
+		return [37, 80, 68, 70].every((current, index) => current == bytes[index])
 	}
 
 	export type Header = ResponseHeader
