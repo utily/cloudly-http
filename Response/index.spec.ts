@@ -137,8 +137,4 @@ describe("Response", () => {
 			},
 		})
 	})
-	it("bodyContentType", () => {
-		expect(http.Response.isPdf(pdf)).toEqual(true)
-		expect(http.Response.isPdf(new Uint8Array([50, 67, 97, 82]))).toEqual(false)
-	})
 })

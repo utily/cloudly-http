@@ -102,7 +102,7 @@ export namespace Response {
 			}
 		return result
 	}
-	export function isPdf(body: ArrayBuffer | ArrayBufferView): boolean {
+	function isPdf(body: ArrayBuffer | ArrayBufferView): boolean {
 		const bytes = new Uint8Array(ArrayBuffer.isView(body) ? body.buffer : body).slice(0, 4)
 		return [37, 80, 68, 70].every((current, index) => current == bytes[index])
 	}
