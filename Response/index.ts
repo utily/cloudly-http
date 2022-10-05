@@ -64,9 +64,11 @@ export namespace Response {
 							  }
 							: {},
 					body:
-						typeof response == "object" && !Array.isArray(response)
-							? (({ header, ...body }) => body)(response)
-							: response,
+						!(typeof response == "object" && !Array.isArray(response)) ||
+						response instanceof ArrayBuffer ||
+						ArrayBuffer.isView(response)
+							? response
+							: (({ header, ...body }) => body)(response),
 					...((response.webSocket && { socket: new Socket.Factory(response.webSocket) }) ||
 						(response.socket && { socket: response.socket })),
 			  }
@@ -77,7 +79,15 @@ export namespace Response {
 				default:
 				case "object":
 					result.header.contentType =
-						typeof contentType == "string" ? contentType : contentType?.contentType ?? "application/json; charset=utf-8"
+						typeof contentType == "string"
+							? contentType
+							: contentType?.contentType
+							? contentType.contentType
+							: result.body instanceof ArrayBuffer || ArrayBuffer.isView(result.body)
+							? isPdf(result.body)
+								? "application/pdf"
+								: "application/octet-stream"
+							: "application/json; charset=utf-8"
 					break
 				case "string":
 					result.header.contentType =
@@ -91,6 +101,10 @@ export namespace Response {
 					break
 			}
 		return result
+	}
+	function isPdf(body: ArrayBuffer | ArrayBufferView): boolean {
+		const bytes = new Uint8Array(ArrayBuffer.isView(body) ? body.buffer : body).slice(0, 4)
+		return [37, 80, 68, 70].every((current, index) => current == bytes[index])
 	}
 
 	export type Header = ResponseHeader

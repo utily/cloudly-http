@@ -30,6 +30,19 @@ describe("Response", () => {
 		<rect x=".01cm" y=".01cm" width="4.98cm" height="3.98cm"
 					fill="none" stroke="blue" stroke-width=".02cm" />
 	</svg>`
+	const pdf = new Uint8Array([37, 80, 68, 70])
+	it("create pdf", () => {
+		expect(http.Response.create(pdf)).toEqual({
+			...output,
+			header: { contentType: "application/pdf" },
+			body: pdf,
+		})
+		expect(http.Response.create(pdf.buffer)).toEqual({
+			...output,
+			header: { contentType: "application/pdf" },
+			body: pdf.buffer,
+		})
+	})
 	it("create html", () => {
 		expect(http.Response.create(html)).toEqual({
 			...output,
