@@ -1,19 +1,20 @@
-import * as Parser from "./Parser"
-
 export function to(data: { [key: string]: any }): FormData {
 	const result = new FormData()
-	result.append("", JSON.stringify(data))
+	result.append("", JSON.stringify(toHelper(data, "", result)))
 	return result
 }
-export async function from(data: FormData): Promise<{ [key: string]: any }> {
-	const result = Object.assign(
-		{},
-		...data
-			.getAll("")
-			.map(async entry =>
-				entry instanceof Blob && entry.type.startsWith("application/json") ? JSON.parse(await entry.text()) : entry
-			)
+function toHelper(data: { [key: string]: any }, name: string, form: FormData): { [key: string]: any } {
+	return Object.entries(data).reduce(
+		(result, [property, value]) =>
+			value instanceof Blob
+				? (form.append(name ? [name, property].join(".") : property, value), result)
+				: { ...result, [property]: value },
+		{}
 	)
+}
+
+export async function from(data: FormData): Promise<{ [key: string]: any }> {
+	const result = {}
 	for (const [name, entry] of data.entries())
 		set(result, name.split("."), entry)
 	return result
@@ -37,30 +38,16 @@ async function set(
 }
 
 function merge(target: Record<string, any> | undefined, ...sources: Record<string, any>[]): Record<string, any> {
-	if (!target)
-		target = {}
-	if (!sources.length)
-		return target ?? {}
-	const source = sources.shift()
-	if (isObject(target) && isObject(source)) {
-		for (const key in source) {
-			if (isObject(source[key])) {
-				if (!target[key])
-					Object.assign(target, { [key]: {} })
-				merge(target[key], source[key])
-			} else
-				Object.assign(target, { [key]: source[key] })
-		}
+	let result = target ?? {}
+	if (sources.length) {
+		const [head, ...tail] = sources
+		if (isObject(result) && isObject(head))
+			for (const key in head)
+				result = { ...result, [key]: !isObject(head[key]) ? head[key] : merge(result[key], head[key]) }
+		result = merge(result, ...tail)
 	}
-	return merge(target, ...sources)
+	return result
 }
-function isObject(item) {
-	return item && typeof item === "object" && !Array.isArray(item)
+export function isObject(value: any): value is Record<string, any> {
+	return value && typeof value == "object" && !Array.isArray(value)
 }
-// const d = {
-// 	name: "fasf",
-// 	payment: {
-// 		number: "fasdf",
-// 		receipt: new File([], ""),
-// 	},
-// }
