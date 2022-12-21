@@ -1,53 +1,70 @@
-export function to(data: { [key: string]: any }): FormData {
-	const result = new FormData()
-	result.append("", JSON.stringify(toHelper(data, "", result)))
-	return result
-}
-function toHelper(data: { [key: string]: any }, name: string, form: FormData): { [key: string]: any } {
-	return Object.entries(data).reduce(
-		(result, [property, value]) =>
+export namespace FormData {
+	export function to(data: { [key: string]: any }): FormData {
+		const result = new globalThis.FormData()
+		result.append(
+			"",
+			new globalThis.Blob([new TextEncoder().encode(JSON.stringify(toHelperObject(data, "", result)))], {
+				type: "application/json; charset=utf-8",
+			})
+		)
+		return result
+	}
+	function toHelperObject(
+		data: { [key: string]: unknown },
+		name: string,
+		form: globalThis.FormData
+	): { [key: string]: unknown } {
+		return Object.entries(data).reduce<Record<string, unknown>>((result, [key, value]) => {
 			value instanceof Blob
-				? (form.append(name ? [name, property].join(".") : property, value), result)
-				: { ...result, [property]: value },
-		{}
-	)
-}
-
-export async function from(data: FormData): Promise<{ [key: string]: any }> {
-	const result = {}
-	for (const [name, entry] of data.entries())
-		set(result, name.split("."), entry)
-	return result
-}
-async function set(
-	data: Record<string, any> | undefined,
-	name: string[],
-	value: string | Blob
-): Promise<Record<string, any> | string | Blob> {
-	let result: Record<string, any> | string | Blob
-	if (name.length == 0) {
-		result =
-			value instanceof Blob && value.type.startsWith("application/json")
+				? form.append(name ? `${name}.${key}` : key, value)
+				: typeof value == "object" && value
+				? Array.isArray(value)
+					? (result[key] = toHelperArray(value, name ? `${name}.${key}` : key, form))
+					: (result[key] = toHelperObject(value as Record<string, unknown>, name ? `${name}.${key}` : key, form))
+				: (result[key] = value)
+			return result
+		}, {})
+	}
+	function toHelperArray(data: unknown[], name: string, form: globalThis.FormData) {
+		return data.reduce<unknown[]>((result, value) => {
+			typeof value == "object" && value
+				? Array.isArray(value)
+					? result.push(toHelperArray(value, name, form))
+					: result.push(toHelperObject(value as Record<string, unknown>, name, form))
+				: result.push(value)
+			return result
+		}, [])
+	}
+	export async function from(form: FormData): Promise<{ [key: string]: any }> {
+		const result = {}
+		for (const [name, value] of form.entries())
+			await set(result, name.split("."), value)
+		return result
+	}
+	async function set(data: Record<string, unknown>, [head, ...tail]: string[], value: string | Blob) {
+		if (tail.length == 0)
+			!head && value instanceof Blob && value.type.startsWith("application/json")
 				? merge(data, JSON.parse(await value.text()))
-				: value
-	} else {
-		const [head, ...tail] = name
-		result = { ...data, [head]: set(data?.[head], tail, value) }
+				: (data[head] = value)
+		else
+			set(
+				typeof data[head] == "object" && data[head] ? (data[head] as Record<string, unknown>) : (data[head] = {}),
+				tail,
+				value
+			)
 	}
-	return result
-}
-
-function merge(target: Record<string, any> | undefined, ...sources: Record<string, any>[]): Record<string, any> {
-	let result = target ?? {}
-	if (sources.length) {
-		const [head, ...tail] = sources
-		if (isObject(result) && isObject(head))
-			for (const key in head)
-				result = { ...result, [key]: !isObject(head[key]) ? head[key] : merge(result[key], head[key]) }
-		result = merge(result, ...tail)
+	function merge(target: Record<string, unknown>, ...sources: Record<string, unknown>[]) {
+		if (sources.length) {
+			const [head, ...tail] = sources
+			Object.entries(head).forEach(([key, value]) =>
+				isObject(value)
+					? merge(isObject(target[key]) ? (target[key] as Record<string, unknown>) : (target[key] = {}), value)
+					: (target[key] = head[key])
+			)
+			merge(target, ...tail)
+		}
 	}
-	return result
-}
-export function isObject(value: any): value is Record<string, any> {
-	return value && typeof value == "object" && !Array.isArray(value)
+	export function isObject(value: any): value is Record<string, unknown> {
+		return value && typeof value == "object" && !Array.isArray(value)
+	}
 }
