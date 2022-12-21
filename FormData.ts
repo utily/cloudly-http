@@ -43,8 +43,12 @@ export namespace FormData {
 	}
 	async function set(data: Record<string, unknown>, [head, ...tail]: string[], value: string | Blob) {
 		if (tail.length == 0)
-			!head && value instanceof Blob && value.type.startsWith("application/json")
-				? merge(data, JSON.parse(await value.text()))
+			value instanceof Blob && value.type.startsWith("application/json")
+				? !head
+					? merge(data, JSON.parse(await value.text()))
+					: typeof data[head] == "object" && data[head]
+					? merge(data[head] as Record<string, unknown>, JSON.parse(await value.text()))
+					: (data[head] = JSON.parse(await value.text()))
 				: (data[head] = value)
 		else
 			set(
