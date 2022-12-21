@@ -6,105 +6,28 @@ import { http } from "./index"
 globalThis.Blob = Blob
 globalThis.File = File
 globalThis.FormData = Form
-describe("FormData", () => {
-	it("blob", () => {
-		expect(new Blob() instanceof Blob).toEqual(true)
-	})
+describe("form data", () => {
+	const file = new Blob([JSON.stringify({ test: "testing", tester: "potato" }, null, 2)], { type: "application/json" })
 	it("to", async () => {
-		let form = http.FormData.to({ a: 123, b: "qwe", c: false, d: null, e: [123, 456], f: { g: 789 } })
-		let data = form.get("")
-		expect(data instanceof Blob && data.type.startsWith("application/json")).toEqual(true)
-		expect(JSON.parse(await (data as Blob).text())).toEqual({
-			a: 123,
-			b: "qwe",
-			c: false,
-			d: null,
-			e: [123, 456],
-			f: { g: 789 },
-		})
-		form = http.FormData.to({
-			a: 123,
-			b: { c: new Blob([], { type: "application/octet-stream" }) },
-			d: new Blob([], { type: "application/octet-stream" }),
-		})
-		data = form.get("")
-		expect(data instanceof Blob).toEqual(true)
-		expect(JSON.parse(await (data as Blob).text())).toEqual({ a: 123, b: {} })
-		data = form.get("b.c")
-		expect(data instanceof Blob).toEqual(true)
-		expect((data as Blob).size).toEqual(0)
-		data = form.get("d")
-		expect(data instanceof Blob).toEqual(true)
-		expect((data as Blob).size).toEqual(0)
+		const result = http.FormData.to({ value: "value", file: file, test: "test", tester: "tester" })
+		expect(result.get("")).toEqual(
+			new File([new TextEncoder().encode(JSON.stringify({ value: "value", test: "test", tester: "tester" }))], "blob")
+		)
+		expect(result.get("file") instanceof Blob).toBeTruthy
 	})
 	it("from", async () => {
-		let form = new FormData()
-		form.append(
-			"",
-			new Blob(
-				[
-					new TextEncoder().encode(
-						JSON.stringify({
-							a: 123,
-							b: "qwe",
-							c: false,
-							d: null,
-							e: [123, 456],
-							f: { g: 789 },
-						})
-					),
-				],
-				{ type: "application/json" }
-			)
-		)
-		let data = await http.FormData.from(form)
-		expect(data).toEqual({
-			a: 123,
-			b: "qwe",
-			c: false,
-			d: null,
-			e: [123, 456],
-			f: { g: 789 },
-		})
-		form = new FormData()
-		form.append(
-			"",
-			new Blob(
-				[
-					new TextEncoder().encode(
-						JSON.stringify({
-							a: { b: 123 },
-						})
-					),
-				],
-				{ type: "application/json" }
-			)
-		)
-		form.append("a.c", new Blob([], { type: "application/octet-stream" }))
-		data = await http.FormData.from(form)
-		expect(data).toEqual({ a: { b: 123, c: new File([], "blob", { type: "application/octet-stream" }) } })
+		const data = new FormData()
+		data.append("request", "this is a test")
+		data.append("file", file)
+		const result = await http.FormData.from(data)
+		expect(result).toEqual({ request: "this is a test", file: { test: "testing", tester: "potato" } })
 	})
-	it("from + to", async () => {
-		const form = http.FormData.to({
-			a: 123,
-			b: "qwe",
-			c: false,
-			d: null,
-			e: [123, 456],
-			f: { g: 789 },
-			h: new Blob([]),
-			i: { j: 123, k: new Blob([], { type: "application/octet-stream" }) },
-		})
-		const result = await http.FormData.from(form)
-		expect(result).toEqual({
-			a: 123,
-			b: "qwe",
-			c: false,
-			d: null,
-			e: [123, 456],
-			f: { g: 789 },
-			h: new File([], "blob"),
-			i: { j: 123, k: new File([], "blob", { type: "application/octet-stream" }) },
-		})
+	it("from 2", async () => {
+		const data = new FormData()
+		data.append("key1", "value1")
+		data.append("key2", "value2")
+		data.append("file", file)
+		const result = await http.FormData.from(data)
+		expect(result).toEqual({ file: { test: "testing", tester: "potato" }, key1: "value1", key2: "value2" })
 	})
 })
