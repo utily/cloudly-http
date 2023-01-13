@@ -10,6 +10,17 @@
 		"node_modules": true,
 		"*.code-workspace": true
 	},
+	"search.exclude": {
+		".*": false,
+		"*.json": false,
+		"CODEOWNERS": false,
+		"dist": false,
+		"README.md": false,
+		"LICENSE": false,
+		"tsconfig.*": false,
+		"node_modules": false,
+		"*.code-workspace": false
+	},
 	"files.insertFinalNewline": true,
 	"editor.tabSize": 2,
 	"editor.detectIndentation": false,
@@ -18,7 +29,7 @@
 	"editor.formatOnPaste": true,
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": true,
-		"eslint.autoFixOnSave": true,
+		"eslint.autoFixOnSave": true
 	},
 	"eslint.format.enable": true,
 	"eslint.lintTask.enable": true,
