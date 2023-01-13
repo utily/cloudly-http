@@ -27,7 +27,7 @@ export class Client<Error = never> {
 	}
 
 	private async fetch<R>(path: string, method: Method, body?: any, header?: Request.Header): Promise<R | Error> {
-		let request = Request.create({ url: `${this.url ?? ""}/${path}`, method, header, body })
+		let request = Request.create({ url: `${this.url ?? ""}${path}`, method, header, body })
 		request = await this.preprocess({ ...request, header: (await this.getHeader?.(request)) ?? request.header })
 		const response = await this.postprocess(
 			await fetch(request).catch(error => Response.create({ status: 601, body: error }))
