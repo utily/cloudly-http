@@ -25,7 +25,9 @@ export class Client<Error = never> {
 	) {
 		Object.assign(this, callbacks)
 	}
-
+	/**
+	 * @param path Note: Prior to version 0.1.0 this method inserted a `/` between url and path.
+	 */
 	private async fetch<R>(path: string, method: Method, body?: any, header?: Request.Header): Promise<R | Error> {
 		let request = Request.create({ url: `${this.url ?? ""}${path}`, method, header, body })
 		request = await this.preprocess({ ...request, header: (await this.getHeader?.(request)) ?? request.header })
