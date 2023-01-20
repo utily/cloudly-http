@@ -13,11 +13,11 @@ fetch.create = create
 function create(fetch: GlobalFetch): Fetch {
 	return async (request: Request.Like | string): Promise<Response> => {
 		const r = Request.create(request)
-		console.log("r", r)
+		console.log("r", JSON.stringify(r))
 		const urlToString = r.url.toString()
 		console.log("urlToString", urlToString)
 		const requestTo = await Request.to(r)
-		console.log("requestTo", requestTo)
+		console.log("requestTo", JSON.stringify(requestTo))
 
 		const fetchResponse = await fetch(r.url.toString(), await Request.to(r))
 
