@@ -40,7 +40,8 @@ export namespace Request {
 		const contentType = r.header.contentType
 		let headers
 		if (contentType?.split(";")[0] == "multipart/form-data") {
-			headers = { ...r.header, contentType: undefined }
+			const newHeader = Object.fromEntries(Object.entries(r.header).filter(k => k[0] != "contentType"))
+			headers = newHeader
 		} else {
 			headers = r.header
 		}
