@@ -34,15 +34,23 @@ export namespace Request {
 			(value.header == undefined || RequestHeader.is(value.header))
 		)
 	}
+
 	export async function to(request: RequestLike): Promise<globalThis.RequestInit & { url: string }> {
 		const r = is(request) ? request : create(request)
+		const contentType = r.header.contentType
+		let headers
+		if (contentType?.split(";")[0] == "multipart/form-data") {
+			headers = { ...r.header, contentType: undefined }
+		} else {
+			headers = r.header
+		}
 		return {
 			url: r.url.toString(),
 			method: r.method,
-			headers: RequestHeader.to(r.header) as Record<string, string>,
+			headers: RequestHeader.to(headers) as Record<string, string>,
 			body: ["GET", "HEAD"].some(v => v == r.method)
 				? undefined
-				: await Serializer.serialize(await r.body, r.header.contentType),
+				: await Serializer.serialize(await r.body, contentType),
 		}
 	}
 	export function from(request: globalThis.Request): Request {
