@@ -39,6 +39,8 @@ export namespace Request {
 		const r = is(request) ? request : create(request)
 		const contentType = r.header.contentType
 		let headers
+		// If what is being sent is multipart/formdata, its previous content-type header
+		// needs to be removed in order for the new form-data boundary to be set correctly.
 		if (contentType?.split(";")[0] == "multipart/form-data") {
 			const newHeader = Object.fromEntries(Object.entries(r.header).filter(k => k[0] != "contentType"))
 			headers = newHeader
