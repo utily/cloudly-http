@@ -38,15 +38,11 @@ export namespace Request {
 	export async function to(request: RequestLike): Promise<globalThis.RequestInit & { url: string }> {
 		const r = is(request) ? request : create(request)
 		const contentType = r.header.contentType
-		let headers
-		// If what is being sent is multipart/formdata, its previous content-type header
+		// If what is being sent is multipart/form-data, its previous content-type header
 		// needs to be removed in order for the new form-data boundary to be set correctly.
-		if (contentType?.split(";")[0] == "multipart/form-data") {
-			const newHeader = Object.fromEntries(Object.entries(r.header).filter(k => k[0] != "contentType"))
-			headers = newHeader
-		} else {
-			headers = r.header
-		}
+		const headers = contentType?.startsWith("multipart/form-data")
+			? Object.fromEntries(Object.entries(r.header).filter(k => k[0] != "contentType"))
+			: r.header
 		return {
 			url: r.url.toString(),
 			method: r.method,
