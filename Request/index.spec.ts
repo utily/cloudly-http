@@ -1,6 +1,8 @@
 import "isomorphic-fetch"
+import { FormData as Form } from "formdata-polyfill/esm.min.js"
 import * as http from "../index"
 
+globalThis.FormData = Form
 describe("Request", () => {
 	const output = {
 		method: "GET",
@@ -46,5 +48,24 @@ describe("Request", () => {
 		})
 		expect(request).toEqual({ ...request, search: { key: "value" } })
 		expect(http.Request.is(request)).toEqual(true)
+	})
+	it("to contentType", async () => {
+		const json = http.Request.create({
+			method: "POST",
+			url: new URL("http://example.com/collection/resource?key=value"),
+			header: { contentType: "application/json; charset=utf-8" },
+			body: { resource: "resource", name: "Resource" },
+		})
+		expect((await http.Request.to(json)).headers).toEqual({ "Content-Type": "application/json; charset=utf-8" })
+		const formData = http.Request.create({
+			method: "POST",
+			url: new URL("http://example.com/collection/resource?key=value"),
+			header: {
+				contentType: "multipart/form-data; boundary = asdasdasdasd",
+				authorization: "placeholderValue",
+			},
+			body: new FormData(),
+		})
+		expect((await http.Request.to(formData)).headers).toEqual({ Authorization: "placeholderValue" })
 	})
 })
