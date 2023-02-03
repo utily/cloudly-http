@@ -37,7 +37,6 @@ export namespace Request {
 
 	export async function to(request: RequestLike): Promise<globalThis.RequestInit & { url: string }> {
 		const r = is(request) ? request : create(request)
-		const contentType = r.header.contentType
 		// If what is being sent is multipart/form-data, its previous content-type header
 		// needs to be removed in order for the new form-data boundary to be set correctly.
 		const header = r.header.contentType?.startsWith("multipart/form-data")
@@ -50,7 +49,7 @@ export namespace Request {
 			headers: RequestHeader.to(header) as Record<string, string>,
 			body: ["GET", "HEAD"].some(v => v == r.method)
 				? undefined
-				: await Serializer.serialize(await r.body, contentType),
+				: await Serializer.serialize(await r.body, r.header.contentType),
 		}
 	}
 	export function from(request: globalThis.Request): Request {
