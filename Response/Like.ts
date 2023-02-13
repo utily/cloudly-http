@@ -1,15 +1,15 @@
 import { Socket } from "../Socket"
 import { Header } from "./Header"
 
-export interface Like {
+export interface Like<T = any | Promise<any>> {
 	status?: number
 	header?: Header
-	body?: any | Promise<any>
+	body?: T
 	socket?: Socket.Factory
 }
 
 export namespace Like {
-	export function is(value: Like | any): value is Like {
+	export function is<T = any | Promise<any>>(value: Like<T> | any): value is Like<T> {
 		return (
 			typeof value == "object" &&
 			Object.keys(value).every(key => ["status", "header", "body", "socket"].some(property => property == key)) &&

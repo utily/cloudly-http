@@ -30,7 +30,7 @@ export type Header = {
 	expires?: string
 	iM?: string
 	lastModified?: string
-	link?: string
+	link?: string[]
 	location?: string
 	p3P?: string
 	pragma?: string
@@ -94,7 +94,7 @@ const fields: [keyof Header, string, number][] = [
 	["expires", "Expires", 1],
 	["iM", "IM", 1],
 	["lastModified", "Last-Modified", 1],
-	["link", "Link", 1],
+	["link", "Link", 2],
 	["location", "Location", 1],
 	["p3P", "P3P", 1],
 	["pragma", "Pragma", 1],

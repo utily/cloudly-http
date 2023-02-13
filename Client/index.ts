@@ -1,7 +1,8 @@
-import { fetch } from "./fetch"
-import { Method } from "./Method"
-import { Request } from "./Request"
-import { Response } from "./Response"
+import { Fetch, fetch, GlobalFetch } from "../fetch"
+import { Method } from "../Method"
+import { Request } from "../Request"
+import { Response } from "../Response"
+import { Middleware } from "./Middleware"
 
 export class Client<Error = never> {
 	preprocess = async (request: Request): Promise<Request> => request
@@ -15,14 +16,20 @@ export class Client<Error = never> {
 	postprocess = async (response: Response): Promise<Response> => response
 	onError?: (request: Request, response: Response) => Promise<boolean>
 	onUnauthorized?: (connection: Client<Error>) => Promise<boolean>
-
+	process?: Middleware<any, Body, BodyInit, any>
+	private f: Fetch
 	constructor(
 		public url?: string,
 		public key?: string,
 		callbacks?: Partial<
-			Pick<Client<Error>, "preprocess" | "getHeader" | "appendHeader" | "postprocess" | "onError" | "onUnauthorized">
-		>
+			Pick<
+				Client<Error>,
+				"preprocess" | "getHeader" | "appendHeader" | "postprocess" | "process" | "onError" | "onUnauthorized"
+			>
+		>,
+		f?: GlobalFetch
 	) {
+		this.f = fetch.create(f ?? globalThis.fetch, callbacks?.process ?? Middleware.create("default"))
 		Object.assign(this, callbacks)
 	}
 	/**
@@ -32,7 +39,9 @@ export class Client<Error = never> {
 		let request = Request.create({ url: `${this.url ?? ""}${path}`, method, header, body })
 		request = await this.preprocess({ ...request, header: (await this.getHeader?.(request)) ?? request.header })
 		const response = await this.postprocess(
-			await fetch(request).catch(error => Response.create({ status: 601, body: error }))
+			await (this.process ? this.process(request, this.f) : this.f(request)).catch(error =>
+				Response.create({ status: 601, body: error })
+			)
 		)
 		return (response.status == 401 && this.onUnauthorized && (await this.onUnauthorized(this))) ||
 			(response.status >= 300 && this.onError && (await this.onError(request, response)))

@@ -1,22 +1,22 @@
 /// <reference lib="webworker.iterable" />
 import { Method } from "../Method"
-import * as Parser from "../Parser"
-import * as Serializer from "../Serializer"
+import { Parser } from "../Parser"
+import { Serializer } from "../Serializer"
 import { Header as RequestHeader } from "./Header"
 import { Like as RequestLike } from "./Like"
 
-export interface Request {
+export interface Request<T = any | Promise<any>> {
 	readonly method: Method
 	readonly url: URL
 	readonly parameter: { readonly [key: string]: string | undefined }
 	readonly search: { readonly [key: string]: string | undefined }
 	readonly remote?: string
 	readonly header: Readonly<RequestHeader>
-	readonly body?: any | Promise<any>
+	readonly body?: T
 }
 
 export namespace Request {
-	export function is(value: any | Request): value is Request {
+	export function is<T = any | Promise<any>>(value: any | Request<T>): value is Request<T> {
 		return (
 			typeof value == "object" &&
 			Object.keys(value).every(key =>
@@ -35,35 +35,38 @@ export namespace Request {
 		)
 	}
 
-	export async function to(request: RequestLike): Promise<globalThis.RequestInit & { url: string }> {
+	export async function to<T>(
+		request: Request.Like<T>,
+		serializer?: Serializer | "none"
+	): Promise<globalThis.RequestInit & { url: string }> {
 		const r = is(request) ? request : create(request)
-		// If what is being sent is multipart/form-data, its previous content-type header
-		// needs to be removed in order for the new form-data boundary to be set correctly.
-		const header = r.header.contentType?.startsWith("multipart/form-data")
-			? (({ contentType, ...header }: Request.Header) => header)(r.header)
-			: r.header
-
+		const result = serializer == "none" ? r : await (serializer ?? Serializer).serialize(r)
 		return {
-			url: r.url.toString(),
-			method: r.method,
-			headers: RequestHeader.to(header) as Record<string, string>,
-			body: ["GET", "HEAD"].some(v => v == r.method)
-				? undefined
-				: await Serializer.serialize(await r.body, r.header.contentType),
+			url: result.url.toString(),
+			method: result.method,
+			headers: RequestHeader.to(result.header) as Record<string, string>,
+			body: result.body,
 		}
 	}
-	export function from(request: globalThis.Request): Request {
+	export async function from<T = any | Promise<any>>(
+		request: globalThis.Request,
+		parser?: Parser<T> | "none"
+	): Promise<Request> {
 		const url = new URL(request.url)
-		return {
+		const result = {
 			method: Method.parse(request.method) ?? "GET",
 			url,
 			header: RequestHeader.from(request.headers),
 			parameter: {},
 			search: Object.fromEntries(url.searchParams.entries()),
-			body: Parser.parse(request),
+			body: request,
 		}
+		return parser == "none" ? result : (parser ?? Parser).parse(result)
 	}
-	export function create(request: string | RequestLike): Request {
+	export function create(request: string): Request<string>
+	export function create<T>(request: Request.Like<T>): Request<T>
+	export function create(request: string | Request.Like): Request
+	export function create(request: string | Request.Like): Request {
 		let result: Request
 		if (typeof request == "string")
 			result = create({ url: request })
@@ -87,5 +90,5 @@ export namespace Request {
 		export const from = RequestHeader.from
 		export const to = RequestHeader.to
 	}
-	export type Like = RequestLike
+	export type Like<T = any | Promise<any>> = RequestLike<T>
 }

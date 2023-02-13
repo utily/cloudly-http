@@ -1,18 +1,19 @@
-import * as Parser from "../Parser"
+import { Parser } from "../Parser"
 import * as Platform from "../Platform"
-import * as Serializer from "../Serializer"
+import { Serializer } from "../Serializer"
 import { Socket } from "../Socket"
+import { ContentType as ResponseContentType } from "./ContentType"
 import { Header as ResponseHeader } from "./Header"
 import { Like as ResponseLike } from "./Like"
 
-export interface Response {
+export interface Response<T = any | Promise<any>> {
 	readonly status: number
-	readonly header: Readonly<ResponseHeader>
-	readonly body?: any | Promise<any>
+	readonly header: Readonly<Response.Header>
 	readonly socket?: Socket.Factory
+	readonly body?: T
 }
 export namespace Response {
-	export function is(value: any | Response): value is Response {
+	export function is<T = any | Promise<any>>(value: any | Response<T>): value is Response<T> {
 		return (
 			typeof value == "object" &&
 			Object.keys(value).every(key => ["status", "header", "body", "socket"].some(k => k == key)) &&
@@ -21,28 +22,43 @@ export namespace Response {
 			(value.socket == undefined || value.socket instanceof WebSocket)
 		)
 	}
-	export async function to(request: Response): Promise<Platform.Response> {
-		return new Platform.Response(await Serializer.serialize(await request.body, request.header.contentType), {
-			status: request.status,
-			headers: new Headers(ResponseHeader.to(request.header) as Record<string, string>),
-			...(request.socket && {
-				webSocket: ({ ...request.socket.createResponse().socket } as Record<string, string | undefined>)?.backend,
+	export async function to(response: Response, serializer?: Serializer | "none"): Promise<Platform.Response>
+	export async function to(response: Response<BodyInit>, serializer: "none"): Promise<Platform.Response>
+	export async function to(response: Response, serializer?: Serializer | "none"): Promise<Platform.Response> {
+		const result = serializer == "none" ? response : await (serializer ?? Serializer).serialize(response)
+		return new Platform.Response(result?.body, {
+			status: result?.status,
+			headers: new Headers(ResponseHeader.to(result?.header ?? {}) as Record<string, string>),
+			...(result?.socket && {
+				webSocket: ({ ...result?.socket.createResponse().socket } as Record<string, string | undefined>)?.backend,
 			}),
 		} as ResponseInit & { webSocket?: WebSocket | null })
 	}
-	export function from(response: Platform.Response & { webSocket?: WebSocket | null }): Response {
-		return {
+	export async function from<T = any | Promise<any>>(
+		response: Platform.Response & { webSocket?: WebSocket | null },
+		parser?: Parser<T>
+	): Promise<Response<T>>
+	export async function from(
+		response: Platform.Response & { webSocket?: WebSocket | null },
+		parser: "none"
+	): Promise<Response<Body>>
+	export async function from<T = any | Promise<any>>(
+		response: Platform.Response & { webSocket?: WebSocket | null },
+		parser?: Parser<T> | "none"
+	): Promise<Response<T>> {
+		const result: Response<Body> = {
 			status: response.status,
 			header: ResponseHeader.from(response.headers),
-			body: response.status == 101 ? undefined : Parser.parse(response),
 			...(response.webSocket && { socket: new Socket.Factory(response.webSocket) }),
+			body: response.status == 101 ? undefined : response,
 		}
+		return parser == "none" ? (result as Response<T>) : (parser ?? Parser).parse(result)
 	}
-	export function create(
-		response: ResponseLike | Socket.Factory | any,
-		contentType?: ResponseHeader | string
-	): Response {
-		const result: Required<Omit<ResponseLike, "socket">> = ResponseLike.is(response)
+	export function create<T = any | Promise<any>>(
+		response: Response.Like<T> | Socket.Factory | any,
+		contentType?: Response.Header | string
+	): Response<T> {
+		const result: Required<Omit<Response.Like<T>, "socket">> = Response.Like.is(response)
 			? {
 					status: 200,
 					header: {},
@@ -50,8 +66,8 @@ export namespace Response {
 					...(response.socket && { socket: response.socket }),
 					...response,
 			  }
-			: typeof response?.createResponse == "function" && (contentType == undefined || ResponseHeader.is(contentType))
-			? (response as Socket.Factory).createResponse(contentType as ResponseHeader)
+			: typeof response?.createResponse == "function" && (contentType == undefined || Response.Header.is(contentType))
+			? (response as Socket.Factory).createResponse(contentType as Response.Header)
 			: {
 					status: (typeof response == "object" && typeof response.status == "number" && response.status) || 200,
 					header:
@@ -72,43 +88,13 @@ export namespace Response {
 					...((response.webSocket && { socket: new Socket.Factory(response.webSocket) }) ||
 						(response.socket && { socket: response.socket })),
 			  }
-		if (!result.header.contentType)
-			switch (typeof result.body) {
-				case "undefined":
-					break
-				default:
-				case "object":
-					result.header.contentType =
-						typeof contentType == "string"
-							? contentType
-							: contentType?.contentType
-							? contentType.contentType
-							: result.body instanceof ArrayBuffer || ArrayBuffer.isView(result.body)
-							? isPdf(result.body)
-								? "application/pdf"
-								: "application/octet-stream"
-							: "application/json; charset=utf-8"
-					break
-				case "string":
-					result.header.contentType =
-						result.body.slice(0, 9).toLowerCase() == "<!doctype"
-							? "text/html; charset=utf-8"
-							: /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/.test(result.body)
-							? "application/jwt; charset=utf-8"
-							: /^<\?xml version=(.|\n)*\?>(.|\n)*<svg(.|\n)*<\/svg>$/.test(result.body)
-							? "image/svg+xml"
-							: "text/plain; charset=utf-8"
-					break
-			}
+		if (result.header.contentType)
+			result.header.contentType = Response.ContentType.deduce(result.body)
 		return result
 	}
-	function isPdf(body: ArrayBuffer | ArrayBufferView): boolean {
-		const bytes = new Uint8Array(ArrayBuffer.isView(body) ? body.buffer : body).slice(0, 4)
-		return [37, 80, 68, 70].every((current, index) => current == bytes[index])
-	}
-
 	export type Header = ResponseHeader
 	export const Header = ResponseHeader
-	export type Like = ResponseLike
+	export type Like<T> = ResponseLike<T>
 	export const Like = ResponseLike
+	export const ContentType = ResponseContentType
 }
