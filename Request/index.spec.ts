@@ -1,6 +1,6 @@
 import "isomorphic-fetch"
 import { FormData as Form } from "formdata-polyfill/esm.min.js"
-import * as http from "../index"
+import { http } from "../index"
 
 globalThis.FormData = Form
 describe("Request", () => {

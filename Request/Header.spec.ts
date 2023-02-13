@@ -1,10 +1,10 @@
 import "isomorphic-fetch"
-import * as parser from "../index"
+import { http } from "../index"
 
 describe("Request.Header", () => {
 	it("to", async () =>
 		expect(
-			parser.Request.Header.to({
+			http.Request.Header.to({
 				contentType: "application/json; charset=utf-8",
 			})
 		).toEqual({
@@ -16,7 +16,7 @@ describe("Request.Header", () => {
 		))
 	it("new cf headers", () => {
 		expect(
-			parser.Request.Header.to({
+			http.Request.Header.to({
 				contentType: "application/json; charset=utf-8",
 				cfConnectionIp: "127.0.0.1",
 				cfIpCountry: "SE",
@@ -27,7 +27,7 @@ describe("Request.Header", () => {
 			"CF-IPCountry": "SE",
 		})
 		expect(
-			parser.Request.Header.from({
+			http.Request.Header.from({
 				"Content-Type": "application/json; charset=utf-8",
 				"CF-Connecting-IP": "127.0.0.1",
 				"CF-IPCountry": "SE",
@@ -40,7 +40,7 @@ describe("Request.Header", () => {
 	})
 	it("custom headers", () => {
 		expect(
-			parser.Request.Header.to({
+			http.Request.Header.to({
 				xModNonce: "some_session_id",
 				xModRetry: "true",
 				xAuthToken: "tOkEnStRiNg",
@@ -53,7 +53,7 @@ describe("Request.Header", () => {
 			"x-tracking-id": "some_tracking_id",
 		})
 		expect(
-			parser.Request.Header.from({
+			http.Request.Header.from({
 				"x-mod-nonce": "some_session_id",
 				"x-mod-retry": "true",
 				"X-Auth-Token": "tOkEnStRiNg",
@@ -68,7 +68,7 @@ describe("Request.Header", () => {
 	})
 	it("unknown headers", () => {
 		expect(
-			parser.Request.Header.to({
+			http.Request.Header.to({
 				contentType: "application/json; charset=utf-8",
 				fooBar: "Foo Bar",
 			})
@@ -77,7 +77,7 @@ describe("Request.Header", () => {
 			"Foo-Bar": "Foo Bar",
 		})
 		expect(
-			parser.Request.Header.from({
+			http.Request.Header.from({
 				"Content-Type": "application/json; charset=utf-8",
 				"Foo-Bar": "Foo Bar",
 			})
