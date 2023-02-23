@@ -55,7 +55,7 @@ describe("Request", () => {
 		expect(http.Request.is(request)).toEqual(true)
 	})
 	it("to contentType", async () => {
-		const json = http.Request.create({
+		const json: http.Request = http.Request.create({
 			method: "POST",
 			url: new URL("http://example.com/collection/resource?key=value"),
 			header: { contentType: "application/json; charset=utf-8" },
