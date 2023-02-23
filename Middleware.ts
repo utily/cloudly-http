@@ -20,6 +20,7 @@ export namespace Middleware {
 	): Middleware<ResponseOut, ResponseIn, RequestOut, RequestIn> {
 		return async (request, next) => before(request, r => after(r, next))
 	}
+	export function create<T = any, U = any>(preset: "identity"): Middleware<T, T, U, U>
 	export function create<T = any, U = any>(preset: "client"): Middleware<T, Body, BodyInit, U>
 	export function create<T = any, U = any>(preset: "server"): Middleware<T, Body, BodyInit, U>
 	export function create<T = any, U = any>(
@@ -31,10 +32,12 @@ export namespace Middleware {
 		parser?: Parser<T>
 	): Middleware<T, T, BodyInit, any>
 	export function create(
-		processor?: "client" | "server" | "headers" | Parser | Serializer,
+		processor?: "identity" | "client" | "server" | "headers" | Parser | Serializer,
 		processorOut?: Parser | Serializer
 	): Middleware {
-		return processor == "client"
+		return processor == "identity"
+			? async (request, next) => await next(request)
+			: processor == "client"
 			? async (request, next) => Parser.parse(await next(await Serializer.serialize(request)))
 			: processor == "server"
 			? async (request, next) => Serializer.serialize(await next(await Parser.parse(request)))
