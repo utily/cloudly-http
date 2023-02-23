@@ -96,6 +96,6 @@ export namespace Response {
 	}
 	export type Header = ResponseHeader
 	export const Header = ResponseHeader
-	export type Like<T> = ResponseLike<T>
+	export type Like<T = any | Promise<any>> = ResponseLike<T>
 	export const Like = ResponseLike
 }
