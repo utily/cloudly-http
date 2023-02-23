@@ -1,8 +1,12 @@
 import "isomorphic-fetch"
-import { FormData as Form } from "formdata-polyfill/esm.min.js"
+import { Blob } from "fetch-blob"
+import { File } from "fetch-blob/file"
+import { FormData } from "formdata-polyfill/esm.min"
 import { http } from "../index"
 
-globalThis.FormData = Form
+globalThis.Blob = Blob
+globalThis.File = File
+globalThis.FormData = FormData
 describe("Request", () => {
 	const output = {
 		method: "GET",
@@ -35,6 +39,7 @@ describe("Request", () => {
 		).toEqual({
 			...output,
 			method: "POST",
+			header: { contentType: "application/json; charset=utf-8" },
 			body: { property: "value" },
 		})
 	})

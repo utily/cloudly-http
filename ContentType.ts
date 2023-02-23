@@ -11,6 +11,8 @@ export namespace ContentType {
 						? isPdf(body)
 							? "application/pdf"
 							: "application/octet-stream"
+						: objectContainsBinary(body)
+						? "multipart/form-data"
 						: "application/json; charset=utf-8"
 				break
 			case "string":
@@ -30,5 +32,14 @@ export namespace ContentType {
 	function isPdf(body: ArrayBuffer | ArrayBufferView): boolean {
 		const bytes = new Uint8Array(ArrayBuffer.isView(body) ? body.buffer : body).slice(0, 4)
 		return [37, 80, 68, 70].every((current, index) => current == bytes[index])
+	}
+	function objectContainsBinary(body: any): boolean {
+		return (
+			typeof body == "object" &&
+			body &&
+			(body instanceof Blob ||
+				ArrayBuffer.isView(body) ||
+				Object.entries(body).some(([_, value]) => objectContainsBinary(value)))
+		)
 	}
 }

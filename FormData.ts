@@ -71,4 +71,18 @@ export namespace FormData {
 	export function isObject(value: any): value is Record<string, unknown> {
 		return value && typeof value == "object" && !Array.isArray(value)
 	}
+	export async function toObject(data: globalThis.FormData): Promise<Record<string, any>> {
+		return Object.fromEntries(
+			await Promise.all(
+				[...data.entries()].map(async ([property, value]) => [
+					property,
+					!(value instanceof File)
+						? value
+						: value.type.startsWith("application/json")
+						? JSON.parse(await value.text())
+						: new Array(...new Uint8Array(await value.arrayBuffer())),
+				])
+			)
+		)
+	}
 }

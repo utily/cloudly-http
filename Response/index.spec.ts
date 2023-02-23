@@ -1,9 +1,16 @@
 import "isomorphic-fetch"
+import { Blob } from "fetch-blob"
+import { File } from "fetch-blob/file"
+import { FormData } from "formdata-polyfill/esm.min"
 import WebSocket from "jest-websocket-mock"
+import { http } from "../index"
+
+globalThis.Blob = Blob
+globalThis.File = File
+globalThis.FormData = FormData
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
 global.WebSocket = WebSocket
-import { http } from "../index"
 
 describe("Response", () => {
 	const output = {

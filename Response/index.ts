@@ -1,8 +1,8 @@
+import { ContentType } from "../ContentType"
 import { Parser } from "../Parser"
 import * as Platform from "../Platform"
 import { Serializer } from "../Serializer"
 import { Socket } from "../Socket"
-import { ContentType as ResponseContentType } from "./ContentType"
 import { Header as ResponseHeader } from "./Header"
 import { Like as ResponseLike } from "./Like"
 
@@ -58,10 +58,11 @@ export namespace Response {
 		response: Response.Like<T> | Socket.Factory | any,
 		contentType?: Response.Header | string
 	): Response<T> {
+		const header = typeof contentType == "string" ? { contentType } : contentType ?? {}
 		const result: Required<Omit<Response.Like<T>, "socket">> = Response.Like.is(response)
 			? {
 					status: 200,
-					header: {},
+					header,
 					body: undefined,
 					...(response.socket && { socket: response.socket }),
 					...response,
@@ -77,8 +78,9 @@ export namespace Response {
 									...((response.status == 301 || response.status == 302) && response.location
 										? { location: response.location }
 										: {}),
+									...header,
 							  }
-							: {},
+							: header,
 					body:
 						!(typeof response == "object" && !Array.isArray(response)) ||
 						response instanceof ArrayBuffer ||
@@ -88,13 +90,12 @@ export namespace Response {
 					...((response.webSocket && { socket: new Socket.Factory(response.webSocket) }) ||
 						(response.socket && { socket: response.socket })),
 			  }
-		if (result.header.contentType)
-			result.header.contentType = Response.ContentType.deduce(result.body)
+		if (!result.header.contentType)
+			result.header.contentType = ContentType.deduce(result.body)
 		return result
 	}
 	export type Header = ResponseHeader
 	export const Header = ResponseHeader
 	export type Like<T> = ResponseLike<T>
 	export const Like = ResponseLike
-	export const ContentType = ResponseContentType
 }

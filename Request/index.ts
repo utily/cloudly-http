@@ -1,4 +1,5 @@
 /// <reference lib="webworker.iterable" />
+import { ContentType } from "../ContentType"
 import { Method } from "../Method"
 import { Parser } from "../Parser"
 import { Serializer } from "../Serializer"
@@ -82,6 +83,8 @@ export namespace Request {
 				body: request.body,
 			}
 		}
+		if (!result.header.contentType)
+			result = { ...result, header: { ...result.header, contentType: ContentType.deduce(result.body) } }
 		return result
 	}
 	export type Header = RequestHeader

@@ -1,30 +1,37 @@
 import { Blob } from "fetch-blob"
 import { File } from "fetch-blob/file"
-import { FormData as Form } from "formdata-polyfill/esm.min.js"
+import { FormData } from "formdata-polyfill/esm.min"
 import { http } from "./index"
 
-globalThis.FormData = Form
+globalThis.FormData = FormData
 globalThis.Blob = Blob
 globalThis.File = File
-describe("serializer", () => {
+describe("Serializer", () => {
 	it("send standard form data", async () => {
 		const body = new FormData()
 		const file = new Blob([JSON.stringify({ test: "testing", tester: "potato" }, null, 2)], { type: "application/pdf" })
 		body.append("request", "value1")
 		body.append("remittanceAdvice", file)
-		const result = await http.Serializer.serialize(
-			http.Request.create({ url: "http://localhost", header: { contentType: "multipart/form-data" }, body })
-		)
-		expect(result).toEqual(body)
+		const request = await http.Request.to({
+			method: "POST",
+			url: "http://localhost",
+			header: { contentType: "multipart/form-data" },
+			body,
+		})
+		expect(request.body).toEqual(body)
 	})
-	it("FormData.to", async () => {
+	it("FormData.to w/o Blob", async () => {
 		const body = { a: 123, b: "qwe", c: false, d: null, e: [123, 456], f: { g: 789 } }
-		const result = await http.Serializer.serialize(
-			http.Request.create({ url: "http://localhost", header: { contentType: "multipart/form-data" }, body })
-		)
-		expect(result instanceof FormData).toBeTruthy()
+		const request = await http.Request.to({
+			method: "POST",
+			url: "http://localhost",
+			header: { contentType: "multipart/form-data" },
+			body,
+		})
+
+		expect(request.body instanceof FormData).toBeTruthy()
 	})
-	it("FormData.to", async () => {
+	it("FormData.to w/ Blob", async () => {
 		const body = {
 			a: 123,
 			b: {
@@ -33,24 +40,16 @@ describe("serializer", () => {
 			},
 			d: new Blob([new TextEncoder().encode("The Power of Attraction.")], { type: "application/octet-stream" }),
 		}
-		const serialized = await http.Serializer.serialize(
-			http.Request.create({ url: "http://localhost", header: { contentType: "multipart/form-data" }, body })
+		const request = await http.Request.to(
+			http.Request.create({
+				method: "POST",
+				url: "http://localhost",
+				header: { contentType: "multipart/form-data" },
+				body,
+			})
 		)
-		const result = Object.fromEntries((serialized.body as FormData).entries())
-		expect(
-			Object.fromEntries(
-				await Promise.all(
-					Object.entries(result).map(async ([property, value]) => [
-						property,
-						!(value instanceof File)
-							? value
-							: value.type.startsWith("application/json")
-							? JSON.parse(await value.text())
-							: new Array(...new Uint8Array(await value.arrayBuffer())),
-					])
-				)
-			)
-		).toMatchObject({
+		expect(request.body instanceof FormData).toBeTruthy()
+		expect(await http.FormData.toObject(request.body as FormData)).toEqual({
 			"": {
 				a: 123,
 				b: {
