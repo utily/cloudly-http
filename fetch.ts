@@ -1,4 +1,4 @@
-import { Middleware } from "./Client/Middleware"
+import { Middleware } from "./Middleware"
 import * as Platform from "./Platform"
 import { Request } from "./Request"
 import { Response } from "./Response"
