@@ -1,9 +1,6 @@
 import { bind } from "./bind"
-import { Continuable } from "./Continuable"
-import { FormData } from "./FormData"
-import { Request } from "./Request"
-import { Response } from "./Response"
-import * as Search from "./Search"
+import type { Request } from "./Request"
+import type { Response } from "./Response"
 
 type Parse<T> = (request: Request<Body> | Response<Body>) => Promise<Request<T> | Response<T>>
 
@@ -36,25 +33,3 @@ export class Parser<T = any | Promise<any>> {
 		return value instanceof Parser
 	}
 }
-
-Parser.add(async message => ({ ...message, body: await message.body?.text() }), "text/plain", "text/html")
-Parser.add(async message => {
-	let result = { ...message, body: await message.body?.json() }
-	if (
-		Response.is(message) &&
-		Array.isArray(result.body) &&
-		Array.isArray(result.header.link) &&
-		result.header.link.length == 2 &&
-		result.header.link[1] == 'rel="next"'
-	)
-		result = { ...result, body: Continuable.create(result.body, result.header.link[0]) }
-	return result
-}, "application/json")
-Parser.add(
-	async message => ({ ...message, body: message.body && FormData.from(await message.body.formData()) }),
-	"multipart/form-data"
-)
-Parser.add(
-	async message => ({ ...message, body: message.body && Search.parse(await message.body.text()) }),
-	"application/x-www-form-urlencoded"
-)

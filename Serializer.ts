@@ -1,9 +1,6 @@
 import { bind } from "./bind"
-import { Continuable } from "./Continuable"
-import { FormData } from "./FormData"
-import { Request } from "./Request"
-import { Response } from "./Response"
-import * as Search from "./Search"
+import type { Request } from "./Request"
+import type { Response } from "./Response"
 
 type Serialize = (
 	message: Request<any> | Response<any>,
@@ -40,34 +37,3 @@ export class Serializer {
 		return value instanceof Serializer
 	}
 }
-
-Serializer.add(
-	async message => ({ ...message, body: typeof message.body == "string" ? message.body : message.body.toString() }),
-	"text/plain",
-	"text/html"
-)
-Serializer.add(
-	async message =>
-		Response.is(message) && Continuable.hasCursor(message.body)
-			? {
-					...message,
-					header: { ...message.header, link: [message.body.cursor, 'rel="next"'] },
-					body: JSON.stringify((({ cursor, ...data }) => data)(message.body)),
-			  }
-			: { ...message, body: JSON.stringify(message.body) },
-	"application/json"
-)
-Serializer.add(
-	async message => ({ ...message, body: Search.stringify(message.body) }),
-	"application/x-www-form-urlencoded"
-)
-Serializer.add(async message => {
-	const body = message.body instanceof globalThis.FormData ? message.body : FormData.to(message.body)
-	return Request.is(message)
-		? {
-				...message,
-				header: (({ contentType, ...header }) => header)(message.header),
-				body,
-		  }
-		: { ...message, body }
-}, "multipart/form-data")
