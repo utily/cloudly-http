@@ -1,4 +1,5 @@
 /// <reference lib="webworker.iterable" />
+import type { Request as CloudflareRequest } from "@cloudflare/workers-types"
 import { Method } from "../Method"
 import * as Parser from "../Parser"
 import * as Serializer from "../Serializer"
@@ -13,6 +14,7 @@ export interface Request {
 	readonly remote?: string
 	readonly header: Readonly<RequestHeader>
 	readonly body?: any | Promise<any>
+	readonly cloudflare?: CloudflareRequest["cf"]
 }
 
 export namespace Request {
@@ -52,7 +54,7 @@ export namespace Request {
 				: await Serializer.serialize(await r.body, r.header.contentType),
 		}
 	}
-	export function from(request: globalThis.Request): Request {
+	export function from(request: globalThis.Request | CloudflareRequest): Request {
 		const url = new URL(request.url)
 		return {
 			method: Method.parse(request.method) ?? "GET",
@@ -61,6 +63,7 @@ export namespace Request {
 			parameter: {},
 			search: Object.fromEntries(url.searchParams.entries()),
 			body: Parser.parse(request),
+			...("cf" in request && { cloudflare: request.cf }),
 		}
 	}
 	export function create(request: string | RequestLike): Request {
