@@ -14,7 +14,7 @@ export interface Request {
 	readonly remote?: string
 	readonly header: Readonly<RequestHeader>
 	readonly body?: any | Promise<any>
-	readonly cloudflare?: CloudflareRequest["cf"]
+	readonly cloudflare?: Readonly<CloudflareRequest["cf"]>
 }
 
 export namespace Request {
