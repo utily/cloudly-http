@@ -23,7 +23,7 @@ export class Serializer {
 		const serialize =
 			Request.is(message) && ["GET", "HEAD"].some(v => v == message.method)
 				? undefined
-				: this.serializers[message.header.contentType?.split(";")[0] ?? ""]
+				: this.serializers[message.header?.contentType?.split(";")[0] ?? ""]
 		return serialize ? serialize(message) : (({ body, ...message }) => message)(message)
 	}
 	extend(): Serializer {
