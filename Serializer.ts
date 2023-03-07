@@ -1,5 +1,5 @@
 import { bind } from "./bind"
-import type { Request } from "./Request"
+import { Request } from "./Request"
 import type { Response } from "./Response"
 
 type Serialize = (
@@ -21,7 +21,7 @@ export class Serializer {
 	async serialize(response: Response): Promise<Response<BodyInit>>
 	async serialize(message: Request<any> | Response<any>): Promise<Request<BodyInit> | Response<BodyInit>> {
 		const serialize =
-			"method" in message && ["GET", "HEAD"].some(v => v == message.method)
+			Request.is(message) && ["GET", "HEAD"].some(v => v == message.method)
 				? undefined
 				: this.serializers[message.header.contentType?.split(";")[0] ?? ""]
 		return serialize ? serialize(message) : (({ body, ...message }) => message)(message)
