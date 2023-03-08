@@ -167,4 +167,15 @@ export namespace Header {
 	function isHeaders(value: globalThis.Headers | any): value is globalThis.Headers {
 		return typeof value.entries == "function"
 	}
+	export type Name = keyof Header
+	export namespace Name {
+		export function to(name: string): Name | string {
+			const field = fields.find(([camelCase, n, l]) => camelCase == name)
+			return field ? field[1] : CamelCase.from(name)
+		}
+		export function from(name: Name | string): string {
+			const field = fields.find(([c, n, l]) => name.toLowerCase() == n.toLowerCase())
+			return field ? field[0] : CamelCase.to(name)
+		}
+	}
 }

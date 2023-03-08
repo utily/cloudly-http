@@ -88,10 +88,6 @@ export namespace Request {
 		return result
 	}
 	export type Header = RequestHeader
-	export namespace Header {
-		export const is = RequestHeader.is
-		export const from = RequestHeader.from
-		export const to = RequestHeader.to
-	}
+	export const Header = RequestHeader
 	export type Like<T = any | Promise<any>> = RequestLike<T>
 }

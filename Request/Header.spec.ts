@@ -86,4 +86,9 @@ describe("Request.Header", () => {
 			fooBar: "Foo Bar",
 		})
 	})
+	it("Header.Name.to(contentType)", () => expect(http.Response.Header.Name.to("contentType")).toEqual("Content-Type"))
+	it("Header.Name.from(Content-Type)", () =>
+		expect(http.Response.Header.Name.from("Content-Type")).toEqual("contentType"))
+	it("Header.Name.to(fooBar)", () => expect(http.Response.Header.Name.to("fooBar")).toEqual("Foo-Bar"))
+	it("Header.Name.from(Foo-Bar)", () => expect(http.Response.Header.Name.from("Foo-Bar")).toEqual("fooBar"))
 })
