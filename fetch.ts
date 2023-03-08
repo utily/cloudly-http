@@ -20,8 +20,8 @@ function create<TRequest = any, TResponse = Promise<any>>(
 ): Fetch {
 	return async (request: Request.Like<TRequest> | string): Promise<Response> => {
 		const r = Request.create(request)
-		return middleware
-			? middleware(r, async r => Response.from(await fetch(r.url.toString(), await Request.to(r, "none")), "none"))
-			: Response.from(await fetch(r.url.toString(), await Request.to(r)))
+		return (middleware ?? Middleware.create("client"))(r, async r =>
+			Response.from(await fetch(r.url.toString(), await Request.to(r, "none")), "none")
+		)
 	}
 }
