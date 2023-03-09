@@ -22,7 +22,7 @@ export namespace Middleware {
 	}
 	export function create<T = any, U = any>(preset: "identity"): Middleware<T, T, U, U>
 	export function create<T = any, U = any>(preset: "client"): Middleware<T, Body, BodyInit, U>
-	export function create<T = any, U = any>(preset: "server"): Middleware<T, Body, BodyInit, U>
+	export function create<T = any, U = any>(preset: "server"): Middleware<BodyInit, T, U, Body>
 	export function create<T = any, U = any>(
 		parser: Parser<T> | undefined,
 		serializer?: Serializer

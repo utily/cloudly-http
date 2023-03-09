@@ -49,6 +49,8 @@ export namespace Request {
 			body: result.body,
 		}
 	}
+	export async function from<T = any | Promise<any>>(request: globalThis.Request, parser?: Parser<T>): Promise<Request>
+	export async function from(request: globalThis.Request, parser: "none"): Promise<Request<Body>>
 	export async function from<T = any | Promise<any>>(
 		request: globalThis.Request,
 		parser?: Parser<T> | "none"
