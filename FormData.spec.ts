@@ -13,7 +13,7 @@ describe("form data", () => {
 		expect(result.get("")).toEqual(
 			new File([new TextEncoder().encode(JSON.stringify({ value: "value", test: "test", tester: "tester" }))], "blob")
 		)
-		expect(result.get("file") instanceof Blob).toBeTruthy
+		expect(result.get("file") instanceof Blob).toBeTruthy()
 	})
 	it("from", async () => {
 		const data = new FormData()
@@ -29,5 +29,26 @@ describe("form data", () => {
 		data.append("file", file)
 		const result = await http.FormData.from(data)
 		expect(result).toEqual({ file: { test: "testing", tester: "potato" }, key1: "value1", key2: "value2" })
+	})
+	it("back and forth", async () => {
+		const to = http.FormData.to({
+			file: new File([new Uint8Array([97])], "myfile.jpeg", { type: "image/jpeg" }),
+			net: [10, "EUR"],
+			vat: [20, "EUR"],
+			obj: {
+				nestedNet: [10, "EUR"],
+				nestedVat: [20, "EUR"],
+			},
+		})
+		const from = await http.FormData.from(to)
+		expect(from).toEqual({
+			file: new File([new Uint8Array([97])], "myfile.jpeg", { type: "image/jpeg" }),
+			net: [10, "EUR"],
+			vat: [20, "EUR"],
+			obj: {
+				nestedNet: [10, "EUR"],
+				nestedVat: [20, "EUR"],
+			},
+		})
 	})
 })
