@@ -24,7 +24,13 @@ export namespace Response {
 	export async function to(request: Response): Promise<Platform.Response> {
 		return new Platform.Response(await Serializer.serialize(await request.body, request.header.contentType), {
 			status: request.status,
-			headers: new Headers(ResponseHeader.to(request.header) as Record<string, string>),
+			headers: new Headers(
+				ResponseHeader.to(
+					!request.header.contentType?.startsWith("multipart/formdata")
+						? request.header
+						: (({ contentType, ...header }) => header)(request.header)
+				) as Record<string, string>
+			),
 			...(request.socket && {
 				webSocket: ({ ...request.socket.createResponse().socket } as Record<string, string | undefined>)?.backend,
 			}),
@@ -66,7 +72,8 @@ export namespace Response {
 					body:
 						!(typeof response == "object" && !Array.isArray(response)) ||
 						response instanceof ArrayBuffer ||
-						ArrayBuffer.isView(response)
+						ArrayBuffer.isView(response) ||
+						response instanceof FormData
 							? response
 							: (({ header, ...body }) => body)(response),
 					...((response.webSocket && { socket: new Socket.Factory(response.webSocket) }) ||
@@ -83,6 +90,8 @@ export namespace Response {
 							? contentType
 							: contentType?.contentType
 							? contentType.contentType
+							: result.body instanceof FormData
+							? "multipart/formdata"
 							: result.body instanceof ArrayBuffer || ArrayBuffer.isView(result.body)
 							? isPdf(result.body)
 								? "application/pdf"
