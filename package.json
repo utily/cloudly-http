@@ -20,13 +20,13 @@
 		"release": true
 	},
 	"jest": {
-		"globals": {
-			"ts-jest": {
-				"tsconfig": "tsconfig.test.json"
-			}
-		},
 		"transform": {
-			"^.+\\.(j|t)sx?$": "ts-jest"
+			"^.+\\.(j|t)sx?$": [
+				"ts-jest",
+				{
+					"tsconfig": "./tsconfig.test.json"
+				}
+			]
 		},
 		"transformIgnorePatterns": [
 			"<rootDir>/node_modules/(?!(cryptly|authly|isoly|gracely|cloudly-http|cloudly-router|cloudly-formdata|formdata-polyfill|fetch-blob)/.*)"
@@ -41,9 +41,7 @@
 			"**/*.{ts,tsx,js,jsx}",
 			"!**/node_modules/**",
 			"!**/dist/**"
-		],
-		"preset": "ts-jest",
-		"testMatch": null
+		]
 	},
 	"scripts": {
 		"lint": "eslint '**/*.{ts,tsx}'",
