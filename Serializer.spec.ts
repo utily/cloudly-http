@@ -44,7 +44,7 @@ describe("serializer", () => {
 				)
 			)
 		).toMatchObject({
-			"": {
+			"$!json!$": {
 				a: 123,
 				b: {
 					c1: "attraction",
