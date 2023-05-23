@@ -43,8 +43,8 @@ describe("serializer", () => {
 					])
 				)
 			)
-		).toMatchObject({
-			"": {
+		).toEqual({
+			"*": {
 				a: 123,
 				b: {
 					c1: "attraction",

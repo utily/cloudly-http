@@ -2,7 +2,7 @@ export namespace FormData {
 	export function to(data: { [key: string]: any }): FormData {
 		const result = new globalThis.FormData()
 		result.append(
-			"",
+			"*",
 			new globalThis.Blob([new TextEncoder().encode(JSON.stringify(toHelperObject(data, "", result)))], {
 				type: "application/json; charset=utf-8",
 			})
@@ -44,7 +44,7 @@ export namespace FormData {
 	async function set(data: Record<string, unknown>, [head, ...tail]: string[], value: string | Blob) {
 		if (tail.length == 0)
 			value instanceof Blob && value.type.startsWith("application/json")
-				? !head
+				? head == "*"
 					? merge(data, JSON.parse(await value.text()))
 					: typeof data[head] == "object" && data[head]
 					? merge(data[head] as Record<string, unknown>, JSON.parse(await value.text()))

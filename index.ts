@@ -1,6 +1,7 @@
 import { Client } from "./Client"
 import { fetch } from "./fetch"
 import { FormData } from "./FormData"
+import * as http from "./http"
 import { Method } from "./Method"
 import * as Parser from "./Parser"
 import { Request } from "./Request"
@@ -18,7 +19,5 @@ Serializer.add(async body => (typeof body == "string" ? body : body.toString()),
 Serializer.add(async body => JSON.stringify(body), "application/json")
 Serializer.add(async body => Search.stringify(body), "application/x-www-form-urlencoded")
 Serializer.add(async body => (body instanceof globalThis.FormData ? body : FormData.to(body)), "multipart/form-data")
-
-const http = { Client, fetch, FormData, Method, Parser, Request, Response, Search, Serializer, Socket }
 
 export { Client, fetch, FormData, Method, Parser, Request, Response, Search, Serializer, Socket, http }
