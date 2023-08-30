@@ -69,6 +69,11 @@ export namespace Response {
 			  }
 			: typeof response?.createResponse == "function" && (contentType == undefined || Response.Header.is(contentType))
 			? (response as Socket.Factory).createResponse(contentType as Response.Header)
+			: !response
+			? {
+					status: 204,
+					header,
+			  }
 			: {
 					status: (typeof response == "object" && typeof response.status == "number" && response.status) || 200,
 					header:
