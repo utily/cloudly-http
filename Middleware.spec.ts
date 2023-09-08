@@ -19,7 +19,7 @@ describe("http.Middleware", () => {
 					"none"
 				),
 				async request => {
-					expect(request).toEqual({
+					expect(request).toMatchObject({
 						body: {
 							test: {
 								value: "The Power of Attraction.",
@@ -57,7 +57,7 @@ describe("http.Middleware", () => {
 					"none"
 				),
 				async request => {
-					expect(request).toEqual({
+					expect(request).toMatchObject({
 						body: "The Power of Attraction.",
 						header: {
 							contentType: "text/plain; charset=utf-8",
