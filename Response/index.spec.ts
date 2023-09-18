@@ -155,4 +155,7 @@ describe("Response", () => {
 			},
 		})
 	})
+	it("no content", () => {
+		expect(http.Response.create(undefined)).toEqual({ header: {}, status: 204 })
+	})
 })
