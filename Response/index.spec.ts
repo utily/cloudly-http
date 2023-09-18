@@ -78,6 +78,17 @@ describe("Response", () => {
 			body: array,
 		})
 	})
+	it("create cursor array", async () => {
+		const body = http.Continuable.create(
+			array.map(e => ({ string: e })),
+			"cursor"
+		)
+		const response = await http.Response.from(await http.Response.to(http.Response.create(body)))
+		expect(response.status).toEqual(output.status)
+		expect(response.header).toEqual({ contentType: "application/json; charset=utf-8", link: ["cursor", 'rel="next"'] })
+		expect(JSON.stringify(response.body)).toStrictEqual(JSON.stringify(body))
+		expect(response.body.cursor).toStrictEqual(body.cursor)
+	})
 	it("create svg", () => {
 		expect(http.Response.create(svg)).toEqual({
 			...output,
@@ -143,5 +154,8 @@ describe("Response", () => {
 				type: "not authorized",
 			},
 		})
+	})
+	it("no content", () => {
+		expect(http.Response.create(undefined)).toEqual({ header: {}, status: 204 })
 	})
 })

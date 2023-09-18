@@ -23,7 +23,7 @@ Serializer.add(
 			? {
 					...message,
 					header: { ...message.header, link: [message.body.cursor, 'rel="next"'] },
-					body: JSON.stringify((({ cursor, ...data }) => data)(message.body)),
+					body: JSON.stringify([...message.body]),
 			  }
 			: { ...message, body: JSON.stringify(message.body) },
 	"application/json"

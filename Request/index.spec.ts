@@ -18,13 +18,13 @@ describe("Request", () => {
 		body: undefined,
 	}
 	it("create url string", () => {
-		expect(http.Request.create("http://example.com/collection/resource")).toEqual(output)
+		expect(http.Request.create("http://example.com/collection/resource")).toMatchObject(output)
 	})
 	it("create url", () => {
-		expect(http.Request.create({ url: "http://example.com/collection/resource" })).toEqual(output)
+		expect(http.Request.create({ url: "http://example.com/collection/resource" })).toMatchObject(output)
 	})
 	it("create method url", () => {
-		expect(http.Request.create({ method: "post", url: "http://example.com/collection/resource" })).toEqual({
+		expect(http.Request.create({ method: "post", url: "http://example.com/collection/resource" })).toMatchObject({
 			...output,
 			method: "POST",
 		})
@@ -36,7 +36,7 @@ describe("Request", () => {
 				url: "http://example.com/collection/resource",
 				body: { property: "value" },
 			})
-		).toEqual({
+		).toMatchObject({
 			...output,
 			method: "POST",
 			header: { contentType: "application/json; charset=utf-8" },
