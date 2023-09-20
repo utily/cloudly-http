@@ -56,15 +56,16 @@ export namespace Request {
 		parser?: Parser<T> | "none"
 	): Promise<Request> {
 		const url = new URL(request.url)
+		const method = Method.parse(request.method) ?? "GET"
 		const result = {
-			method: Method.parse(request.method) ?? "GET",
+			method,
 			url,
 			header: RequestHeader.from(request.headers),
 			parameter: {},
 			search: Object.fromEntries(url.searchParams.entries()),
 			body: request,
 		}
-		return parser == "none" ? result : (parser ?? Parser).parse(result)
+		return parser == "none" || !["PUT", "POST", "PATCH"].includes(method) ? result : (parser ?? Parser).parse(result)
 	}
 	export function create(request: string): Request<string>
 	export function create<T>(request: Request.Like<T>): Request<T>

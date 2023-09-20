@@ -73,4 +73,11 @@ describe("Request", () => {
 		})
 		expect((await http.Request.to(formData)).headers).toEqual({ Authorization: "placeholderValue" })
 	})
+	it("contentType on body-less method", async () => {
+		const request: Request = new Request(new URL("http://example.com/collection/resource?key=value"), {
+			method: "GET",
+			headers: { "Content-Type": "application/json" },
+		})
+		expect((await http.Request.from(request)).url).toEqual(new URL("http://example.com/collection/resource?key=value"))
+	})
 })
