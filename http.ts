@@ -15,7 +15,8 @@ import { Socket } from "./Socket"
 Serializer.add(
 	async message => ({ ...message, body: typeof message.body == "string" ? message.body : message.body.toString() }),
 	"text/plain",
-	"text/html"
+	"text/html",
+	"application/jwt"
 )
 Serializer.add(
 	async message =>
@@ -43,7 +44,12 @@ Serializer.add(async message => {
 		: { ...message, body }
 }, "multipart/form-data")
 
-Parser.add(async message => ({ ...message, body: await message.body?.text() }), "text/plain", "text/html")
+Parser.add(
+	async message => ({ ...message, body: await message.body?.text() }),
+	"text/plain",
+	"text/html",
+	"application/jwt"
+)
 Parser.add(async message => {
 	let result = { ...message, body: await message.body?.json() }
 	if (
