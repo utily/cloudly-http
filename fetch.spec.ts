@@ -56,4 +56,15 @@ describe("fetch", () => {
 			status: 200,
 		})
 	})
+	it("parse application/jwt", async () => {
+		const jwt =
+			"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+		const fetch = http.fetch.create(
+			async (_: string, __: RequestInit): Promise<Response> =>
+				new Response(jwt, { headers: { "Content-Type": "application/jwt" } })
+		)
+		const response = await fetch("http://example.com")
+		const body = await response.body
+		expect(body).toEqual(jwt)
+	})
 })
