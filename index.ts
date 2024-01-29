@@ -18,7 +18,7 @@ Parser.add(async request => Search.parse(await request.text()), "application/x-w
 
 Serializer.add(async body => (typeof body == "string" ? body : body.toString()), "text/plain", "text/html")
 Serializer.add(async body => JSON.stringify(body), "application/json")
-Serializer.add(async body => new Blob([body]), "application/pdf")
+Serializer.add(async body => new globalThis.Blob([body]), "application/pdf")
 Serializer.add(async body => Search.stringify(body), "application/x-www-form-urlencoded")
 Serializer.add(async body => (body instanceof globalThis.FormData ? body : FormData.to(body)), "multipart/form-data")
 
