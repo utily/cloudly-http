@@ -70,5 +70,9 @@
 	},
 	"dependencies": {
 		"@cloudflare/workers-types": "^4.20230321.0"
+	},
+	"overrides": {
+		"postcss": "8.4.31",
+		"semver": "7.5.3"
 	}
 }
