@@ -39,8 +39,8 @@ export class Client<Error = never> {
 	private async fetch<R>(path: string, method: Method, body?: any, header?: Request.Header): Promise<R | Error> {
 		const request = Request.create({ url: `${this.url ?? ""}${path}`, method, header, body })
 		const response = await this.f(request).catch(error => Response.create({ status: 601, body: error }))
-		return (response.status == 401 && this.onUnauthorized && (await this.onUnauthorized(this))) ||
-			(response.status >= 300 && this.onError && (await this.onError(request, response)))
+		return (response.status == 401 && (await this.onUnauthorized?.(this))) ||
+			(response.status >= 300 && (await this.onError?.(request, response)))
 			? await this.fetch<R>(path, method, body, header)
 			: ((await response.body) as R | Error)
 	}

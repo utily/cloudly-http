@@ -59,42 +59,48 @@ export namespace Response {
 		contentType?: Response.Header | string
 	): Response<T> {
 		const header = typeof contentType == "string" ? { contentType } : contentType ?? {}
-		const result: Required<Omit<Response.Like<T>, "socket">> = Response.Like.is(response)
-			? {
-					status: 200,
-					header,
-					body: undefined,
-					...(response.socket && { socket: response.socket }),
-					...response,
-			  }
-			: typeof response?.createResponse == "function" && (contentType == undefined || Response.Header.is(contentType))
-			? (response as Socket.Factory).createResponse(contentType as Response.Header)
-			: !response
-			? {
-					status: 204,
-					header,
-			  }
-			: {
-					status: (typeof response == "object" && typeof response.status == "number" && response.status) || 200,
-					header:
-						typeof response == "object"
-							? {
-									...response.header,
-									...((response.status == 301 || response.status == 302) && response.location
-										? { location: response.location }
-										: {}),
-									...header,
-							  }
-							: header,
-					body:
-						!(typeof response == "object" && !Array.isArray(response)) ||
-						response instanceof ArrayBuffer ||
-						ArrayBuffer.isView(response)
-							? response
-							: (({ header, ...body }) => body)(response),
-					...((response.webSocket && { socket: new Socket.Factory(response.webSocket) }) ||
-						(response.socket && { socket: response.socket })),
-			  }
+		let result: Required<Omit<Response.Like<T>, "socket">>
+		if (Response.Like.is(response)) {
+			result = {
+				status: 200,
+				header,
+				body: undefined,
+				...(response.socket && { socket: response.socket }),
+				...response,
+			}
+		} else if (
+			typeof response?.createResponse == "function" &&
+			(contentType == undefined || Response.Header.is(contentType))
+		) {
+			result = (response as Socket.Factory).createResponse(contentType as Response.Header)
+		} else if (!response) {
+			result = {
+				status: 204,
+				header,
+			}
+		} else {
+			result = {
+				status: (typeof response == "object" && typeof response.status == "number" && response.status) || 200,
+				header:
+					typeof response == "object"
+						? {
+								...response.header,
+								...((response.status == 301 || response.status == 302) && response.location
+									? { location: response.location }
+									: {}),
+								...header,
+						  }
+						: header,
+				body:
+					!(typeof response == "object" && !Array.isArray(response)) ||
+					response instanceof ArrayBuffer ||
+					ArrayBuffer.isView(response)
+						? response
+						: (({ header, ...body }) => body)(response),
+				...((response.webSocket && { socket: new Socket.Factory(response.webSocket) }) ||
+					(response.socket && { socket: response.socket })),
+			}
+		}
 		if (!result.header.contentType)
 			result.header.contentType = ContentType.deduce(result.body)
 		return result
