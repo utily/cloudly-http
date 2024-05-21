@@ -14,7 +14,7 @@ export class Client<Error = never> {
 	appendHeader?: (request: Request) => Request.Header
 	postprocess = async (response: Response): Promise<Response> => response
 	onError?: (request: Request, response: Response) => Promise<boolean>
-	onUnauthorized?: (connection: Client<Error>) => Promise<boolean>
+	onUnauthorized?: (connection: Client<Error>, request: Request, response: Response) => Promise<boolean>
 
 	constructor(
 		public url?: string,
@@ -34,7 +34,7 @@ export class Client<Error = never> {
 		const response = await this.postprocess(
 			await fetch(request).catch(error => Response.create({ status: 601, body: error }))
 		)
-		return (response.status == 401 && this.onUnauthorized && (await this.onUnauthorized(this))) ||
+		return (response.status == 401 && this.onUnauthorized && (await this.onUnauthorized(this, request, response))) ||
 			(response.status >= 300 && this.onError && (await this.onError(request, response)))
 			? await this.fetch<R>(path, method, body, header)
 			: ((await response.body) as R | Error)
