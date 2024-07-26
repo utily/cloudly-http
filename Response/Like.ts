@@ -7,7 +7,6 @@ export interface Like<T = any | Promise<any>> {
 	body?: T
 	socket?: Socket.Factory
 }
-
 export namespace Like {
 	export function is<T = any | Promise<any>>(value: Like<T> | any): value is Like<T> {
 		return (
@@ -18,5 +17,14 @@ export namespace Like {
 			(value.socket == undefined || value.socket instanceof Socket.Factory) &&
 			(value.status != undefined || value.header != undefined || value.body != undefined)
 		)
+	}
+	export function createHeader(like: Like | any, header: Header): Header {
+		return typeof like != "object"
+			? header
+			: {
+					...like.header,
+					...((like.status == 301 || like.status == 302) && like.location ? { location: like.location } : {}),
+					...header,
+			  }
 	}
 }
