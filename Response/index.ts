@@ -80,7 +80,7 @@ export namespace Response {
 				ArrayBuffer.isView(response)
 					? response
 					: (({ header, ...body }) => body)(response)
-			const header = Like.createHeader(response, contentType)
+			const header = Header.fromAny(response, contentType)
 			!header.contentType && (header.contentType = ContentType.deduce(body))
 			result = {
 				status: (typeof response == "object" && typeof response.status == "number" && response.status) || 200,

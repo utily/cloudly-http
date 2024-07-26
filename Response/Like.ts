@@ -18,13 +18,4 @@ export namespace Like {
 			(value.status != undefined || value.header != undefined || value.body != undefined)
 		)
 	}
-	export function createHeader(like: Like | any, header: Header): Header {
-		return typeof like != "object"
-			? header
-			: {
-					...like.header,
-					...((like.status == 301 || like.status == 302) && like.location ? { location: like.location } : {}),
-					...header,
-			  }
-	}
 }

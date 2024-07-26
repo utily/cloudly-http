@@ -167,6 +167,15 @@ export namespace Header {
 			.map(([header, value]) => header + ": " + value)
 			.join("\n")
 	}
+	export function fromAny(value: any, header: Header): Header {
+		return typeof value != "object"
+			? header
+			: {
+					...value.header,
+					...((value.status == 301 || value.status == 302) && value.location ? { location: value.location } : {}),
+					...header,
+			  }
+	}
 	function isHeaders(value: globalThis.Headers | any): value is globalThis.Headers {
 		return typeof value.forEach == "function"
 	}
