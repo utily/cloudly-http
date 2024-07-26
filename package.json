@@ -45,9 +45,6 @@
 		"preset": "ts-jest",
 		"testMatch": null
 	},
-	"overrides": {
-		"semver": "7.5.3"
-	},
 	"scripts": {
 		"lint": "eslint '**/*.{ts,tsx}'",
 		"fix": "eslint '**/*.{ts,tsx}' --fix",
