@@ -58,45 +58,47 @@ export namespace Response {
 		response: Response.Like<T> | Socket.Factory | any,
 		contentType?: Response.Header | string
 	): Response<T> {
-		const header = typeof contentType == "string" ? { contentType } : contentType ?? {}
-		const result: Required<Omit<Response.Like<T>, "socket">> = Response.Like.is(response)
-			? {
-					status: 200,
-					header,
-					body: undefined,
-					...(response.socket && { socket: response.socket }),
-					...response,
-			  }
-			: typeof response?.createResponse == "function" && (contentType == undefined || Response.Header.is(contentType))
-			? (response as Socket.Factory).createResponse(contentType as Response.Header)
-			: !response
-			? {
-					status: 204,
-					header,
-			  }
-			: {
-					status: (typeof response == "object" && typeof response.status == "number" && response.status) || 200,
-					header:
-						typeof response == "object"
-							? {
-									...response.header,
-									...((response.status == 301 || response.status == 302) && response.location
-										? { location: response.location }
-										: {}),
-									...header,
-							  }
-							: header,
-					body:
-						!(typeof response == "object" && !Array.isArray(response)) ||
-						response instanceof ArrayBuffer ||
-						ArrayBuffer.isView(response)
-							? response
-							: (({ header, ...body }) => body)(response),
-					...((response.webSocket && { socket: new Socket.Factory(response.webSocket) }) ||
-						(response.socket && { socket: response.socket })),
-			  }
-		if (!result.header.contentType)
-			result.header.contentType = ContentType.deduce(result.body)
+		let result: Omit<Response<T>, "socket"> | Required<Omit<Response, "body">>
+		contentType = (typeof contentType == "string" ? { contentType } : contentType) ?? {}
+		if (Response.Like.is(response)) {
+			const header: Response.Header = { ...response.header, ...contentType }
+			!header.contentType && (header.contentType = ContentType.deduce(response.body))
+			result = {
+				status: response.status ?? 200,
+				header,
+				body: response.body,
+				...(response.socket && { socket: response.socket }),
+			}
+		} else if (response instanceof Socket.Factory)
+			result = response.createResponse(contentType)
+		else if (!response)
+			result = { status: 204, header: contentType }
+		else {
+			const body =
+				!(typeof response == "object" && !Array.isArray(response)) ||
+				response instanceof ArrayBuffer ||
+				ArrayBuffer.isView(response)
+					? response
+					: (({ header, ...body }) => body)(response)
+			const header =
+				typeof response == "object"
+					? {
+							...response.header,
+							...((response.status == 301 || response.status == 302) && response.location
+								? { location: response.location }
+								: {}),
+							...contentType,
+					  }
+					: contentType
+			!header.contentType && (header.contentType = ContentType.deduce(body))
+			result = {
+				status: (typeof response == "object" && typeof response.status == "number" && response.status) || 200,
+				header,
+				body,
+				...((response.webSocket && { socket: new Socket.Factory(response.webSocket) }) ||
+					(response.socket && { socket: response.socket })),
+			}
+		}
 		return result
 	}
 	export type Header = ResponseHeader
