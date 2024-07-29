@@ -24,7 +24,7 @@ export class Factory {
 		return this.#arrayBuffer
 	}
 	constructor(private readonly backend: Backend, private readonly isOpen?: boolean) {}
-	createResponse(header: Response.Header = {}): Response {
+	createResponse(header: Response.Header = {}): Required<Omit<Response, "body">> {
 		return { status: 101, socket: this, header }
 	}
 	close(code?: number, reason?: string): void {
