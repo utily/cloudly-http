@@ -23,7 +23,11 @@ Serializer.add(
 		Response.is(message) && Continuable.hasCursor(message.body)
 			? {
 					...message,
-					header: { ...message.header, link: [message.body.cursor, 'rel="next"'] },
+					header: {
+						...message.header,
+						link: [message.body.cursor, 'rel="next"'],
+						accessControlExposeHeaders: ["link"].concat(message.header.accessControlAllowHeaders ?? []),
+					},
 					body: JSON.stringify([...message.body]),
 			  }
 			: { ...message, body: JSON.stringify(message.body) },
