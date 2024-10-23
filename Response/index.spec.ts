@@ -85,7 +85,11 @@ describe("Response", () => {
 		)
 		const response = await http.Response.from(await http.Response.to(http.Response.create(body)))
 		expect(response.status).toEqual(output.status)
-		expect(response.header).toEqual({ contentType: "application/json; charset=utf-8", link: ["cursor", 'rel="next"'] })
+		expect(response.header).toEqual({
+			contentType: "application/json; charset=utf-8",
+			link: ["cursor", 'rel="next"'],
+			accessControlExposeHeaders: ["link"],
+		})
 		expect(JSON.stringify(response.body)).toStrictEqual(JSON.stringify(body))
 		expect(response.body.cursor).toStrictEqual(body.cursor)
 	})
