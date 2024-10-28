@@ -24,10 +24,7 @@ export class Client<Error = never> {
 				next(
 					this.authorization == undefined
 						? request
-						: {
-								...request,
-								header: { ...request.header, authorization: Authorization.serialize(this.authorization) },
-						  }
+						: { ...request, header: { ...request.header, authorization: Authorization.serialize(this.authorization) } }
 				)
 			)
 		)

@@ -13,6 +13,11 @@ export namespace Authorization {
 	export function parse(authorization: string | undefined): Authorization | undefined {
 		return Basic.parse(authorization) ?? Bearer.parse(authorization) ?? authorization
 	}
+	export function check(server: Authorization | undefined, client: Authorization | undefined): boolean {
+		server = typeof server != "string" ? serialize(server) : server
+		client = typeof client != "string" ? serialize(client) : client
+		return typeof server == "string" && typeof client == "string" && server == client
+	}
 	export type Basic = AuthorizationBasic
 	export const Basic = AuthorizationBasic
 	export type Bearer = AuthorizationBearer
