@@ -26,7 +26,11 @@ export class Client<Error = never> {
 						? request
 						: {
 								...request,
-								header: { ...request.header, authorization: Authorization.serialize(this.authorization) },
+								header: {
+									...request.header,
+									...(!request.header.authorization &&
+										this.authorization && { authorization: Authorization.serialize(this.authorization) }),
+								},
 						  }
 				)
 			)
