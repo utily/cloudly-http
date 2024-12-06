@@ -28,7 +28,8 @@ export class Client<Error = never> {
 								...request,
 								header: {
 									...request.header,
-									...(!request.header.authorization && { authorization: Authorization.serialize(this.authorization) }),
+									...(!request.header.authorization &&
+										this.authorization && { authorization: Authorization.serialize(this.authorization) }),
 								},
 						  }
 				)
