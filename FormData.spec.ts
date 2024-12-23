@@ -1,19 +1,15 @@
-import { Blob } from "fetch-blob"
-import { File } from "fetch-blob/file"
-import { FormData as Form } from "formdata-polyfill/esm.min.js"
 import { http } from "./index"
 
-globalThis.Blob = Blob
-globalThis.File = File
-globalThis.FormData = Form
 describe("form data", () => {
 	const file = new Blob([JSON.stringify({ test: "testing", tester: "potato" }, null, 2)], { type: "application/json" })
 	it("to", async () => {
 		const result = http.FormData.to({ value: "value", file: file, test: "test", tester: "tester" })
 		expect(result.get("")).toEqual(
-			new File([new TextEncoder().encode(JSON.stringify({ value: "value", test: "test", tester: "tester" }))], "blob")
+			new File([new TextEncoder().encode(JSON.stringify({ value: "value", test: "test", tester: "tester" }))], "blob", {
+				type: "application/json; charset=utf-8",
+			})
 		)
-		expect(result.get("file") instanceof Blob).toBeTruthy
+		expect(result.get("file") instanceof Blob).toBeTruthy()
 	})
 	it("from", async () => {
 		const data = new FormData()

@@ -15,6 +15,7 @@ export namespace FormData {
 		form: globalThis.FormData
 	): { [key: string]: unknown } {
 		return Object.entries(data).reduce<Record<string, unknown>>((result, [key, value]) => {
+			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 			value instanceof Blob
 				? form.append(name ? `${name}.${key}` : key, value)
 				: typeof value == "object" && value
@@ -27,6 +28,7 @@ export namespace FormData {
 	}
 	function toHelperArray(data: unknown[], name: string, form: globalThis.FormData) {
 		return data.reduce<unknown[]>((result, value) => {
+			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 			typeof value == "object" && value
 				? Array.isArray(value)
 					? result.push(toHelperArray(value, name, form))
@@ -43,6 +45,7 @@ export namespace FormData {
 	}
 	async function set(data: Record<string, unknown>, [head, ...tail]: string[], value: string | Blob) {
 		if (tail.length == 0)
+			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 			value instanceof Blob && value.type.startsWith("application/json")
 				? !head
 					? merge(data, JSON.parse(await value.text()))

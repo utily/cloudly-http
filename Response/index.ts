@@ -62,6 +62,7 @@ export namespace Response {
 		contentType = (typeof contentType == "string" ? { contentType } : contentType) ?? {}
 		if (Response.Like.is(response)) {
 			const header: Response.Header = { ...response.header, ...contentType }
+			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 			!header.contentType && (header.contentType = ContentType.deduce(response.body))
 			result = {
 				status: response.status ?? 200,
@@ -81,6 +82,7 @@ export namespace Response {
 					? response
 					: (({ header, ...body }) => body)(response)
 			const header = Header.fromAny(response, contentType)
+			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 			!header.contentType && (header.contentType = ContentType.deduce(body))
 			result = {
 				status: (typeof response == "object" && typeof response.status == "number" && response.status) || 200,
