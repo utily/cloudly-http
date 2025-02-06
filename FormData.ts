@@ -15,25 +15,25 @@ export namespace FormData {
 		form: globalThis.FormData
 	): { [key: string]: unknown } {
 		return Object.entries(data).reduce<Record<string, unknown>>((result, [key, value]) => {
-			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-			value instanceof Blob
-				? form.append(name ? `${name}.${key}` : key, value)
-				: typeof value == "object" && value
-				? Array.isArray(value)
-					? (result[key] = toHelperArray(value, name ? `${name}.${key}` : key, form))
-					: (result[key] = toHelperObject(value as Record<string, unknown>, name ? `${name}.${key}` : key, form))
-				: (result[key] = value)
+			if (value instanceof Blob)
+				form.append(name ? `${name}.${key}` : key, value)
+			else if (typeof value == "object" && value)
+				result[key] = Array.isArray(value)
+					? toHelperArray(value, name ? `${name}.${key}` : key, form)
+					: toHelperObject(value as Record<string, unknown>, name ? `${name}.${key}` : key, form)
+			else
+				result[key] = value
 			return result
 		}, {})
 	}
 	function toHelperArray(data: unknown[], name: string, form: globalThis.FormData) {
 		return data.reduce<unknown[]>((result, value) => {
-			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-			typeof value == "object" && value
-				? Array.isArray(value)
-					? result.push(toHelperArray(value, name, form))
-					: result.push(toHelperObject(value as Record<string, unknown>, name, form))
-				: result.push(value)
+			if (typeof value != "object" || !value)
+				result.push(value)
+			else if (!Array.isArray(value))
+				result.push(toHelperObject(value as Record<string, unknown>, name, form))
+			else
+				result.push(toHelperArray(value, name, form))
 			return result
 		}, [])
 	}
@@ -44,21 +44,21 @@ export namespace FormData {
 		return result
 	}
 	async function set(data: Record<string, unknown>, [head, ...tail]: string[], value: string | Blob) {
-		if (tail.length == 0)
-			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-			value instanceof Blob && value.type.startsWith("application/json")
-				? !head
-					? merge(data, JSON.parse(await value.text()))
-					: typeof data[head] == "object" && data[head]
-					? merge(data[head] as Record<string, unknown>, JSON.parse(await value.text()))
-					: (data[head] = JSON.parse(await value.text()))
-				: (data[head] = value)
-		else
-			set(
-				typeof data[head] == "object" && data[head] ? (data[head] as Record<string, unknown>) : (data[head] = {}),
-				tail,
-				value
-			)
+		if (tail.length == 0) {
+			if (value instanceof Blob && value.type.startsWith("application/json"))
+				if (!head)
+					merge(data, JSON.parse(await value.text()))
+				else if (typeof data[head] == "object" && data[head])
+					merge(data[head] as Record<string, unknown>, JSON.parse(await value.text()))
+				else
+					data[head] = JSON.parse(await value.text())
+			else
+				data[head] = value
+		} else {
+			if (typeof data[head] != "object" || !data[head])
+				data[head] = {}
+			set(data[head] as Record<string, unknown>, tail, value)
+		}
 	}
 	function merge(target: Record<string, unknown>, ...sources: Record<string, unknown>[]) {
 		if (sources.length) {
