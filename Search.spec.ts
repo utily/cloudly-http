@@ -1,11 +1,5 @@
-import { Blob } from "fetch-blob"
-import { File } from "fetch-blob/file"
-import { FormData as Form } from "formdata-polyfill/esm.min.js"
 import { http } from "./index"
 
-globalThis.Blob = Blob
-globalThis.File = File
-globalThis.FormData = Form
 describe("http.Search", () => {
 	it("stringify", async () => {
 		const result = http.Search.stringify({ value: 1337, nested: { value: 42, string: "The power of attraction." } })

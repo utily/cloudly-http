@@ -62,7 +62,8 @@ export namespace Response {
 		contentType = (typeof contentType == "string" ? { contentType } : contentType) ?? {}
 		if (Response.Like.is(response)) {
 			const header: Response.Header = { ...response.header, ...contentType }
-			!header.contentType && (header.contentType = ContentType.deduce(response.body))
+			if (!header.contentType)
+				header.contentType = ContentType.deduce(response.body)
 			result = {
 				status: response.status ?? 200,
 				header,
@@ -81,7 +82,8 @@ export namespace Response {
 					? response
 					: (({ header, ...body }) => body)(response)
 			const header = Header.fromAny(response, contentType)
-			!header.contentType && (header.contentType = ContentType.deduce(body))
+			if (!header.contentType)
+				header.contentType = ContentType.deduce(body)
 			result = {
 				status: (typeof response == "object" && typeof response.status == "number" && response.status) || 200,
 				header,
@@ -92,8 +94,7 @@ export namespace Response {
 		}
 		return result
 	}
-	export type Header = ResponseHeader
-	export const Header = ResponseHeader
+	export import Header = ResponseHeader
 	export type Like<T = any | Promise<any>> = ResponseLike<T>
 	export const Like = ResponseLike
 }

@@ -1,4 +1,3 @@
-import { bind } from "./bind"
 import type { Request } from "./Request"
 import type { Response } from "./Response"
 
@@ -26,9 +25,9 @@ export class Parser<T = any | Promise<any>> {
 		return new Parser(this)
 	}
 	private static parser = new Parser()
-	static add = bind(this.parser.add, this.parser)
-	static parse = bind(this.parser.parse, this.parser)
-	static extend = bind(this.parser.extend, this.parser)
+	static add = this.parser.add.bind(this.parser)
+	static parse = this.parser.parse.bind(this.parser)
+	static extend = this.parser.extend.bind(this.parser)
 	static is<T = any | Promise<any>>(value: any | Parser<T>): value is Parser<T> {
 		return value instanceof Parser
 	}

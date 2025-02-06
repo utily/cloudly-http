@@ -1,4 +1,3 @@
-import { bind } from "./bind"
 import type { Request } from "./Request"
 import type { Response } from "./Response"
 
@@ -30,9 +29,9 @@ export class Serializer {
 		return new Serializer(this)
 	}
 	private static serializer = new Serializer()
-	static add = bind(this.serializer.add, this.serializer)
-	static serialize = bind(this.serializer.serialize, this.serializer)
-	static extend = bind(this.serializer.extend, this.serializer)
+	static add = this.serializer.add.bind(this.serializer)
+	static serialize = this.serializer.serialize.bind(this.serializer)
+	static extend = this.serializer.extend.bind(this.serializer)
 	static is(value: any | Serializer): value is Serializer {
 		return value instanceof Serializer
 	}

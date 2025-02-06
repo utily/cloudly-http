@@ -1,11 +1,5 @@
-import { Blob } from "fetch-blob"
-import { File } from "fetch-blob/file"
-import { FormData as Form } from "formdata-polyfill/esm.min.js"
 import * as CamelCase from "./CamelCase"
 
-globalThis.Blob = Blob
-globalThis.File = File
-globalThis.FormData = Form
 describe("CamelCase", () => {
 	it("from contentType", async () => expect(CamelCase.from("contentType")).toEqual("Content-Type"))
 	it("to Content-Type", async () => expect(CamelCase.to("Content-Type")).toEqual("contentType"))
