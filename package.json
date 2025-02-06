@@ -4,7 +4,10 @@
 	"description": "Improved handling of HTTP Requests and Responses.",
 	"author": "Simon Mika <simon@mika.se>",
 	"license": "MIT",
-	"repository": "https://github.com/utily/cloudly-http",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/utily/cloudly-http.git"
+	},
 	"bugs": {
 		"url": "https://github.com/utily/cloudly-http/issues"
 	},
