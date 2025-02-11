@@ -15,7 +15,7 @@ jobs:
       - name: "Setup Node"
         uses: "actions/setup-node@v3"
         with:
-          node-version: current
+          node-version: 20
           cache: 'npm'
       - name: Update NPM
         run: npm install -g npm
