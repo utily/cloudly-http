@@ -44,6 +44,9 @@
 		"clean": "rimraf dist node_modules coverage",
 		"verify": "npm run build && npm run test && npm run lint && npm audit"
 	},
+	"overrides": {
+		"esbuild": ">=0.25.0"
+	},
 	"devDependencies": {
 		"@typescript-eslint/eslint-plugin": "8.18.1",
 		"@typescript-eslint/parser": "8.18.1",
