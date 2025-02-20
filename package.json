@@ -4,7 +4,10 @@
 	"description": "Improved handling of HTTP Requests and Responses.",
 	"author": "Simon Mika <simon@mika.se>",
 	"license": "MIT",
-	"repository": "https://github.com/utily/cloudly-http",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/utily/cloudly-http"
+	},
 	"bugs": {
 		"url": "https://github.com/utily/cloudly-http/issues"
 	},
@@ -16,12 +19,12 @@
 	"exports": {
 		".": {
 			"import": {
-				"default": "./dist/mjs/index.js",
-				"types": "./dist/types/index.d.ts"
+				"types": "./dist/types/index.d.ts",
+				"default": "./dist/mjs/index.js"
 			},
 			"require": {
-				"default": "./dist/cjs/index.js",
-				"types": "./dist/types/index.d.ts"
+				"types": "./dist/types/index.d.ts",
+				"default": "./dist/cjs/index.js"
 			}
 		}
 	},
@@ -40,6 +43,9 @@
 		"prepare": "npm run build",
 		"clean": "rimraf dist node_modules coverage",
 		"verify": "npm run build && npm run test && npm run lint && npm audit"
+	},
+	"overrides": {
+		"esbuild": ">=0.25.0"
 	},
 	"devDependencies": {
 		"@typescript-eslint/eslint-plugin": "8.18.1",
