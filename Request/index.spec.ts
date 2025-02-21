@@ -1,12 +1,5 @@
-import "isomorphic-fetch"
-import { Blob } from "fetch-blob"
-import { File } from "fetch-blob/file"
-import { FormData } from "formdata-polyfill/esm.min"
 import { http } from "../index"
 
-globalThis.Blob = Blob
-globalThis.File = File
-globalThis.FormData = FormData
 describe("Request", () => {
 	const output = {
 		method: "GET",

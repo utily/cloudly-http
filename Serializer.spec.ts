@@ -1,11 +1,5 @@
-import { Blob } from "fetch-blob"
-import { File } from "fetch-blob/file"
-import { FormData } from "formdata-polyfill/esm.min"
 import { http } from "./index"
 
-globalThis.FormData = FormData
-globalThis.Blob = Blob
-globalThis.File = File
 describe("Serializer", () => {
 	it("send standard form data", async () => {
 		const body = new FormData()

@@ -15,8 +15,8 @@ export namespace Basic {
 		return is(authorization) ? `Basic ${btoa(`${authorization.user}:${authorization.password ?? ""}`)}` : undefined
 	}
 	export function parse(authorization: string | undefined): Basic | undefined {
-		return authorization && authorization.startsWith("Basic ")
-			? (([user, password]) => ({ user, password }))(atob(authorization.substring(6)).split(":"))
+		return authorization?.startsWith("Basic ")
+			? (([user, password]) => ({ user: user, password }))(atob(authorization.substring(6)).split(":"))
 			: undefined
 	}
 }

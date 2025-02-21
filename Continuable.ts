@@ -35,11 +35,10 @@ export namespace Continuable {
 				thisArg?: any
 			): Continuable<S> => create(filter.bind(result)(predicate, thisArg), cursor)
 			const slice = result.slice
-			result.slice = (start?: number, end?: number, thisArg?: any): Continuable<T> =>
-				create(slice.bind(result)(start, end, thisArg), cursor)
+			result.slice = (start?: number, end?: number): Continuable<T> => create(slice.bind(result)(start, end), cursor)
 			const splice = result.splice
 			result.splice = (start: number, deleteCount?: number, ...items: T[]): Continuable<T> =>
-				create(splice.bind(result)(start, deleteCount, ...items), cursor)
+				create(splice.bind(result)(start, deleteCount ?? Number.POSITIVE_INFINITY, ...items), cursor)
 			const concat = result.concat
 			result.concat = (...items: ConcatArray<T>[]): Continuable<T> => create(concat.bind(result)(...items), cursor)
 		}

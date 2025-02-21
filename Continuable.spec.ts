@@ -1,11 +1,5 @@
-import { Blob } from "fetch-blob"
-import { File } from "fetch-blob/file"
-import { FormData as Form } from "formdata-polyfill/esm.min.js"
 import { http } from "./index"
 
-globalThis.Blob = Blob
-globalThis.File = File
-globalThis.FormData = Form
 describe("Continuable", () => {
 	const array = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 	it("is", async () => {

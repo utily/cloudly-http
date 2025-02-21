@@ -1,16 +1,4 @@
-import "isomorphic-fetch"
-import { Blob } from "fetch-blob"
-import { File } from "fetch-blob/file"
-import { FormData } from "formdata-polyfill/esm.min"
-import WebSocket from "jest-websocket-mock"
 import { http } from "../index"
-
-globalThis.Blob = Blob
-globalThis.File = File
-globalThis.FormData = FormData
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-ignore
-global.WebSocket = WebSocket
 
 describe("Response", () => {
 	const output = {
@@ -32,7 +20,7 @@ describe("Response", () => {
 			<rect x="0.5cm" y="2cm" width="1cm" height="1.5cm"/>
 			<rect x="3cm" y="0.5cm" width="1.5cm" height="2cm"/>
 			<rect x="3.5cm" y="3cm" width="1cm" height="0.5cm"/>
-	
+
 		<!-- Show outline of viewport using 'rect' element -->
 		<rect x=".01cm" y=".01cm" width="4.98cm" height="3.98cm"
 					fill="none" stroke="blue" stroke-width=".02cm" />
