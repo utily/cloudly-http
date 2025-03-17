@@ -26,4 +26,11 @@ describe("form data", () => {
 		const result = await http.FormData.from(data)
 		expect(result).toEqual({ file: { test: "testing", tester: "potato" }, key1: "value1", key2: "value2" })
 	})
+	it("overrides ", async () => {
+		const data = new FormData()
+		data.append("key1", "value1")
+		data.append("key1.key2", "value2")
+		const result = await http.FormData.from(data)
+		expect(result).toEqual({ key1: { key2: "value2" } })
+	})
 })
