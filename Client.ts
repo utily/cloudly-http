@@ -8,13 +8,14 @@ import { Response } from "./Response"
 //...(this.key ? { authorization: `Bearer ${this.key}` } : undefined),
 export class Client<Error = never> {
 	onError?: (request: Request, response: Response) => Promise<boolean>
+	toError?: (request: Request, response: Response) => Promise<Error>
 	onUnauthorized?: (connection: Client<Error>) => Promise<boolean>
 	authorization?: Authorization
 	private f: Fetch
 	constructor(
 		public url?: string,
 		public key?: string,
-		options?: Partial<Pick<Client<Error>, "onError" | "onUnauthorized" | "authorization">> & {
+		options?: Partial<Pick<Client<Error>, "onError" | "toError" | "onUnauthorized" | "authorization">> & {
 			process?: Middleware<any, Body, BodyInit, any>
 		} & { fetch: GlobalFetch }
 	) {
@@ -43,10 +44,12 @@ export class Client<Error = never> {
 	private async fetch<R>(path: string, method: Method, body?: any, header?: Request.Header): Promise<R | Error> {
 		const request = Request.create({ url: `${this.url ?? ""}${path}`, method, header, body })
 		const response = await this.f(request).catch(error => Response.create({ status: 601, body: error }))
-		return (response.status == 401 && this.onUnauthorized && (await this.onUnauthorized(this))) ||
-			(response.status >= 300 && this.onError && (await this.onError(request, response)))
-			? await this.fetch<R>(path, method, body, header)
-			: ((await response.body) as R | Error)
+		return (
+			((response.status == 401 && (await this.onUnauthorized?.(this))) ||
+			(response.status >= 300 && (await this.onError?.(request, response)))
+				? await this.fetch<R>(path, method, body, header)
+				: await this.toError?.(request, response)) || ((await response.body) as R | Error)
+		)
 	}
 	async get<R>(path: string, header?: Request.Header): Promise<R | Error> {
 		return await this.fetch<R>(path, "GET", undefined, header)
