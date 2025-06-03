@@ -1,0 +1,28 @@
+{
+	"patterns": [
+		"**/*.ts",
+		"**/*.json",
+		"**/*.md",
+		"!**/node_modules/**",
+		"!**/dist/**"
+	],
+	"suggestions": {
+		"typescript": {
+			"description": "TypeScript suggestions:",
+			"rules": {
+				"identifier-pattern": {
+					"interfaces": "PascalCase",
+					"types": "PascalCase",
+					"variables": "camelCase",
+					"functions": "camelCase",
+					"enum-members": "PascalCase"
+				},
+				"no-duplicate-generics": true,
+				"no-implicit-any": true,
+				"no-unused-variables": true,
+				"prefer-const": true,
+				"strict-boolean-expressions": true
+			}
+		}
+	}
+}
