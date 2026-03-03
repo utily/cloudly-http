@@ -10,6 +10,7 @@
 		"eslint:recommended",
 		"plugin:@typescript-eslint/eslint-recommended",
 		"plugin:@typescript-eslint/recommended",
+		"plugin:@typescript-eslint/recommended-requiring-type-checking",
 		"plugin:prettierx/default"
 	],
 	"rules": {
@@ -21,9 +22,9 @@
 		],
 		"@typescript-eslint/no-explicit-any": "off",
 		"@typescript-eslint/no-namespace": "off",
-		"prefer-const": 1,
+		"prefer-const": "warn",
 		"@typescript-eslint/no-unused-vars": [
-			2,
+			"error",
 			{
 				"vars": "all",
 				"args": "none",
@@ -31,8 +32,18 @@
 			}
 		],
 		"@typescript-eslint/explicit-module-boundary-types": "off",
+		"@typescript-eslint/no-non-null-assertion": "error",
+		"@typescript-eslint/no-floating-promises": "error",
+		"@typescript-eslint/naming-convention": [
+			"error",
+			{
+				"selector": "interface",
+				"format": ["PascalCase"]
+			}
+		],
 		"no-case-declarations": "off",
 		"no-inner-declarations": "off",
+		"no-console": "warn",
 		"sort-imports": "off",
 		"simple-import-sort/imports": [
 			"error",
