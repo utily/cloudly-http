@@ -6,8 +6,8 @@ export class ArrayBuffer extends Socket<globalThis.ArrayBuffer> {
 		return data?.arrayBuffer
 			? data.arrayBuffer()
 			: typeof data == "string"
-			? new TextEncoder().encode(data).buffer
-			: data
+				? new TextEncoder().encode(data).buffer
+				: data
 	}
 	protected processSend(data: globalThis.ArrayBuffer): Message {
 		return data

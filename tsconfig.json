@@ -1,15 +1,27 @@
 {
-	"extends": "./tsconfig.test.json",
 	"compilerOptions": {
-		"declaration": true,
-		"sourceMap": true,
-		"sourceRoot": "../",
-		"outDir": "dist",
-		"baseUrl": ".",
-		"allowSyntheticDefaultImports":true,
-		"types": []
+		"lib": ["ES2023", "DOM"],
+		"moduleResolution": "bundler",
+		"module": "ESNext",
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"target": "ES2022",
+		"allowJs": true,
+		"resolveJsonModule": true,
+		"strict": true,
+		"alwaysStrict": true,
+		"noImplicitAny": true,
+		"noImplicitOverride": true,
+		"noUncheckedIndexedAccess": true,
+		"strictNullChecks": true,
+		"noImplicitThis": true,
+		"noEmit": true,
+		"allowSyntheticDefaultImports": true,
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"forceConsistentCasingInFileNames": true,
+		"types": ["vitest/globals"]
 	},
-	"files": [
-		"index.ts",
-	]
+	"include": ["**/*.ts"],
+	"exclude": ["coverage", "dist", "node_modules"]
 }

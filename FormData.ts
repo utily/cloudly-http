@@ -4,7 +4,7 @@ export namespace FormData {
 		result.append(
 			"*",
 			new globalThis.Blob([new TextEncoder().encode(JSON.stringify(toHelperObject(data, "", result)))], {
-				type: "application/json; charset=utf-8",
+				type: "application/json; charset=utf-8"
 			})
 		)
 		return result
@@ -18,10 +18,10 @@ export namespace FormData {
 			value instanceof Blob
 				? form.append(name ? `${name}.${key}` : key, value)
 				: typeof value == "object" && value
-				? Array.isArray(value)
-					? (result[key] = toHelperArray(value, name ? `${name}.${key}` : key, form))
-					: (result[key] = toHelperObject(value as Record<string, unknown>, name ? `${name}.${key}` : key, form))
-				: (result[key] = value)
+					? Array.isArray(value)
+						? (result[key] = toHelperArray(value, name ? `${name}.${key}` : key, form))
+						: (result[key] = toHelperObject(value as Record<string, unknown>, name ? `${name}.${key}` : key, form))
+					: (result[key] = value)
 			return result
 		}, {})
 	}
@@ -37,22 +37,22 @@ export namespace FormData {
 	}
 	export async function from(form: FormData): Promise<{ [key: string]: any }> {
 		const result = {}
-		for (const [name, value] of form.entries())
-			await set(result, name.split("."), value)
+		for (const [name, value] of form.entries()) await set(result, name.split("."), value)
 		return result
 	}
 	async function set(data: Record<string, unknown>, [head, ...tail]: string[], value: string | Blob) {
+		const key = head ?? ""
 		if (tail.length == 0)
 			value instanceof Blob && value.type.startsWith("application/json")
-				? head == "*"
+				? key == "*"
 					? merge(data, JSON.parse(await value.text()))
-					: typeof data[head] == "object" && data[head]
-					? merge(data[head] as Record<string, unknown>, JSON.parse(await value.text()))
-					: (data[head] = JSON.parse(await value.text()))
-				: (data[head] = value)
+					: typeof data[key] == "object" && data[key]
+						? merge(data[key] as Record<string, unknown>, JSON.parse(await value.text()))
+						: (data[key] = JSON.parse(await value.text()))
+				: (data[key] = value)
 		else
 			set(
-				typeof data[head] == "object" && data[head] ? (data[head] as Record<string, unknown>) : (data[head] = {}),
+				typeof data[key] == "object" && data[key] ? (data[key] as Record<string, unknown>) : (data[key] = {}),
 				tail,
 				value
 			)
@@ -60,10 +60,10 @@ export namespace FormData {
 	function merge(target: Record<string, unknown>, ...sources: Record<string, unknown>[]) {
 		if (sources.length) {
 			const [head, ...tail] = sources
-			Object.entries(head).forEach(([key, value]) =>
+			Object.entries(head ?? {}).forEach(([key, value]) =>
 				isObject(value)
 					? merge(isObject(target[key]) ? (target[key] as Record<string, unknown>) : (target[key] = {}), value)
-					: (target[key] = head[key])
+					: (target[key] = (head ?? {})[key])
 			)
 			merge(target, ...tail)
 		}

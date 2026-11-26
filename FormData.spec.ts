@@ -35,20 +35,14 @@ describe("form data", () => {
 			file: new File([new Uint8Array([97])], "myfile.jpeg", { type: "image/jpeg" }),
 			net: [10, "EUR"],
 			vat: [20, "EUR"],
-			obj: {
-				nestedNet: [10, "EUR"],
-				nestedVat: [20, "EUR"],
-			},
+			obj: { nestedNet: [10, "EUR"], nestedVat: [20, "EUR"] }
 		})
 		const from = await http.FormData.from(to)
 		expect(from).toEqual({
 			file: new File([new Uint8Array([97])], "myfile.jpeg", { type: "image/jpeg" }),
 			net: [10, "EUR"],
 			vat: [20, "EUR"],
-			obj: {
-				nestedNet: [10, "EUR"],
-				nestedVat: [20, "EUR"],
-			},
+			obj: { nestedNet: [10, "EUR"], nestedVat: [20, "EUR"] }
 		})
 	})
 })

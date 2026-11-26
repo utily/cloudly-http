@@ -14,11 +14,11 @@ export interface Response {
 export namespace Response {
 	export function is(value: any | Response): value is Response {
 		return (
-			typeof value == "object" &&
-			Object.keys(value).every(key => ["status", "header", "body", "socket"].some(k => k == key)) &&
-			(value.status == undefined || typeof value.status == "number") &&
-			(value.header == undefined || ResponseHeader.is(value.header)) &&
-			(value.socket == undefined || value.socket instanceof WebSocket)
+			typeof value == "object"
+			&& Object.keys(value).every(key => ["status", "header", "body", "socket"].some(k => k == key))
+			&& (value.status == undefined || typeof value.status == "number")
+			&& (value.header == undefined || ResponseHeader.is(value.header))
+			&& (value.socket == undefined || value.socket instanceof WebSocket)
 		)
 	}
 	export async function to(request: Response): Promise<Platform.Response> {
@@ -32,8 +32,8 @@ export namespace Response {
 				) as Record<string, string>
 			),
 			...(request.socket && {
-				webSocket: ({ ...request.socket.createResponse().socket } as Record<string, string | undefined>)?.backend,
-			}),
+				webSocket: ({ ...request.socket.createResponse().socket } as Record<string, string | undefined>)?.backend
+			})
 		} as ResponseInit & { webSocket?: WebSocket | null })
 	}
 	export function from(response: Platform.Response & { webSocket?: WebSocket | null }): Response {
@@ -41,7 +41,7 @@ export namespace Response {
 			status: response.status,
 			header: ResponseHeader.from(response.headers),
 			body: response.status == 101 ? undefined : Parser.parse(response),
-			...(response.webSocket && { socket: new Socket.Factory(response.webSocket) }),
+			...(response.webSocket && { socket: new Socket.Factory(response.webSocket) })
 		}
 	}
 	export function create(
@@ -49,36 +49,30 @@ export namespace Response {
 		contentType?: ResponseHeader | string
 	): Response {
 		const result: Required<Omit<ResponseLike, "socket">> = ResponseLike.is(response)
-			? {
-					status: 200,
-					header: {},
-					body: undefined,
-					...(response.socket && { socket: response.socket }),
-					...response,
-			  }
+			? { status: 200, header: {}, body: undefined, ...(response.socket && { socket: response.socket }), ...response }
 			: typeof response?.createResponse == "function" && (contentType == undefined || ResponseHeader.is(contentType))
-			? (response as Socket.Factory).createResponse(contentType as ResponseHeader)
-			: {
-					status: (typeof response == "object" && typeof response.status == "number" && response.status) || 200,
-					header:
-						typeof response == "object"
-							? {
-									...response.header,
-									...((response.status == 301 || response.status == 302) && response.location
-										? { location: response.location }
-										: {}),
-							  }
-							: {},
-					body:
-						!(typeof response == "object" && !Array.isArray(response)) ||
-						response instanceof ArrayBuffer ||
-						ArrayBuffer.isView(response) ||
-						response instanceof FormData
-							? response
-							: (({ header, ...body }) => body)(response),
-					...((response.webSocket && { socket: new Socket.Factory(response.webSocket) }) ||
-						(response.socket && { socket: response.socket })),
-			  }
+				? (response as Socket.Factory).createResponse(contentType as ResponseHeader)
+				: {
+						status: (typeof response == "object" && typeof response.status == "number" && response.status) || 200,
+						header:
+							typeof response == "object"
+								? {
+										...response.header,
+										...((response.status == 301 || response.status == 302) && response.location
+											? { location: response.location }
+											: {})
+									}
+								: {},
+						body:
+							!(typeof response == "object" && !Array.isArray(response))
+							|| response instanceof ArrayBuffer
+							|| ArrayBuffer.isView(response)
+							|| response instanceof FormData
+								? response
+								: (({ header, ...body }) => body)(response),
+						...((response.webSocket && { socket: new Socket.Factory(response.webSocket) })
+							|| (response.socket && { socket: response.socket }))
+					}
 		if (!result.header.contentType)
 			switch (typeof result.body) {
 				case "undefined":
@@ -89,24 +83,24 @@ export namespace Response {
 						typeof contentType == "string"
 							? contentType
 							: contentType?.contentType
-							? contentType.contentType
-							: result.body instanceof FormData
-							? "multipart/formdata"
-							: result.body instanceof ArrayBuffer || ArrayBuffer.isView(result.body)
-							? isPdf(result.body)
-								? "application/pdf"
-								: "application/octet-stream"
-							: "application/json; charset=utf-8"
+								? contentType.contentType
+								: result.body instanceof FormData
+									? "multipart/formdata"
+									: result.body instanceof ArrayBuffer || ArrayBuffer.isView(result.body)
+										? isPdf(result.body)
+											? "application/pdf"
+											: "application/octet-stream"
+										: "application/json; charset=utf-8"
 					break
 				case "string":
 					result.header.contentType =
 						result.body.slice(0, 9).toLowerCase() == "<!doctype"
 							? "text/html; charset=utf-8"
 							: /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/.test(result.body)
-							? "application/jwt; charset=utf-8"
-							: /^<\?xml version=(.|\n)*\?>(.|\n)*<svg(.|\n)*<\/svg>$/.test(result.body)
-							? "image/svg+xml"
-							: "text/plain; charset=utf-8"
+								? "application/jwt; charset=utf-8"
+								: /^<\?xml version=(.|\n)*\?>(.|\n)*<svg(.|\n)*<\/svg>$/.test(result.body)
+									? "image/svg+xml"
+									: "text/plain; charset=utf-8"
 					break
 			}
 		return result

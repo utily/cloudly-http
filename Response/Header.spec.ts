@@ -8,13 +8,13 @@ describe("Response.Header", () => {
 				["Content-Type", "application/json; charset=utf-8"],
 				["Allow", "GET, PUT"],
 				["CF-Connecting-IP", "127.0.0.1"],
-				["CF-IPCountry", "SE"],
+				["CF-IPCountry", "SE"]
 			])
 		).toEqual({
 			contentType: "application/json; charset=utf-8",
 			allow: ["GET", "PUT"],
 			cfConnectionIp: "127.0.0.1",
-			cfIpCountry: "SE",
+			cfIpCountry: "SE"
 		}))
 	it("from object", async () =>
 		expect(
@@ -22,13 +22,13 @@ describe("Response.Header", () => {
 				"Content-Type": "application/json; charset=utf-8",
 				Allow: "GET, PUT",
 				"CF-Connecting-IP": "127.0.0.1",
-				"CF-IPCountry": "SE",
+				"CF-IPCountry": "SE"
 			})
 		).toEqual({
 			contentType: "application/json; charset=utf-8",
 			allow: ["GET", "PUT"],
 			cfConnectionIp: "127.0.0.1",
-			cfIpCountry: "SE",
+			cfIpCountry: "SE"
 		}))
 	it("to", async () =>
 		expect(
@@ -36,32 +36,21 @@ describe("Response.Header", () => {
 				contentType: "application/json; charset=utf-8",
 				allow: ["GET", "PUT"],
 				cfConnectionIp: "127.0.0.1",
-				cfIpCountry: "SE",
+				cfIpCountry: "SE"
 			})
 		).toEqual({
 			"Content-Type": "application/json; charset=utf-8",
 			Allow: "GET, PUT",
 			"CF-Connecting-IP": "127.0.0.1",
-			"CF-IPCountry": "SE",
+			"CF-IPCountry": "SE"
 		}))
 	it("unknown headers", () => {
-		expect(
-			parser.Response.Header.to({
-				contentType: "application/json; charset=utf-8",
-				fooBar: "Foo Bar",
-			})
-		).toEqual({
+		expect(parser.Response.Header.to({ contentType: "application/json; charset=utf-8", fooBar: "Foo Bar" })).toEqual({
 			"Content-Type": "application/json; charset=utf-8",
-			"Foo-Bar": "Foo Bar",
+			"Foo-Bar": "Foo Bar"
 		})
 		expect(
-			parser.Response.Header.from({
-				"Content-Type": "application/json; charset=utf-8",
-				"Foo-Bar": "Foo Bar",
-			})
-		).toEqual({
-			contentType: "application/json; charset=utf-8",
-			fooBar: "Foo Bar",
-		})
+			parser.Response.Header.from({ "Content-Type": "application/json; charset=utf-8", "Foo-Bar": "Foo Bar" })
+		).toEqual({ contentType: "application/json; charset=utf-8", fooBar: "Foo Bar" })
 	})
 })

@@ -9,7 +9,7 @@ export class Client<Error = never> {
 		...(request.body ? { contentType: "application/json; charset=utf-8" } : undefined),
 		...(this.key ? { authorization: `Bearer ${this.key}` } : undefined),
 		...this.appendHeader?.(request),
-		...request.header,
+		...request.header
 	})
 	appendHeader?: (request: Request) => Request.Header
 	postprocess = async (response: Response): Promise<Response> => response
@@ -34,8 +34,8 @@ export class Client<Error = never> {
 		const response = await this.postprocess(
 			await fetch(request).catch(error => Response.create({ status: 601, body: error }))
 		)
-		return (response.status == 401 && this.onUnauthorized && (await this.onUnauthorized(this))) ||
-			(response.status >= 300 && this.onError && (await this.onError(request, response)))
+		return (response.status == 401 && this.onUnauthorized && (await this.onUnauthorized(this)))
+			|| (response.status >= 300 && this.onError && (await this.onError(request, response)))
 			? await this.fetch<R>(path, method, body, header)
 			: ((await response.body) as R | Error)
 	}

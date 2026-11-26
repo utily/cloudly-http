@@ -1,5 +1,4 @@
 /// <reference lib="webworker.iterable" />
-import type { Request as CloudflareRequest } from "@cloudflare/workers-types"
 import { Method } from "../Method"
 import * as Parser from "../Parser"
 import * as Serializer from "../Serializer"
@@ -14,26 +13,26 @@ export interface Request {
 	readonly remote?: string
 	readonly header: Readonly<RequestHeader>
 	readonly body?: any | Promise<any>
-	readonly cloudflare?: Readonly<CloudflareRequest["cf"]>
+	readonly cloudflare?: Readonly<Record<string, unknown>>
 }
 
 export namespace Request {
 	export function is(value: any | Request): value is Request {
 		return (
-			typeof value == "object" &&
-			Object.keys(value).every(key =>
+			typeof value == "object"
+			&& Object.keys(value).every(key =>
 				["method", "url", "parameter", "search", "remote", "header", "body"].some(k => k == key)
-			) &&
-			Method.is(value.method) &&
-			value.url instanceof URL &&
-			typeof value.parameter == "object" &&
-			Object.entries(value.parameter).every(
+			)
+			&& Method.is(value.method)
+			&& value.url instanceof URL
+			&& typeof value.parameter == "object"
+			&& Object.entries(value.parameter).every(
 				([parameter, value]) => typeof parameter == "string" && typeof value == "string"
-			) &&
-			typeof value.search == "object" &&
-			Object.entries(value.search).every(([key, value]) => typeof key == "string" && typeof value == "string") &&
-			(value.remote == undefined || typeof value.remote == "string") &&
-			(value.header == undefined || RequestHeader.is(value.header))
+			)
+			&& typeof value.search == "object"
+			&& Object.entries(value.search).every(([key, value]) => typeof key == "string" && typeof value == "string")
+			&& (value.remote == undefined || typeof value.remote == "string")
+			&& (value.header == undefined || RequestHeader.is(value.header))
 		)
 	}
 
@@ -51,25 +50,26 @@ export namespace Request {
 			headers: RequestHeader.to(header) as Record<string, string>,
 			body: ["GET", "HEAD"].some(v => v == r.method)
 				? undefined
-				: await Serializer.serialize(await r.body, r.header.contentType),
+				: await Serializer.serialize(await r.body, r.header.contentType)
 		}
 	}
-	export function from(request: globalThis.Request | CloudflareRequest): Request {
+	export function from(request: globalThis.Request): Request {
 		const url = new URL(request.url)
 		return {
 			method: Method.parse(request.method) ?? "GET",
 			url,
-			header: RequestHeader.from(request.headers),
+			header: RequestHeader.from(request.headers as unknown as globalThis.HeadersInit),
 			parameter: {},
 			search: Object.fromEntries(url.searchParams.entries()),
 			body: Parser.parse(request),
-			...("cf" in request && { cloudflare: request.cf }),
+			...("cf" in request
+				&& typeof request.cf == "object"
+				&& request.cf != null && { cloudflare: request.cf as Readonly<Record<string, unknown>> })
 		}
 	}
 	export function create(request: string | RequestLike): Request {
 		let result: Request
-		if (typeof request == "string")
-			result = create({ url: request })
+		if (typeof request == "string") result = create({ url: request })
 		else {
 			const url = typeof request.url == "string" ? new URL(request.url) : request.url
 			result = {
@@ -79,7 +79,7 @@ export namespace Request {
 				search: { ...request.search, ...Object.fromEntries(url.searchParams.entries()) },
 				remote: request.remote,
 				header: request.header ?? {},
-				body: request.body,
+				body: request.body
 			}
 		}
 		return result

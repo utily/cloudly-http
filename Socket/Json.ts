@@ -7,8 +7,8 @@ export class Json extends Socket<any> {
 			data?.arrayBuffer
 				? new TextDecoder().decode(data.arrayBuffer())
 				: typeof data != "string"
-				? new TextDecoder().decode(data)
-				: data
+					? new TextDecoder().decode(data)
+					: data
 		)
 	}
 	protected processSend(data: any): string {

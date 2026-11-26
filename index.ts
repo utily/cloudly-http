@@ -20,6 +20,10 @@ Serializer.add(async body => (typeof body == "string" ? body : body.toString()),
 Serializer.add(async body => JSON.stringify(body), "application/json")
 Serializer.add(async body => body, "application/pdf")
 Serializer.add(async body => Search.stringify(body), "application/x-www-form-urlencoded")
-Serializer.add(async body => (body instanceof globalThis.FormData ? body : FormData.to(body)), "multipart/form-data")
+Serializer.add(
+	async (body: any): Promise<globalThis.BodyInit | undefined> =>
+		(body instanceof globalThis.FormData ? body : FormData.to(body)) as unknown as globalThis.BodyInit,
+	"multipart/form-data"
+)
 
 export { Client, fetch, FormData, Method, Parser, Request, Response, Search, Serializer, Socket, http }
