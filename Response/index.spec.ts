@@ -1,6 +1,3 @@
-import "isomorphic-fetch"
-import { FormData } from "formdata-polyfill/esm.min.js"
-globalThis.FormData = FormData
 import * as http from "../index"
 
 describe("Response", () => {
@@ -19,82 +16,17 @@ describe("Response", () => {
 			<rect x="0.5cm" y="2cm" width="1cm" height="1.5cm"/>
 			<rect x="3cm" y="0.5cm" width="1.5cm" height="2cm"/>
 			<rect x="3.5cm" y="3cm" width="1cm" height="0.5cm"/>
-	
 		<!-- Show outline of viewport using 'rect' element -->
 		<rect x=".01cm" y=".01cm" width="4.98cm" height="3.98cm"
 					fill="none" stroke="blue" stroke-width=".02cm" />
 	</svg>`
 	const pdf = new Uint8Array([37, 80, 68, 70])
-	it("create pdf", () => {
-		expect(http.Response.create(pdf)).toEqual({ ...output, header: { contentType: "application/pdf" }, body: pdf })
-		expect(http.Response.create(pdf.buffer)).toEqual({
-			...output,
-			header: { contentType: "application/pdf" },
-			body: pdf.buffer
-		})
-	})
-	it("create html", () => {
-		expect(http.Response.create(html)).toEqual({
-			...output,
-			header: { contentType: "text/html; charset=utf-8" },
-			body: html
-		})
-	})
-	it("create jwt", () => {
-		expect(http.Response.create(jwt)).toEqual({
-			...output,
-			header: { contentType: "application/jwt; charset=utf-8" },
-			body: jwt
-		})
-	})
-	it("create object", () => {
-		expect(http.Response.create(object)).toEqual({
-			...output,
-			header: { contentType: "application/json; charset=utf-8" },
-			body: object
-		})
-	})
-	it("create array", () => {
-		expect(http.Response.create(array)).toEqual({
-			...output,
-			header: { contentType: "application/json; charset=utf-8" },
-			body: array
-		})
-	})
-	it("create svg", () => {
-		expect(http.Response.create(svg)).toEqual({ ...output, header: { contentType: "image/svg+xml" }, body: svg })
-	})
-	it("create object json", () => {
-		expect(http.Response.create(object, "application/json; charset=utf-8")).toEqual({
-			...output,
-			header: { contentType: "application/json; charset=utf-8" },
-			body: object
-		})
-	})
-	it("create object urlencoded", () => {
-		expect(http.Response.create(object, "application/x-www-form-urlencoded")).toEqual({
-			...output,
-			header: { contentType: "application/x-www-form-urlencoded" },
-			body: object
-		})
-	})
 	const error = {
 		status: 400,
 		type: "missing query argument",
 		argument: { name: "argument", type: "string", description: "description of argument" }
 	}
-	it("create error json", () => {
-		expect(http.Response.create(error)).toEqual({
-			status: 400,
-			header: { contentType: "application/json; charset=utf-8" },
-			body: {
-				status: 400,
-				type: "missing query argument",
-				argument: { name: "argument", type: "string", description: "description of argument" }
-			}
-		})
-	})
-	it("gracely authenticate", () => {
+	it("gracefully authenticate", () => {
 		expect(
 			http.Response.create({
 				status: 401,
@@ -107,4 +39,28 @@ describe("Response", () => {
 			body: { status: 401, type: "not authorized" }
 		})
 	})
+	it.each([
+		{ name: "pdf", body: pdf, contentType: "application/pdf" },
+		{ name: "pdf buffer", body: pdf.buffer, contentType: "application/pdf" },
+		{ name: "html", body: html, contentType: "text/html; charset=utf-8" },
+		{ name: "jwt", body: jwt, contentType: "application/jwt; charset=utf-8" },
+		{ name: "object", body: object, contentType: "application/json; charset=utf-8" },
+		{ name: "array", body: array, contentType: "application/json; charset=utf-8" },
+		{ name: "svg", body: svg, contentType: "image/svg+xml" },
+		{
+			name: "object json",
+			body: object,
+			contentType: "application/json; charset=utf-8",
+			type: "application/json; charset=utf-8"
+		},
+		{
+			name: "object urlencoded",
+			body: object,
+			contentType: "application/x-www-form-urlencoded",
+			type: "application/x-www-form-urlencoded"
+		},
+		{ name: "error json", body: error, contentType: "application/json; charset=utf-8", status: 400 }
+	])("create $name", ({ body, contentType, type, status }) =>
+		expect(http.Response.create(body, type)).toEqual({ status: status ?? 200, header: { contentType }, body })
+	)
 })

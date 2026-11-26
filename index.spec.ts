@@ -1,10 +1,5 @@
-import { Blob } from "fetch-blob"
-import { File } from "fetch-blob/file"
-import { FormData as Form } from "formdata-polyfill/esm.min.js"
 import { http } from "./index"
-globalThis.FormData = Form
-globalThis.Blob = Blob
-globalThis.File = File
+
 describe("cloudly-http", () => {
 	it("Request multipart", async () => {
 		const data = {
