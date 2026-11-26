@@ -6,12 +6,20 @@ describe("http.Client", () => {
 		const onUnauthorized = async () => false
 		const authorization = { bearer: "api-key" }
 		const process = http.Middleware.create("identity")
+		const preprocess = async (request: http.Request) => request
+		const getHeader = async (request: http.Request) => request.header
+		const appendHeader = () => ({})
+		const postprocess = async (response: http.Response) => response
 		const globalFetch = async () => new Response(null, { status: 204 })
 		const client = new http.Client("https://example.com", "key", {
 			onError,
 			onUnauthorized,
 			authorization,
 			process,
+			preprocess,
+			getHeader,
+			appendHeader,
+			postprocess,
 			fetch: globalFetch
 		})
 
@@ -20,6 +28,11 @@ describe("http.Client", () => {
 		expect(client.onError).toBe(onError)
 		expect(client.onUnauthorized).toBe(onUnauthorized)
 		expect(client.authorization).toBe(authorization)
+		expect(client.process).toBe(process)
+		expect(client.preprocess).toBe(preprocess)
+		expect(client.getHeader).toBe(getHeader)
+		expect(client.appendHeader).toBe(appendHeader)
+		expect(client.postprocess).toBe(postprocess)
 	})
 	it("uses constructor url and default GET options", async () => {
 		const globalFetch = vi.fn(

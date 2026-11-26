@@ -48,12 +48,7 @@ describe("Request", () => {
 		expect(http.Request.is(request)).toEqual(true)
 	})
 	it("is rejects invalid shape", () => {
-		expect(
-			http.Request.is({
-				...output,
-				parameter: { invalid: 1 }
-			})
-		).toBe(false)
+		expect(http.Request.is({ ...output, parameter: { invalid: 1 } })).toBe(false)
 		expect(http.Request.is({ ...output, remote: 1 })).toBe(false)
 	})
 	it("to contentType", async () => {
