@@ -24,12 +24,6 @@
 		"README.md"
 	],
 	"type": "module",
-	"git": {
-		"tagName": "release-${version}"
-	},
-	"github": {
-		"release": true
-	},
 	"scripts": {
 		"build": "tsc -p tsconfig.build.json",
 		"lint": "biome format .",
