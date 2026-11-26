@@ -36,7 +36,7 @@
 	"scripts": {
 		"build": "tsc -p tsconfig.build.json",
 		"lint": "biome format .",
-		"format": "biome format --write .",
+		"format": "biome check --write .",
 		"test": "vitest --run",
 		"coverage": "vitest --coverage",
 		"prepare": "npm run build",

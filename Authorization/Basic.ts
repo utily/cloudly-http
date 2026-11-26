@@ -4,7 +4,7 @@ export interface Basic {
 }
 export namespace Basic {
 	export function is(value: any | Basic): value is Basic {
-		return (
+		return !!(
 			typeof value == "object"
 			&& value
 			&& typeof value.user == "string"

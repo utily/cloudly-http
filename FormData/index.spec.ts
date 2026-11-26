@@ -25,4 +25,38 @@ describe("form data", () => {
 		const result = await http.FormData.from(data)
 		expect(result).toEqual({ file: { test: "testing", tester: "potato" }, key1: "value1", key2: "value2" })
 	})
+	it("to handles nested arrays and nested objects", async () => {
+		const attachment = new Blob(["content"], { type: "text/plain" })
+		const data = { profile: { list: [1, null, { name: "potato", attachment }, [2, { nested: true }]] } }
+		const result = http.FormData.to(data)
+		const serialized = result.get("")
+		expect(serialized).toBeInstanceOf(File)
+		expect(await (serialized as File).text()).toBe(
+			JSON.stringify({ profile: { list: [1, null, { name: "potato" }, [2, { nested: true }]] } })
+		)
+		expect(result.get("profile.list.attachment")).toBeInstanceOf(File)
+	})
+	it("from merges json into existing nested object", async () => {
+		const data = new FormData()
+		data.append("", new Blob([JSON.stringify({ ignored: true })], { type: "application/json" }))
+		data.append("user.name", "Jane")
+		data.append("user.preferences.theme", "dark")
+		data.append(
+			"user",
+			new Blob([JSON.stringify({ role: "admin", preferences: { locale: "en" } })], { type: "application/json" })
+		)
+		const result = await http.FormData.from(data)
+		expect(result).toEqual({ user: { name: "Jane", role: "admin", preferences: { theme: "dark", locale: "en" } } })
+	})
+	it("helpers", async () => {
+		expect(http.FormData.isObject({})).toBe(true)
+		expect(http.FormData.isObject([])).toBe(false)
+		expect(http.FormData.isObject(null)).toBeNull()
+
+		const data = new FormData()
+		data.append("text", "value")
+		data.append("json", new File([JSON.stringify({ value: 1 })], "payload.json", { type: "application/json" }))
+		data.append("bytes", new File([new Uint8Array([1, 2, 3])], "payload.bin", { type: "application/octet-stream" }))
+		expect(await http.FormData.toObject(data)).toEqual({ text: "value", json: { value: 1 }, bytes: [1, 2, 3] })
+	})
 })

@@ -3,7 +3,7 @@ export interface Bearer {
 }
 export namespace Bearer {
 	export function is(value: any | Bearer): value is Bearer {
-		return typeof value == "object" && value && typeof value.bearer == "string"
+		return typeof value == "object" && !!value && typeof value.bearer == "string"
 	}
 	export function serialize(authorization: Bearer | any): string | undefined {
 		return is(authorization) ? `Bearer ${authorization.bearer}` : undefined

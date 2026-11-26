@@ -5,7 +5,7 @@ export type Authorization = Authorization.Basic | Authorization.Bearer | string
 
 export namespace Authorization {
 	export function is(value: any | Authorization): value is Authorization {
-		return Basic.is(value) || Bearer.is(value)
+		return typeof value == "string" || Basic.is(value) || Bearer.is(value)
 	}
 	export function serialize(authorization: Authorization | undefined): string | undefined {
 		return Basic.serialize(authorization) ?? Bearer.serialize(authorization)

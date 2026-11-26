@@ -12,7 +12,7 @@ export abstract class Socket<T = any> {
 	#onMessage?: (message: T) => void
 	set onMessage(value: ((message: T) => void) | undefined) {
 		if (this.#receiveQueue.length && value) {
-			this.#receiveQueue.forEach(value)
+			this.#receiveQueue.forEach(message => value(message))
 			this.#receiveQueue = []
 		}
 		this.#onMessage = value
@@ -36,20 +36,20 @@ export abstract class Socket<T = any> {
 		if (isOpen) this.#sendQueue = undefined
 		this.#backend.addEventListener("open", () => {
 			if (this.#onOpen) this.#onOpen()
-			this.#handleOpen.bind(this)
+			this.#handleOpen()
 		})
 		this.#backend.addEventListener("message", async (event: MessageEvent) => {
-			const data = this.processReceived(event.data)
+			const data = await this.processReceived(event.data)
 			this.#handleOpen()
 			if (this.#onMessage) this.#onMessage(data)
 			else this.#receiveQueue?.push(data)
 		})
 		this.#backend.addEventListener("close", () => {
-			if (this.#onClose) this.#onClose()
 			this.#closed = true
+			if (this.#onClose) this.#onClose()
 		})
 	}
-	protected abstract processReceived(data: Message): T
+	protected abstract processReceived(data: Message): T | Promise<T>
 	protected abstract processSend(data: T): Message
 	send(message: T): void {
 		if (this.#sendQueue) this.#sendQueue.push(this.processSend(message))

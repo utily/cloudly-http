@@ -12,6 +12,35 @@ describe("Continuable", () => {
 		expect(http.Continuable.hasCursor(continuable)).toEqual(true)
 		expect(http.Continuable.hasCursor(array)).toEqual(false)
 	})
+	it("is validates items and cursors", async () => {
+		const isNumber = (value: unknown): value is number => typeof value == "number"
+		const invalidCursor = [1, 2] as number[] & { cursor?: unknown }
+		invalidCursor.cursor = 42
+
+		expect(http.Continuable.is([1, 2], isNumber)).toEqual(true)
+		expect(http.Continuable.is([1, "two"], isNumber)).toEqual(false)
+		expect(http.Continuable.is(invalidCursor)).toEqual(false)
+		expect(http.Continuable.is({ cursor: "abcd" })).toEqual(false)
+		expect(http.Continuable.hasCursor([1, 2] as number[], isNumber)).toEqual(false)
+	})
+	it("modify preserves an existing cursor", async () => {
+		const plain = http.Continuable.modify([1, 2])
+		const continuable = http.Continuable.create([1, 2], "abcd")
+		const inherited = http.Continuable.modify(continuable)
+
+		expect(http.Continuable.hasCursor(plain)).toEqual(false)
+		expect(inherited.cursor).toEqual("abcd")
+		expect([...inherited.map(value => value * 2)]).toEqual([2, 4])
+		expect(inherited.map(value => value * 2).cursor).toEqual("abcd")
+	})
+	it("awaits resolves a continuable of promises", async () => {
+		const continuable = http.Continuable.create([Promise.resolve(1), Promise.resolve(2)], "abcd")
+
+		const resolved = await http.Continuable.awaits(continuable)
+
+		expect([...resolved]).toEqual([1, 2])
+		expect(resolved.cursor).toEqual("abcd")
+	})
 	it("map", async () => {
 		const continuable = http.Continuable.create(array, "abcd")
 		const r = continuable.map(Math.sqrt)

@@ -1,8 +1,8 @@
 import { Authorization } from "./Authorization"
 import { Client } from "./Client"
 import { Continuable } from "./Continuable"
-import { fetch } from "./fetch"
 import { FormData } from "./FormData"
+import { fetch } from "./fetch"
 import { Method } from "./Method"
 import { Middleware } from "./Middleware"
 import { Parser } from "./Parser"
@@ -63,7 +63,10 @@ Parser.add(async message => {
 	return result
 }, "application/json")
 Parser.add(
-	async message => ({ ...message, body: message.body && FormData.from(await message.body.formData()) }),
+	async message => ({
+		...message,
+		body: message.body ? await FormData.from(await message.body.formData()) : undefined
+	}),
 	"multipart/form-data"
 )
 Parser.add(
@@ -75,8 +78,8 @@ export {
 	Authorization,
 	Client,
 	Continuable,
-	fetch,
 	FormData,
+	fetch,
 	Method,
 	Middleware,
 	Parser,

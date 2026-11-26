@@ -1,5 +1,20 @@
 {
-	"search.exclude": {},
+	"search.exclude": {
+		".vscode": false,
+		".editorconfig": false,
+		"biome.json": false,
+		"tsconfig.*": false,
+		"package.json": false,
+		"package-lock.json": false,
+		"*.config.ts": false,
+		"dist": false,
+		"coverage": false,
+		".copilot": false,
+		".github": false,
+		"LICENSE": false,
+		".*": false,
+		"node_modules": false
+	},
 	"editor.formatOnSave": true,
 	"[javascript]": { "editor.defaultFormatter": "biomejs.biome" },
 	"[javascriptreact]": { "editor.defaultFormatter": "biomejs.biome" },
@@ -47,5 +62,5 @@
 		"uply",
 		"Utily"
 	],
-	"typescript.tsdk": "node_modules/typescript/lib"
+	"ts.tsdk": "node_modules/typescript/lib"
 }

@@ -14,6 +14,16 @@ describe("http.Search", () => {
 			"threeDSSessionData=&cres=eyJhY3NUcmFuc0lEIjoiZjE5MjEwMWYtYjJlYi00YjBlLThkMzYtY2ZlZjJmOWM1NWY4IiwiY2hhbGxlbmdlQ29tcGxldGlvbkluZCI6IlkiLCJtZXNzYWdlVHlwZSI6IkNSZXMiLCJtZXNzYWdlVmVyc2lvbiI6IjIuMS4wIiwidGhyZWVEU1NlcnZlclRyYW5zSUQiOiI4YmZkZDQ2MC1mZDc3LTRlZWYtOWE4Ny1hOTc4ZTJlMzAzY2YiLCJ0cmFuc1N0YXR1cyI6IlkifQ%3D%3D"
 		)
 	})
+	it("stringify includes primitive types and skips undefined and inherited properties", async () => {
+		const values = Object.create({ inherited: "ignored" }) as { [key: string]: any }
+		values.flag = true
+		values.size = 20n
+		values.label = "ok"
+		values.ignored = undefined
+
+		const result = http.Search.stringify(values)
+		expect(result).toEqual("flag=true&size=20&label=ok")
+	})
 	it("parse", async () => {
 		const result = http.Search.parse("value=1337&nested[value]=42&nested[string]=The%20power%20of%20attraction.")
 		expect(result).toEqual({ value: "1337", nested: { value: "42", string: "The power of attraction." } })
@@ -61,5 +71,17 @@ describe("http.Search", () => {
 				groupname: "Random People"
 			}
 		})
+	})
+	it("parse converts numeric root keys to arrays", async () => {
+		const result = http.Search.parse("0=first&1=second")
+		expect(result).toEqual(["first", "second"])
+	})
+	it("parse keeps sparse numeric keys as objects", async () => {
+		const result = http.Search.parse("values[0]=first&values[2]=third")
+		expect(result).toEqual({ values: { 0: "first", 2: "third" } })
+	})
+	it("parse ignores entries with empty keys", async () => {
+		const result = http.Search.parse("=ignored&value=kept")
+		expect(result).toEqual({ value: "kept" })
 	})
 })

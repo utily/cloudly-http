@@ -47,6 +47,15 @@ describe("Request", () => {
 		expect(request).toEqual({ ...request, search: { key: "value" } })
 		expect(http.Request.is(request)).toEqual(true)
 	})
+	it("is rejects invalid shape", () => {
+		expect(
+			http.Request.is({
+				...output,
+				parameter: { invalid: 1 }
+			})
+		).toBe(false)
+		expect(http.Request.is({ ...output, remote: 1 })).toBe(false)
+	})
 	it("to contentType", async () => {
 		const json: http.Request = http.Request.create({
 			method: "POST",
@@ -62,5 +71,21 @@ describe("Request", () => {
 			body: new FormData()
 		})
 		expect((await http.Request.to(formData)).headers).toEqual({ Authorization: "placeholderValue" })
+	})
+	it("to omits GET body", async () => {
+		const request = http.Request.create({
+			method: "GET",
+			url: "http://example.com/resource",
+			header: { contentType: "application/json" },
+			body: { ignored: true }
+		})
+		expect((await http.Request.to(request)).body).toBeUndefined()
+	})
+	it("multipart from parses FormData", async () => {
+		const body = new FormData()
+		body.append("name", "Example")
+		const native = new globalThis.Request("http://example.com/resource", { method: "POST", body })
+		const parsed = await http.Request.from(native)
+		expect(parsed.body).toEqual({ name: "Example" })
 	})
 })

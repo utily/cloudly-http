@@ -66,9 +66,36 @@ describe("Request.Header", () => {
 			http.Request.Header.from({ "Content-Type": "application/json; charset=utf-8", "Foo-Bar": "Foo Bar" })
 		).toEqual({ contentType: "application/json; charset=utf-8", fooBar: "Foo Bar" })
 	})
-	it("Header.Name.to(contentType)", () => expect(http.Response.Header.Name.to("contentType")).toEqual("Content-Type"))
-	it("Header.Name.from(Content-Type)", () =>
-		expect(http.Response.Header.Name.from("Content-Type")).toEqual("contentType"))
-	it("Header.Name.to(fooBar)", () => expect(http.Response.Header.Name.to("fooBar")).toEqual("Foo-Bar"))
-	it("Header.Name.from(Foo-Bar)", () => expect(http.Response.Header.Name.from("Foo-Bar")).toEqual("fooBar"))
+	it("is", () => {
+		expect(http.Request.Header.is({ contentType: "application/json", accept: ["application/json"] })).toBe(true)
+		expect(http.Request.Header.is({ accept: "application/json" })).toBe(false)
+		expect(() => http.Request.Header.is(null)).toThrow(TypeError)
+	})
+	it("to with array header", () =>
+		expect(http.Request.Header.to({ accept: ["application/json", "text/plain"] })).toEqual({
+			Accept: "application/json, text/plain"
+		}))
+	it("from HeadersInit array", () =>
+		expect(
+			http.Request.Header.from([
+				["Accept", "application/json", "text/plain"],
+				["x-foo", "bar"]
+			])
+		).toEqual({ accept: ["application/json", "text/plain"], xFoo: "bar" }))
+	it("from Headers instance", () =>
+		expect(http.Request.Header.from(new Headers({ Accept: "application/json, text/plain" }))).toEqual({
+			accept: ["application/json", "text/plain"]
+		}))
+	it("toString", () =>
+		expect(http.Request.Header.toString({ contentType: "application/json" })).toEqual("contentType: application/json"))
+	it.each([
+		{ direction: "to", input: "contentType", expected: "Content-Type" },
+		{ direction: "from", input: "Content-Type", expected: "contentType" },
+		{ direction: "to", input: "fooBar", expected: "Foo-Bar" },
+		{ direction: "from", input: "Foo-Bar", expected: "fooBar" }
+	])("Header.Name.$direction($input)", ({ direction, input, expected }) =>
+		expect(direction == "to" ? http.Request.Header.Name.to(input) : http.Request.Header.Name.from(input)).toEqual(
+			expected
+		)
+	)
 })

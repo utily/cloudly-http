@@ -1,9 +1,9 @@
-import { Authorization } from "./Authorization"
-import { Fetch, fetch, GlobalFetch } from "./fetch"
-import { Method } from "./Method"
-import { Middleware } from "./Middleware"
-import { Request } from "./Request"
-import { Response } from "./Response"
+import { Authorization } from "../Authorization"
+import { Fetch, fetch, GlobalFetch } from "../fetch"
+import { Method } from "../Method"
+import { Middleware } from "../Middleware"
+import { Request } from "../Request"
+import { Response } from "../Response"
 
 //...(this.key ? { authorization: `Bearer ${this.key}` } : undefined),
 export class Client<Error = never> {
@@ -35,7 +35,9 @@ export class Client<Error = never> {
 				)
 			)
 		)
-		Object.assign(this, options)
+		this.onError = options?.onError
+		this.onUnauthorized = options?.onUnauthorized
+		this.authorization = options?.authorization
 	}
 	/**
 	 * @param path Note: Prior to version 0.1.0 this method inserted a `/` between url and path.

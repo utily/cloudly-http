@@ -1,6 +1,23 @@
 import { http } from "../index"
 
 describe("Serializer", () => {
+	it("extend", async () => {
+		const serializer = new http.Serializer()
+		serializer.add(async message => ({ ...message, body: "extended" }), "application/test")
+		const extended = serializer.extend()
+		extended.add(async message => ({ ...message, body: "overridden" }), "application/test")
+
+		await expect(
+			extended.serialize(
+				http.Request.create({
+					method: "POST",
+					url: "http://localhost",
+					header: { contentType: "application/test" },
+					body: "request"
+				})
+			)
+		).resolves.toMatchObject({ body: "overridden" })
+	})
 	it("send standard form data", async () => {
 		const body = new FormData()
 		const file = new Blob([JSON.stringify({ test: "testing", tester: "potato" }, null, 2)], { type: "application/pdf" })

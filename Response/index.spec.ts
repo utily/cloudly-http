@@ -2,6 +2,11 @@ import { http } from "../index"
 
 describe("Response", () => {
 	const output = { status: 200, header: {}, body: undefined }
+	function createSocketBackend() {
+		return { close: vi.fn(), send: vi.fn(), addEventListener: vi.fn() } as unknown as ConstructorParameters<
+			typeof http.Socket.Factory
+		>[0]
+	}
 	const html = "<!doctype><html></html>"
 	const jwt =
 		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5ceyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
@@ -121,5 +126,36 @@ describe("Response", () => {
 	})
 	it("no content", () => {
 		expect(http.Response.create(undefined)).toEqual({ header: {}, status: 204 })
+	})
+	it("create response like with socket", () => {
+		const socket = new http.Socket.Factory(createSocketBackend())
+		expect(
+			http.Response.create({ status: 202, header: { contentType: "text/plain" }, body: "accepted", socket })
+		).toEqual({ status: 202, header: { contentType: "text/plain" }, body: "accepted", socket })
+	})
+	it("create from socket factory", () => {
+		const socket = new http.Socket.Factory(createSocketBackend())
+		expect(http.Response.create(socket, "text/plain")).toEqual({
+			status: 101,
+			header: { contentType: "text/plain" },
+			socket
+		})
+	})
+	it("to serializer none with socket", async () => {
+		const socket = new http.Socket.Factory(createSocketBackend())
+		const createResponse = vi.spyOn(socket, "createResponse")
+		await http.Response.to({ status: 200, header: {}, socket }, "none")
+		expect(createResponse).toHaveBeenCalledOnce()
+	})
+	it("from parser none with websocket", async () => {
+		const backend = createSocketBackend() as unknown as WebSocket
+		const response = { status: 101, headers: new Headers(), webSocket: backend } as Response & {
+			webSocket?: WebSocket | null
+		}
+		const result = await http.Response.from(response, "none")
+		expect(result.status).toEqual(101)
+		expect(result.header).toEqual({})
+		expect(result.body).toBeUndefined()
+		expect(result.socket).toBeInstanceOf(http.Socket.Factory)
 	})
 })

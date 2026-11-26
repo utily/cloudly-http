@@ -1,9 +1,11 @@
-import * as CamelCase from "./CamelCase"
+import * as CamelCase from "../CamelCase"
 
 describe("CamelCase", () => {
-	it("from contentType", async () => expect(CamelCase.from("contentType")).toEqual("Content-Type"))
-	it("to Content-Type", async () => expect(CamelCase.to("Content-Type")).toEqual("contentType"))
-	it("to content-type", async () => expect(CamelCase.to("content-type")).toEqual("contentType"))
-	it("from T", async () => expect(CamelCase.from("t")).toEqual("T"))
-	it("to T", async () => expect(CamelCase.to("T")).toEqual("t"))
+	it.each([
+		{ name: "from contentType", input: "contentType", convert: CamelCase.from, expected: "Content-Type" },
+		{ name: "to Content-Type", input: "Content-Type", convert: CamelCase.to, expected: "contentType" },
+		{ name: "to content-type", input: "content-type", convert: CamelCase.to, expected: "contentType" },
+		{ name: "from T", input: "t", convert: CamelCase.from, expected: "T" },
+		{ name: "to T", input: "T", convert: CamelCase.to, expected: "t" }
+	])("$name", ({ input, convert, expected }) => expect(convert(input)).toEqual(expected))
 })
