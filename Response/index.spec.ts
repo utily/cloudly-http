@@ -1,7 +1,6 @@
 import * as http from "../index"
 
 describe("Response", () => {
-	const output = { status: 200, header: {}, body: undefined }
 	const html = "<!doctype><html></html>"
 	const jwt =
 		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5ceyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
@@ -63,4 +62,151 @@ describe("Response", () => {
 	])("create $name", ({ body, contentType, type, status }) =>
 		expect(http.Response.create(body, type)).toEqual({ status: status ?? 200, header: { contentType }, body })
 	)
+	it.each([
+		{
+			name: "plain text",
+			body: "hello",
+			expected: { status: 200, header: { contentType: "text/plain; charset=utf-8" }, body: "hello" }
+		},
+		{
+			name: "binary",
+			body: new Uint8Array([1, 2, 3]),
+			expected: { status: 200, header: { contentType: "application/octet-stream" }, body: new Uint8Array([1, 2, 3]) }
+		},
+		{
+			name: "form data",
+			body: new FormData(),
+			expected: { status: 200, header: { contentType: "multipart/formdata" }, body: expect.any(FormData) }
+		}
+	])("create $name", ({ body, expected }) => expect(http.Response.create(body)).toEqual(expected))
+	it.each([
+		{
+			name: "redirect location",
+			input: { status: 301, location: "/next", body: undefined },
+			expected: {
+				status: 301,
+				header: { location: "/next", contentType: "application/json; charset=utf-8" },
+				body: { status: 301, location: "/next", body: undefined }
+			}
+		},
+		{
+			name: "explicit content type",
+			input: { status: 201, header: { contentType: "text/custom" }, body: "created" },
+			expected: { status: 201, header: { contentType: "text/custom" }, body: "created" }
+		}
+	])("create $name", ({ input, expected }) => expect(http.Response.create(input)).toEqual(expected))
+	it("create from socket factory", () => {
+		const socket = new http.Socket.Factory({} as WebSocket)
+		expect(http.Response.create(socket, { connection: "Upgrade" })).toEqual({
+			status: 101,
+			header: { connection: "Upgrade" },
+			socket
+		})
+	})
+	it.each([
+		{ name: "valid", value: { status: 204, header: {} }, expected: true },
+		{ name: "body only", value: { header: {}, body: "value" }, expected: true },
+		{ name: "unknown property", value: { status: 200, header: {}, unknown: true }, expected: false },
+		{ name: "invalid status", value: { status: "200", header: {} }, expected: false },
+		{ name: "invalid header", value: { status: 200, header: { allow: "GET" } }, expected: false },
+		{ name: "invalid socket", value: { status: 101, header: {}, socket: {} }, expected: false }
+	])("is $name", ({ value, expected }) => expect(http.Response.is(value)).toBe(expected))
+	it.each([
+		{ value: { body: "value" }, expected: true },
+		{
+			value: {
+				status: 101,
+				socket: { close() {}, json: { send() {} }, string: { send() {} }, arrayBuffer: { send() {} } }
+			},
+			expected: true
+		},
+		{ value: {}, expected: false },
+		{ value: { body: "value", unknown: true }, expected: false },
+		{ value: { header: { allow: "GET" } }, expected: false },
+		{ value: { body: "value", socket: {} }, expected: false }
+	])("like $expected", ({ value, expected }) => expect(http.Response.Like.is(value)).toBe(expected))
+	it("to", async () => {
+		const response = await http.Response.to({
+			status: 202,
+			header: { contentType: "application/json; charset=utf-8", xRequestId: "request-id" },
+			body: Promise.resolve({ accepted: true })
+		})
+
+		expect(response.status).toBe(202)
+		expect(Object.fromEntries(response.headers)).toEqual({
+			"content-type": "application/json; charset=utf-8",
+			"x-request-id": "request-id"
+		})
+		expect(await response.json()).toEqual({ accepted: true })
+	})
+	it("to multipart", async () => {
+		const response = await http.Response.to({
+			status: 200,
+			header: { contentType: "multipart/formdata", xRequestId: "request-id" },
+			body: new FormData()
+		})
+
+		expect(response.headers.get("Content-Type")).toMatch(/^multipart\/form-data; boundary=/)
+		expect(response.headers.get("X-Request-ID")).toBe("request-id")
+	})
+	it("to with socket response", async () => {
+		const socket = new http.Socket.Factory({ close() {}, send() {}, addEventListener() {} } as WebSocket)
+		const response = await http.Response.to({
+			status: 200,
+			header: { connection: "Upgrade" },
+			body: { accepted: true },
+			socket
+		})
+		expect(response.status).toBe(200)
+		expect(response.headers.get("Connection")).toBe("Upgrade")
+	})
+	it.each([
+		{
+			name: "body",
+			input: new globalThis.Response('{"ok":true}', {
+				status: 201,
+				headers: { "Content-Type": "application/json", Allow: "GET, POST" }
+			}),
+			expected: { status: 201, header: { contentType: "application/json", allow: ["GET", "POST"] } }
+		},
+		{
+			name: "switching protocols",
+			input: { status: 101, headers: new Headers({ Connection: "Upgrade" }) },
+			expected: { status: 101, header: { connection: "Upgrade" }, body: undefined }
+		}
+	])("from $name", async ({ input, expected }) => {
+		const response = http.Response.from(input as globalThis.Response)
+		expect(response).toMatchObject(expected)
+		if (response.status != 101) expect(await response.body).toEqual({ ok: true })
+	})
+	it("from with websocket", () => {
+		const result = http.Response.from({
+			status: 101,
+			headers: new Headers({ Connection: "Upgrade" }),
+			webSocket: {} as WebSocket
+		} as globalThis.Response & { webSocket: WebSocket })
+		expect(result.socket).toBeInstanceOf(http.Socket.Factory)
+	})
+	it("create from object with websocket", () => {
+		const result = http.Response.create({ webSocket: {} as WebSocket, value: "payload" })
+		expect(result.socket).toBeInstanceOf(http.Socket.Factory)
+		expect(result.body).toEqual({ webSocket: {}, value: "payload" })
+	})
+	it("create from object with socket and unknown property", () => {
+		const socket = new http.Socket.Factory({ close() {}, send() {}, addEventListener() {} } as WebSocket)
+		const result = http.Response.create({ status: 202, socket, value: "payload" })
+		expect(result.socket).toBe(socket)
+	})
+	it("create with numeric body", () =>
+		expect(http.Response.create(123)).toEqual({
+			status: 200,
+			header: { contentType: "application/json; charset=utf-8" },
+			body: 123
+		}))
+	it("create with header object as second argument", () =>
+		expect(http.Response.create({ value: true }, { contentType: "text/custom" })).toEqual({
+			status: 200,
+			header: { contentType: "text/custom" },
+			body: { value: true }
+		}))
 })

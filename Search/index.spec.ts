@@ -15,7 +15,18 @@ describe("Search", () => {
 			},
 			expected:
 				"threeDSSessionData=&cres=eyJhY3NUcmFuc0lEIjoiZjE5MjEwMWYtYjJlYi00YjBlLThkMzYtY2ZlZjJmOWM1NWY4IiwiY2hhbGxlbmdlQ29tcGxldGlvbkluZCI6IlkiLCJtZXNzYWdlVHlwZSI6IkNSZXMiLCJtZXNzYWdlVmVyc2lvbiI6IjIuMS4wIiwidGhyZWVEU1NlcnZlclRyYW5zSUQiOiI4YmZkZDQ2MC1mZDc3LTRlZWYtOWE4Ny1hOTc4ZTJlMzAzY2YiLCJ0cmFuc1N0YXR1cyI6IlkifQ%3D%3D"
-		}
+		},
+		{
+			name: "primitives and undefined",
+			input: { boolean: true, number: 7, bigint: 42n, text: "value", missing: undefined },
+			expected: "boolean=true&number=7&bigint=42&text=value"
+		},
+		{
+			name: "inherited properties",
+			input: Object.assign(Object.create({ hidden: "secret" }), { shown: "value" }),
+			expected: "shown=value"
+		},
+		{ name: "symbol values", input: { token: Symbol("token") }, expected: "token=Symbol(token)" }
 	])("stringify $name", ({ input, expected }) => expect(Search.stringify(input).toString()).toEqual(expected))
 	it.each([
 		{
@@ -45,7 +56,13 @@ describe("Search", () => {
 				threeDSSessionData: "",
 				cres: "eyJhY3NUcmFuc0lEIjoiZjE5MjEwMWYtYjJlYi00YjBlLThkMzYtY2ZlZjJmOWM1NWY4IiwiY2hhbGxlbmdlQ29tcGxldGlvbkluZCI6IlkiLCJtZXNzYWdlVHlwZSI6IkNSZXMiLCJtZXNzYWdlVmVyc2lvbiI6IjIuMS4wIiwidGhyZWVEU1NlcnZlclRyYW5zSUQiOiI4YmZkZDQ2MC1mZDc3LTRlZWYtOWE4Ny1hOTc4ZTJlMzAzY2YiLCJ0cmFuc1N0YXR1cyI6IlkifQ=="
 			}
-		}
+		},
+		{
+			name: "sparse arrays",
+			input: "values[0]=first&values[2]=third",
+			expected: { values: { 0: "first", 2: "third" } }
+		},
+		{ name: "duplicate keys", input: "value=first&value=second", expected: { value: "second" } }
 	])("parse $name", ({ input, expected }) => expect(Search.parse(input)).toEqual(expected))
 	it("parse with nested arrays", async () => {
 		const result = Search.parse(

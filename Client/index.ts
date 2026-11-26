@@ -1,7 +1,7 @@
-import { fetch } from "./fetch"
-import { Method } from "./Method"
-import { Request } from "./Request"
-import { Response } from "./Response"
+import { fetch } from "../fetch"
+import { Method } from "../Method"
+import { Request } from "../Request"
+import { Response } from "../Response"
 
 export class Client<Error = never> {
 	preprocess = async (request: Request): Promise<Request> => request

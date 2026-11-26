@@ -1,6 +1,6 @@
 import { Client } from "./Client"
-import { fetch } from "./fetch"
 import { FormData } from "./FormData"
+import { fetch } from "./fetch"
 import * as http from "./http"
 import { Method } from "./Method"
 import * as Parser from "./Parser"
@@ -26,4 +26,4 @@ Serializer.add(
 	"multipart/form-data"
 )
 
-export { Client, fetch, FormData, Method, Parser, Request, Response, Search, Serializer, Socket, http }
+export { Client, FormData, fetch, http, Method, Parser, Request, Response, Search, Serializer, Socket }

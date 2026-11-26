@@ -56,4 +56,29 @@ describe("serializer", () => {
 			).toEqual(expected)
 		}
 	})
+	it.each([
+		{ name: "unknown content type", contentType: "application/x-unknown" },
+		{ name: "missing content type", contentType: undefined }
+	])("returns body for $name", async ({ contentType }) => {
+		const body = { keep: true }
+		expect(await Serializer.serialize(body, contentType)).toBe(body)
+	})
+	it("uses serializer when content type includes parameters", async () => {
+		expect(await Serializer.serialize({ a: 123 }, "application/json; charset=utf-8")).toBe('{"a":123}')
+	})
+	it("registers serializer for multiple content types", async () => {
+		const custom = async (body: any, contentType?: string) => `${contentType}:${body}`
+		Serializer.add(custom, "application/vnd.serializer-test-a+json", "application/vnd.serializer-test-b+json")
+		expect(await Serializer.serialize("value1", "application/vnd.serializer-test-a+json")).toBe(
+			"application/vnd.serializer-test-a+json:value1"
+		)
+		expect(await Serializer.serialize("value2", "application/vnd.serializer-test-b+json; charset=utf-8")).toBe(
+			"application/vnd.serializer-test-b+json; charset=utf-8:value2"
+		)
+	})
+	it("uses latest serializer for same content type", async () => {
+		Serializer.add(async body => `first:${body}`, "application/vnd.serializer-test-c+json")
+		Serializer.add(async body => `second:${body}`, "application/vnd.serializer-test-c+json")
+		expect(await Serializer.serialize("value", "application/vnd.serializer-test-c+json")).toBe("second:value")
+	})
 })
