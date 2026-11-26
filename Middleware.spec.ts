@@ -8,35 +8,26 @@ describe("http.Middleware", () => {
 					new Request("http://example.com/collection/resource", {
 						method: "PUT",
 						headers: { "Content-Type": "application/json; charset=utf-8" },
-						body: JSON.stringify({ value: 42, test: { value: "The Power of Attraction." } }),
+						body: JSON.stringify({ value: 42, test: { value: "The Power of Attraction." } })
 					}),
 					"none"
 				),
 				async request => {
 					expect(request).toMatchObject({
-						body: {
-							test: {
-								value: "The Power of Attraction.",
-							},
-							value: 42,
-						},
-						header: {
-							contentType: "application/json; charset=utf-8",
-						},
+						body: { test: { value: "The Power of Attraction." }, value: 42 },
+						header: { contentType: "application/json; charset=utf-8" },
 						method: "PUT",
 						parameter: {},
 						search: {},
-						url: new URL("http://example.com/collection/resource"),
+						url: new URL("http://example.com/collection/resource")
 					})
 					return http.Response.create({ status: 200, body: { id: "42", test: { value: 1337 } } })
 				}
 			)
 		).toEqual({
 			body: '{"id":"42","test":{"value":1337}}',
-			header: {
-				contentType: "application/json; charset=utf-8",
-			},
-			status: 200,
+			header: { contentType: "application/json; charset=utf-8" },
+			status: 200
 		})
 	})
 	it("server text", async () => {
@@ -46,30 +37,22 @@ describe("http.Middleware", () => {
 					new Request("http://example.com/collection/resource", {
 						method: "PUT",
 						headers: { "Content-Type": "text/plain; charset=utf-8" },
-						body: "The Power of Attraction.",
+						body: "The Power of Attraction."
 					}),
 					"none"
 				),
 				async request => {
 					expect(request).toMatchObject({
 						body: "The Power of Attraction.",
-						header: {
-							contentType: "text/plain; charset=utf-8",
-						},
+						header: { contentType: "text/plain; charset=utf-8" },
 						method: "PUT",
 						parameter: {},
 						search: {},
-						url: new URL("http://example.com/collection/resource"),
+						url: new URL("http://example.com/collection/resource")
 					})
 					return http.Response.create("id: 42")
 				}
 			)
-		).toEqual({
-			body: "id: 42",
-			header: {
-				contentType: "text/plain; charset=utf-8",
-			},
-			status: 200,
-		})
+		).toEqual({ body: "id: 42", header: { contentType: "text/plain; charset=utf-8" }, status: 200 })
 	})
 })

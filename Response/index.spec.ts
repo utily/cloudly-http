@@ -1,11 +1,7 @@
 import { http } from "../index"
 
 describe("Response", () => {
-	const output = {
-		status: 200,
-		header: {},
-		body: undefined,
-	}
+	const output = { status: 200, header: {}, body: undefined }
 	const html = "<!doctype><html></html>"
 	const jwt =
 		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5ceyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
@@ -27,43 +23,39 @@ describe("Response", () => {
 	</svg>`
 	const pdf = new Uint8Array([37, 80, 68, 70])
 	it("create pdf", () => {
-		expect(http.Response.create(pdf)).toEqual({
-			...output,
-			header: { contentType: "application/pdf" },
-			body: pdf,
-		})
+		expect(http.Response.create(pdf)).toEqual({ ...output, header: { contentType: "application/pdf" }, body: pdf })
 		expect(http.Response.create(pdf.buffer)).toEqual({
 			...output,
 			header: { contentType: "application/pdf" },
-			body: pdf.buffer,
+			body: pdf.buffer
 		})
 	})
 	it("create html", () => {
 		expect(http.Response.create(html)).toEqual({
 			...output,
 			header: { contentType: "text/html; charset=utf-8" },
-			body: html,
+			body: html
 		})
 	})
 	it("create jwt", () => {
 		expect(http.Response.create(jwt)).toEqual({
 			...output,
 			header: { contentType: "application/jwt; charset=utf-8" },
-			body: jwt,
+			body: jwt
 		})
 	})
 	it("create object", () => {
 		expect(http.Response.create(object)).toEqual({
 			...output,
 			header: { contentType: "application/json; charset=utf-8" },
-			body: object,
+			body: object
 		})
 	})
 	it("create array", () => {
 		expect(http.Response.create(array)).toEqual({
 			...output,
 			header: { contentType: "application/json; charset=utf-8" },
-			body: array,
+			body: array
 		})
 	})
 	it("create cursor array", async () => {
@@ -76,40 +68,32 @@ describe("Response", () => {
 		expect(response.header).toEqual({
 			contentType: "application/json; charset=utf-8",
 			link: ["cursor", 'rel="next"'],
-			accessControlExposeHeaders: ["link"],
+			accessControlExposeHeaders: ["link"]
 		})
 		expect(JSON.stringify(response.body)).toStrictEqual(JSON.stringify(body))
 		expect(response.body.cursor).toStrictEqual(body.cursor)
 	})
 	it("create svg", () => {
-		expect(http.Response.create(svg)).toEqual({
-			...output,
-			header: { contentType: "image/svg+xml" },
-			body: svg,
-		})
+		expect(http.Response.create(svg)).toEqual({ ...output, header: { contentType: "image/svg+xml" }, body: svg })
 	})
 	it("create object json", () => {
 		expect(http.Response.create(object, "application/json; charset=utf-8")).toEqual({
 			...output,
 			header: { contentType: "application/json; charset=utf-8" },
-			body: object,
+			body: object
 		})
 	})
 	it("create object urlencoded", () => {
 		expect(http.Response.create(object, "application/x-www-form-urlencoded")).toEqual({
 			...output,
 			header: { contentType: "application/x-www-form-urlencoded" },
-			body: object,
+			body: object
 		})
 	})
 	const error = {
 		status: 400,
 		type: "missing query argument",
-		argument: {
-			name: "argument",
-			type: "string",
-			description: "description of argument",
-		},
+		argument: { name: "argument", type: "string", description: "description of argument" }
 	}
 	it("create error json", () => {
 		expect(http.Response.create(error)).toEqual({
@@ -118,33 +102,21 @@ describe("Response", () => {
 			body: {
 				status: 400,
 				type: "missing query argument",
-				argument: {
-					name: "argument",
-					type: "string",
-					description: "description of argument",
-				},
-			},
+				argument: { name: "argument", type: "string", description: "description of argument" }
+			}
 		})
 	})
 	it("gracely authenticate", () => {
 		expect(
 			http.Response.create({
 				status: 401,
-				header: {
-					wwwAuthenticate: "Basic realm=Administration",
-				},
-				type: "not authorized",
+				header: { wwwAuthenticate: "Basic realm=Administration" },
+				type: "not authorized"
 			})
 		).toEqual({
 			status: 401,
-			header: {
-				contentType: "application/json; charset=utf-8",
-				wwwAuthenticate: "Basic realm=Administration",
-			},
-			body: {
-				status: 401,
-				type: "not authorized",
-			},
+			header: { contentType: "application/json; charset=utf-8", wwwAuthenticate: "Basic realm=Administration" },
+			body: { status: 401, type: "not authorized" }
 		})
 	})
 	it("no content", () => {

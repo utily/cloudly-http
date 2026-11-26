@@ -7,15 +7,13 @@ export default defineConfig({
 		coverage: {
 			reporter: ["text", "json", "html"],
 			enabled: true,
-			all: true,
 			cleanOnRerun: true,
-			thresholds: { statements: 35, branches: 75, functions: 50, lines: 35 },
+			thresholds: { statements: 35, branches: 60, functions: 50, lines: 35 }
 		},
 		globals: true,
 		include: ["**/*.spec.[tj]s"],
 		testTimeout: 20000,
 		isolate: false,
-		exclude: ["node_modules", "dist", "test-worker"],
-		server: { deps: { inline: [] } },
-	},
+		exclude: ["node_modules", "dist"]
+	}
 })

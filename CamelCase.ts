@@ -3,5 +3,6 @@ export function to(name: string): string {
 }
 export function from(name: string): string {
 	const result = name.replace(/[A-Z]/g, match => "-" + match)
-	return result[0].toUpperCase() + result.substring(1)
+	const first = result[0]
+	return first ? first.toUpperCase() + result.substring(1) : result
 }

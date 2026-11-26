@@ -1,34 +1,39 @@
-name: "Publish"
-
+name: Publish
+permissions:
+  contents: write
+  id-token: write
 on:
   push:
-    tags:
-      - "release-*"
+    branches:
+      - master
+concurrency:
+  group: publish-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   publish:
-    name: "Publish"
-    timeout-minutes: 60
+    name: Publish package
     runs-on: ubuntu-latest
     steps:
-      - name: "Checkout source code"
-        uses: "actions/checkout@v3"
-      - name: "Setup Node"
-        uses: "actions/setup-node@v3"
+      - name: Checkout repository
+        uses: actions/checkout@v6
         with:
-          node-version: current
-          cache: "npm"
-      - uses: actions/cache@v3
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
-          path: "**/node_modules"
-          key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-      - name: Install
-        run: npm install
-      - name: Build
+          node-version: lts/*
+          package-manager-cache: false
+      - name: Install npm trusted-publishing CLI
+        run: npm install --global npm@11.5.1
+      - name: Install dependencies
+        run: npm clean-install
+      - name: Verify dependency signatures
+        run: npm audit signatures
+      - name: Build package
         run: npm run build
-      - name: Publish
-        run: |
-          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
-          npm publish --access public
-        shell: bash
+      - name: Check npm version
+        run: npm --version
+      - name: Release with semantic-release
+        run: npx semantic-release
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

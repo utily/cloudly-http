@@ -2,12 +2,8 @@ import { http } from "../index"
 
 describe("Request.Header", () => {
 	it("to", async () =>
-		expect(
-			http.Request.Header.to({
-				contentType: "application/json; charset=utf-8",
-			})
-		).toEqual({
-			"Content-Type": "application/json; charset=utf-8",
+		expect(http.Request.Header.to({ contentType: "application/json; charset=utf-8" })).toEqual({
+			"Content-Type": "application/json; charset=utf-8"
 		}))
 	it("toJSON", async () =>
 		expect(JSON.stringify({ contentType: "application/json; charset=utf-8" })).toEqual(
@@ -18,24 +14,20 @@ describe("Request.Header", () => {
 			http.Request.Header.to({
 				contentType: "application/json; charset=utf-8",
 				cfConnectionIp: "127.0.0.1",
-				cfIpCountry: "SE",
+				cfIpCountry: "SE"
 			})
 		).toEqual({
 			"Content-Type": "application/json; charset=utf-8",
 			"CF-Connecting-IP": "127.0.0.1",
-			"CF-IPCountry": "SE",
+			"CF-IPCountry": "SE"
 		})
 		expect(
 			http.Request.Header.from({
 				"Content-Type": "application/json; charset=utf-8",
 				"CF-Connecting-IP": "127.0.0.1",
-				"CF-IPCountry": "SE",
+				"CF-IPCountry": "SE"
 			})
-		).toEqual({
-			contentType: "application/json; charset=utf-8",
-			cfConnectionIp: "127.0.0.1",
-			cfIpCountry: "SE",
-		})
+		).toEqual({ contentType: "application/json; charset=utf-8", cfConnectionIp: "127.0.0.1", cfIpCountry: "SE" })
 	})
 	it("custom headers", () => {
 		expect(
@@ -43,47 +35,36 @@ describe("Request.Header", () => {
 				xModNonce: "some_session_id",
 				xModRetry: "true",
 				xAuthToken: "tOkEnStRiNg",
-				xTrackingId: "some_tracking_id",
+				xTrackingId: "some_tracking_id"
 			})
 		).toEqual({
 			"x-mod-nonce": "some_session_id",
 			"x-mod-retry": "true",
 			"X-Auth-Token": "tOkEnStRiNg",
-			"x-tracking-id": "some_tracking_id",
+			"x-tracking-id": "some_tracking_id"
 		})
 		expect(
 			http.Request.Header.from({
 				"x-mod-nonce": "some_session_id",
 				"x-mod-retry": "true",
 				"X-Auth-Token": "tOkEnStRiNg",
-				"x-tracking-id": "some_tracking_id",
+				"x-tracking-id": "some_tracking_id"
 			})
 		).toEqual({
 			xModNonce: "some_session_id",
 			xModRetry: "true",
 			xAuthToken: "tOkEnStRiNg",
-			xTrackingId: "some_tracking_id",
+			xTrackingId: "some_tracking_id"
 		})
 	})
 	it("unknown headers", () => {
-		expect(
-			http.Request.Header.to({
-				contentType: "application/json; charset=utf-8",
-				fooBar: "Foo Bar",
-			})
-		).toEqual({
+		expect(http.Request.Header.to({ contentType: "application/json; charset=utf-8", fooBar: "Foo Bar" })).toEqual({
 			"Content-Type": "application/json; charset=utf-8",
-			"Foo-Bar": "Foo Bar",
+			"Foo-Bar": "Foo Bar"
 		})
 		expect(
-			http.Request.Header.from({
-				"Content-Type": "application/json; charset=utf-8",
-				"Foo-Bar": "Foo Bar",
-			})
-		).toEqual({
-			contentType: "application/json; charset=utf-8",
-			fooBar: "Foo Bar",
-		})
+			http.Request.Header.from({ "Content-Type": "application/json; charset=utf-8", "Foo-Bar": "Foo Bar" })
+		).toEqual({ contentType: "application/json; charset=utf-8", fooBar: "Foo Bar" })
 	})
 	it("Header.Name.to(contentType)", () => expect(http.Response.Header.Name.to("contentType")).toEqual("Content-Type"))
 	it("Header.Name.from(Content-Type)", () =>

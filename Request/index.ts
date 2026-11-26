@@ -19,20 +19,20 @@ export interface Request<T = any | Promise<any>> {
 export namespace Request {
 	export function is<T = any | Promise<any>>(value: any | Request<T>): value is Request<T> {
 		return (
-			typeof value == "object" &&
-			Object.keys(value).every(key =>
+			typeof value == "object"
+			&& Object.keys(value).every(key =>
 				["method", "url", "parameter", "search", "remote", "header", "body"].some(k => k == key)
-			) &&
-			Method.is(value.method) &&
-			value.url instanceof URL &&
-			typeof value.parameter == "object" &&
-			Object.entries(value.parameter).every(
+			)
+			&& Method.is(value.method)
+			&& value.url instanceof URL
+			&& typeof value.parameter == "object"
+			&& Object.entries(value.parameter).every(
 				([parameter, value]) => typeof parameter == "string" && typeof value == "string"
-			) &&
-			typeof value.search == "object" &&
-			Object.entries(value.search).every(([key, value]) => typeof key == "string" && typeof value == "string") &&
-			(value.remote == undefined || typeof value.remote == "string") &&
-			(value.header == undefined || RequestHeader.is(value.header))
+			)
+			&& typeof value.search == "object"
+			&& Object.entries(value.search).every(([key, value]) => typeof key == "string" && typeof value == "string")
+			&& (value.remote == undefined || typeof value.remote == "string")
+			&& (value.header == undefined || RequestHeader.is(value.header))
 		)
 	}
 
@@ -46,7 +46,7 @@ export namespace Request {
 			url: result.url.toString(),
 			method: result.method,
 			headers: RequestHeader.to(result.header) as Record<string, string>,
-			body: result.body,
+			body: result.body
 		}
 	}
 	export async function from<T = any | Promise<any>>(request: globalThis.Request, parser?: Parser<T>): Promise<Request>
@@ -62,7 +62,7 @@ export namespace Request {
 			header: RequestHeader.from(request.headers),
 			parameter: {},
 			search: Object.fromEntries(url.searchParams.entries()),
-			body: request,
+			body: request
 		}
 		return parser == "none" ? result : (parser ?? Parser).parse(result)
 	}
@@ -71,8 +71,7 @@ export namespace Request {
 	export function create(request: string | Request.Like): Request
 	export function create(request: string | Request.Like): Request {
 		let result: Request
-		if (typeof request == "string")
-			result = create({ url: request })
+		if (typeof request == "string") result = create({ url: request })
 		else {
 			const url = typeof request.url == "string" ? new URL(request.url) : request.url
 			result = {
@@ -82,7 +81,7 @@ export namespace Request {
 				search: { ...request.search, ...Object.fromEntries(url.searchParams.entries()) },
 				remote: request.remote,
 				header: request.header ?? {},
-				body: request.body,
+				body: request.body
 			}
 		}
 		if (!result.header.contentType)

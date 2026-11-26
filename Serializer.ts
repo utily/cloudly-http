@@ -7,9 +7,7 @@ type Serialize = (
 ) => Promise<Request<BodyInit> | Response<BodyInit>>
 
 export class Serializer {
-	private serializers: {
-		[contentType: string]: Serialize | undefined
-	} = {}
+	private serializers: { [contentType: string]: Serialize | undefined } = {}
 	constructor(extend?: Serializer) {
 		this.serializers = extend ? { ...extend.serializers } : {}
 	}

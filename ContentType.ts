@@ -12,18 +12,18 @@ export namespace ContentType {
 							? "application/pdf"
 							: "application/octet-stream"
 						: objectContainsBinary(body)
-						? "multipart/form-data"
-						: "application/json; charset=utf-8"
+							? "multipart/form-data"
+							: "application/json; charset=utf-8"
 				break
 			case "string":
 				result =
 					body.slice(0, 9).toLowerCase() == "<!doctype"
 						? "text/html; charset=utf-8"
 						: /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/.test(body)
-						? "application/jwt; charset=utf-8"
-						: /^<\?xml version=(.|\n)*\?>(.|\n)*<svg(.|\n)*<\/svg>$/.test(body)
-						? "image/svg+xml"
-						: "text/plain; charset=utf-8"
+							? "application/jwt; charset=utf-8"
+							: /^<\?xml version=(.|\n)*\?>(.|\n)*<svg(.|\n)*<\/svg>$/.test(body)
+								? "image/svg+xml"
+								: "text/plain; charset=utf-8"
 				break
 		}
 		return result
@@ -35,11 +35,11 @@ export namespace ContentType {
 	}
 	function objectContainsBinary(body: any): boolean {
 		return (
-			typeof body == "object" &&
-			body &&
-			(body instanceof Blob ||
-				ArrayBuffer.isView(body) ||
-				Object.entries(body).some(([_, value]) => objectContainsBinary(value)))
+			typeof body == "object"
+			&& body
+			&& (body instanceof Blob
+				|| ArrayBuffer.isView(body)
+				|| Object.entries(body).some(([_, value]) => objectContainsBinary(value)))
 		)
 	}
 }

@@ -125,7 +125,7 @@ const fields: [keyof Header, string, number][] = [
 	["xRequestId", "X-Request-ID", 1],
 	["xUACompatible", "X-UA-Compatible", 1],
 	["xWebkitCsp", "X-WebKit-CSP", 1],
-	["xXssProtection", "X-XSS-Protection", 1],
+	["xXssProtection", "X-XSS-Protection", 1]
 ]
 export namespace Header {
 	export function is(value: any | Header): value is Header {
@@ -152,8 +152,8 @@ export namespace Header {
 			(Array.isArray(headers)
 				? headers.map<[string, string]>(([field, ...value]) => [field, value.join(", ")])
 				: isHeaders(headers)
-				? getEntries(headers)
-				: Object.entries(headers)
+					? getEntries(headers)
+					: Object.entries(headers)
 			).map(([name, value]) => {
 				const field = fields.find(([c, n, l]) => name.toLowerCase() == n.toLowerCase())
 				return field
@@ -173,8 +173,8 @@ export namespace Header {
 			: {
 					...value.header,
 					...((value.status == 301 || value.status == 302) && value.location ? { location: value.location } : {}),
-					...header,
-			  }
+					...header
+				}
 	}
 	function isHeaders(value: globalThis.Headers | any): value is globalThis.Headers {
 		return typeof value.forEach == "function"

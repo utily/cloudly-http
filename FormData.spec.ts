@@ -4,11 +4,10 @@ describe("form data", () => {
 	const file = new Blob([JSON.stringify({ test: "testing", tester: "potato" }, null, 2)], { type: "application/json" })
 	it("to", async () => {
 		const result = http.FormData.to({ value: "value", file: file, test: "test", tester: "tester" })
-		expect(result.get("")).toEqual(
-			new File([new TextEncoder().encode(JSON.stringify({ value: "value", test: "test", tester: "tester" }))], "blob", {
-				type: "application/json; charset=utf-8",
-			})
-		)
+		const resultFile = result.get("")
+		expect(resultFile).toBeInstanceOf(File)
+		expect(resultFile?.type).toBe("application/json; charset=utf-8")
+		expect(await (resultFile as File).text()).toBe(JSON.stringify({ value: "value", test: "test", tester: "tester" }))
 		expect(result.get("file") instanceof Blob).toBeTruthy()
 	})
 	it("from", async () => {

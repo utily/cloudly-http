@@ -1,8 +1,8 @@
 {
 	"name": "cloudly-http",
-	"version": "0.2.0-alpha.24",
+	"version": "0.1.0",
 	"description": "Improved handling of HTTP Requests and Responses.",
-	"author": "Simon Mika <simon@mika.se>",
+	"author": "Utily Contributors",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
@@ -14,49 +14,47 @@
 	"homepage": "https://github.com/utily/cloudly-http",
 	"private": false,
 	"type": "module",
-	"module": "./dist/mjs/index.js",
 	"types": "./dist/types/index.d.ts",
 	"exports": {
 		".": {
-			"import": {
-				"types": "./dist/types/index.d.ts",
-				"default": "./dist/mjs/index.js"
-			},
-			"require": {
-				"types": "./dist/types/index.d.ts",
-				"default": "./dist/cjs/index.js"
-			}
+			"types": "./dist/types/index.d.ts",
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
 		}
 	},
+	"files": [
+		"dist",
+		"LICENSE",
+		"README.md"
+	],
 	"git": {
-		"tagName": "v${version}"
+		"tagName": "release-${version}"
 	},
 	"github": {
 		"release": true
 	},
 	"scripts": {
-		"lint": "eslint --max-warnings=0 '**/*.{ts,tsx}'",
-		"fix": "eslint '**/*.{ts,tsx}' --fix",
-		"build": "rimraf dist/* && tsc -p tsconfig.mjs.json && tsc -p tsconfig.cjs.json",
+		"build": "tsc -p tsconfig.build.json",
+		"lint": "biome format .",
+		"format": "biome format --write .",
 		"test": "vitest --run",
 		"coverage": "vitest --coverage",
 		"prepare": "npm run build",
 		"clean": "rimraf dist node_modules coverage",
-		"verify": "npm run build && npm run test && npm run lint && npm audit"
-	},
-	"overrides": {
-		"esbuild": ">=0.25.0"
+		"verify": "npm run build && npm run test && npm run lint && npm audit --omit=dev"
 	},
 	"devDependencies": {
-		"@typescript-eslint/eslint-plugin": "8.18.1",
-		"@typescript-eslint/parser": "8.18.1",
-		"@vitest/coverage-v8": "^2.1.8",
-		"eslint": "^8.57.0",
-		"eslint-plugin-prettierx": "github:utily/eslint-plugin-prettierx#utily-20231004",
-		"eslint-plugin-simple-import-sort": "^12.1.1",
-		"prettierx": "github:utily/prettierx#utily-20231004",
-		"rimraf": "^6.0.1",
-		"typescript": "^5.7.2",
-		"vitest": "^2.1.8"
-	}
+		"@biomejs/biome": "2.6.9",
+		"@semantic-release/commit-analyzer": "^13.0.1",
+		"@semantic-release/github": "^12.0.2",
+		"@semantic-release/npm": "^13.1.3",
+		"@semantic-release/release-notes-generator": "^14.1.0",
+		"@vitest/coverage-v8": "5.1.2",
+		"rimraf": "6.1.4",
+		"semantic-release": "^25.0.2",
+		"typescript": "7.0.2",
+		"vite": "8.4.0",
+		"vitest": "5.1.2"
+	},
+	"dependencies": {}
 }

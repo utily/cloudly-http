@@ -4,9 +4,7 @@ import type { Response } from "./Response"
 type Parse<T> = (request: Request<Body> | Response<Body>) => Promise<Request<T> | Response<T>>
 
 export class Parser<T = any | Promise<any>> {
-	private parsers: {
-		[contentType: string]: Parse<T> | undefined
-	}
+	private parsers: { [contentType: string]: Parse<T> | undefined }
 	constructor(extend?: Parser<T>) {
 		this.parsers = extend ? { ...extend.parsers } : {}
 	}
@@ -18,7 +16,7 @@ export class Parser<T = any | Promise<any>> {
 	async parse(request: Request<Body> | Response<Body>): Promise<Request<T> | Response<T>> {
 		const contentType = request.header.contentType
 		const type = contentType && contentType.split(";")
-		const parser = type && this.parsers[type[0]]
+		const parser = type && type[0] ? this.parsers[type[0]] : undefined
 		return parser ? parser(request) : (({ body, ...request }) => request)(request)
 	}
 	extend(): Parser {

@@ -19,8 +19,7 @@ export abstract class Socket<T = any> {
 	}
 	#onClose?: () => void
 	set onClose(value: (() => void) | undefined) {
-		if (this.state == "closed" && value)
-			value()
+		if (this.state == "closed" && value) value()
 		this.#onClose = value
 	}
 	#handleOpen() {
@@ -29,39 +28,31 @@ export abstract class Socket<T = any> {
 	}
 	#onOpen?: () => void
 	set onOpen(value: (() => void) | undefined) {
-		if (this.state == "opened" && value)
-			value()
+		if (this.state == "opened" && value) value()
 		this.#onOpen = value
 	}
 	constructor(backend: Backend, isOpen?: boolean) {
 		this.#backend = backend
-		if (isOpen)
-			this.#sendQueue = undefined
+		if (isOpen) this.#sendQueue = undefined
 		this.#backend.addEventListener("open", () => {
-			if (this.#onOpen)
-				this.#onOpen()
+			if (this.#onOpen) this.#onOpen()
 			this.#handleOpen.bind(this)
 		})
 		this.#backend.addEventListener("message", async (event: MessageEvent) => {
 			const data = this.processReceived(event.data)
 			this.#handleOpen()
-			if (this.#onMessage)
-				this.#onMessage(data)
-			else
-				this.#receiveQueue?.push(data)
+			if (this.#onMessage) this.#onMessage(data)
+			else this.#receiveQueue?.push(data)
 		})
 		this.#backend.addEventListener("close", () => {
-			if (this.#onClose)
-				this.#onClose()
+			if (this.#onClose) this.#onClose()
 			this.#closed = true
 		})
 	}
 	protected abstract processReceived(data: Message): T
 	protected abstract processSend(data: T): Message
 	send(message: T): void {
-		if (this.#sendQueue)
-			this.#sendQueue.push(this.processSend(message))
-		else
-			this.#backend.send(this.processSend(message))
+		if (this.#sendQueue) this.#sendQueue.push(this.processSend(message))
+		else this.#backend.send(this.processSend(message))
 	}
 }

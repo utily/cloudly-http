@@ -38,21 +38,21 @@ export namespace Middleware {
 		return processor == "identity"
 			? async (request, next) => await next(request)
 			: processor == "client"
-			? async (request, next) => Parser.parse(await next(await Serializer.serialize(request)))
-			: processor == "server"
-			? async (request, next) => Serializer.serialize(await next(await Parser.parse(request)))
-			: Parser.is(processor) && Serializer.is(processorOut)
-			? async (request, next) => processorOut.serialize(await next(await processor.parse(request)))
-			: Parser.is(processor) && processorOut == undefined
-			? async (request, next) => await next(await processor.parse(request))
-			: processor == undefined && Serializer.is(processorOut)
-			? async (request, next) => processorOut.serialize(await next(request))
-			: Serializer.is(processor) && Parser.is(processorOut)
-			? async (request, next) => processorOut.parse(await next(await processor.serialize(request)))
-			: Serializer.is(processor) && processorOut == undefined
-			? async (request, next) => await next(await processor.serialize(request))
-			: processor == undefined && Parser.is(processorOut)
-			? async (request, next) => processorOut.parse(await next(request))
-			: async (request, next) => await next(request)
+				? async (request, next) => Parser.parse(await next(await Serializer.serialize(request)))
+				: processor == "server"
+					? async (request, next) => Serializer.serialize(await next(await Parser.parse(request)))
+					: Parser.is(processor) && Serializer.is(processorOut)
+						? async (request, next) => processorOut.serialize(await next(await processor.parse(request)))
+						: Parser.is(processor) && processorOut == undefined
+							? async (request, next) => await next(await processor.parse(request))
+							: processor == undefined && Serializer.is(processorOut)
+								? async (request, next) => processorOut.serialize(await next(request))
+								: Serializer.is(processor) && Parser.is(processorOut)
+									? async (request, next) => processorOut.parse(await next(await processor.serialize(request)))
+									: Serializer.is(processor) && processorOut == undefined
+										? async (request, next) => await next(await processor.serialize(request))
+										: processor == undefined && Parser.is(processorOut)
+											? async (request, next) => processorOut.parse(await next(request))
+											: async (request, next) => await next(request)
 	}
 }

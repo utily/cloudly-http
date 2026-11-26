@@ -26,19 +26,21 @@ export namespace Search {
 	}
 	export function parse(data: string): Search {
 		const convertArrays = (target: Record<string, any>): Record<string, any> | any[] => {
-			return typeof target == "object" &&
-				Object.keys(target)
+			return typeof target == "object"
+				&& Object.keys(target)
 					.sort()
 					.every((k, i) => `${k}` == `${i}`)
 				? Object.entries(target)
 						.sort()
 						.map(entry => (typeof entry[1] == "object" ? convertArrays(entry[1]) : entry[1]))
 				: typeof target == "object"
-				? Object.fromEntries(Object.entries(target).map(entry => [entry[0], convertArrays(entry[1])]))
-				: target
+					? Object.fromEntries(Object.entries(target).map(entry => [entry[0], convertArrays(entry[1])]))
+					: target
 		}
 		const insert = (target: Search, key: string[], value: string): any => {
-			target[key[0]] = key.length > 1 ? insert(target[key[0]] ?? {}, key.slice(1), value) : value
+			const head = key[0]
+			if (!head) return target
+			target[head] = key.length > 1 ? insert(target[head] ?? {}, key.slice(1), value) : value
 			return target
 		}
 		const entries = data
@@ -48,7 +50,7 @@ export namespace Search {
 				decodeURIComponent(k)
 					.split("[")
 					.map(p => p.replace("]", "")),
-				decodeURIComponent(v.replace(/\+/g, " ")),
+				decodeURIComponent(v.replace(/\+/g, " "))
 			])
 		return entries.reduce<Search>((result, [key, value]) => convertArrays(insert(result, key, value)), {})
 	}

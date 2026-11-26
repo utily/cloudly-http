@@ -15,11 +15,11 @@ export interface Response<T = any | Promise<any>> {
 export namespace Response {
 	export function is<T = any | Promise<any>>(value: any | Response<T>): value is Response<T> {
 		return (
-			typeof value == "object" &&
-			Object.keys(value).every(key => ["status", "header", "body", "socket"].some(k => k == key)) &&
-			(value.status == undefined || typeof value.status == "number") &&
-			(value.header == undefined || ResponseHeader.is(value.header)) &&
-			(value.socket == undefined || value.socket instanceof WebSocket)
+			typeof value == "object"
+			&& Object.keys(value).every(key => ["status", "header", "body", "socket"].some(k => k == key))
+			&& (value.status == undefined || typeof value.status == "number")
+			&& (value.header == undefined || ResponseHeader.is(value.header))
+			&& (value.socket == undefined || value.socket instanceof WebSocket)
 		)
 	}
 	export async function to(response: Response, serializer?: Serializer | "none"): Promise<Platform.Response>
@@ -30,8 +30,8 @@ export namespace Response {
 			status: result?.status,
 			headers: new Headers(ResponseHeader.to(result?.header ?? {}) as Record<string, string>),
 			...(result?.socket && {
-				webSocket: ({ ...result?.socket.createResponse().socket } as Record<string, string | undefined>)?.backend,
-			}),
+				webSocket: ({ ...result?.socket.createResponse().socket } as Record<string, string | undefined>)?.backend
+			})
 		} as ResponseInit & { webSocket?: WebSocket | null })
 	}
 	export async function from<T = any | Promise<any>>(
@@ -50,7 +50,7 @@ export namespace Response {
 			status: response.status,
 			header: ResponseHeader.from(response.headers),
 			...(response.webSocket && { socket: new Socket.Factory(response.webSocket) }),
-			body: response.status == 101 ? undefined : response,
+			body: response.status == 101 ? undefined : response
 		}
 		return parser == "none" ? (result as Response<T>) : (parser ?? Parser).parse(result)
 	}
@@ -62,34 +62,30 @@ export namespace Response {
 		contentType = (typeof contentType == "string" ? { contentType } : contentType) ?? {}
 		if (Response.Like.is(response)) {
 			const header: Response.Header = { ...response.header, ...contentType }
-			if (!header.contentType)
-				header.contentType = ContentType.deduce(response.body)
+			if (!header.contentType) header.contentType = ContentType.deduce(response.body)
 			result = {
 				status: response.status ?? 200,
 				header,
 				body: response.body,
-				...(response.socket && { socket: response.socket }),
+				...(response.socket && { socket: response.socket })
 			}
-		} else if (response instanceof Socket.Factory)
-			result = response.createResponse(contentType)
-		else if (!response)
-			result = { status: 204, header: contentType }
+		} else if (response instanceof Socket.Factory) result = response.createResponse(contentType)
+		else if (!response) result = { status: 204, header: contentType }
 		else {
 			const body =
-				!(typeof response == "object" && !Array.isArray(response)) ||
-				response instanceof ArrayBuffer ||
-				ArrayBuffer.isView(response)
+				!(typeof response == "object" && !Array.isArray(response))
+				|| response instanceof ArrayBuffer
+				|| ArrayBuffer.isView(response)
 					? response
 					: (({ header, ...body }) => body)(response)
 			const header = Header.fromAny(response, contentType)
-			if (!header.contentType)
-				header.contentType = ContentType.deduce(body)
+			if (!header.contentType) header.contentType = ContentType.deduce(body)
 			result = {
 				status: (typeof response == "object" && typeof response.status == "number" && response.status) || 200,
 				header,
 				body,
-				...((response.webSocket && { socket: new Socket.Factory(response.webSocket) }) ||
-					(response.socket && { socket: response.socket })),
+				...((response.webSocket && { socket: new Socket.Factory(response.webSocket) })
+					|| (response.socket && { socket: response.socket }))
 			}
 		}
 		return result

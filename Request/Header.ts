@@ -122,7 +122,7 @@ const fields: [keyof Header, string, number][] = [
 	["xModRetry", "x-mod-retry", 1],
 	["saveData", "Save-Data", 1],
 	["xAuthToken", "X-Auth-Token", 1],
-	["xTrackingId", "x-tracking-id", 1],
+	["xTrackingId", "x-tracking-id", 1]
 ]
 export namespace Header {
 	export function is(value: any | Header): value is Header {
@@ -149,8 +149,8 @@ export namespace Header {
 			(Array.isArray(headers)
 				? headers.map<[string, string]>(([field, ...value]) => [field, value.join(", ")])
 				: isHeaders(headers)
-				? [...headers]
-				: Object.entries(headers)
+					? [...headers]
+					: Object.entries(headers)
 			).map(([name, value]) => {
 				const field = fields.find(([c, n, l]) => name.toLowerCase() == n.toLowerCase())
 				return field

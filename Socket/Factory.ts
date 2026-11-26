@@ -7,23 +7,23 @@ import { String as SocketString } from "./String"
 export class Factory {
 	#json?: SocketJson
 	get json(): SocketJson {
-		if (!this.#json)
-			this.#json = new SocketJson(this.backend, this.isOpen)
+		if (!this.#json) this.#json = new SocketJson(this.backend, this.isOpen)
 		return this.#json
 	}
 	#string?: SocketString
 	get string(): SocketString {
-		if (!this.#string)
-			this.#string = new SocketString(this.backend, this.isOpen)
+		if (!this.#string) this.#string = new SocketString(this.backend, this.isOpen)
 		return this.#string
 	}
 	#arrayBuffer?: SocketArrayBuffer
 	get arrayBuffer(): SocketArrayBuffer {
-		if (!this.#arrayBuffer)
-			this.#arrayBuffer = new SocketArrayBuffer(this.backend, this.isOpen)
+		if (!this.#arrayBuffer) this.#arrayBuffer = new SocketArrayBuffer(this.backend, this.isOpen)
 		return this.#arrayBuffer
 	}
-	constructor(private readonly backend: Backend, private readonly isOpen?: boolean) {}
+	constructor(
+		private readonly backend: Backend,
+		private readonly isOpen?: boolean
+	) {}
 	createResponse(header: Response.Header = {}): Required<Omit<Response, "body">> {
 		return { status: 101, socket: this, header }
 	}

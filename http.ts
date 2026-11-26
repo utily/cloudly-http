@@ -26,10 +26,10 @@ Serializer.add(
 					header: {
 						...message.header,
 						link: [message.body.cursor, 'rel="next"'],
-						accessControlExposeHeaders: ["link"].concat(message.header.accessControlAllowHeaders ?? []),
+						accessControlExposeHeaders: ["link"].concat(message.header.accessControlAllowHeaders ?? [])
 					},
-					body: JSON.stringify([...message.body]),
-			  }
+					body: JSON.stringify([...message.body])
+				}
 			: { ...message, body: JSON.stringify(message.body) },
 	"application/json"
 )
@@ -40,11 +40,7 @@ Serializer.add(
 Serializer.add(async message => {
 	const body = message.body instanceof globalThis.FormData ? message.body : FormData.to(message.body)
 	return Request.is(message)
-		? {
-				...message,
-				header: (({ contentType, ...header }) => header)(message.header),
-				body,
-		  }
+		? { ...message, header: (({ contentType, ...header }) => header)(message.header), body }
 		: { ...message, body }
 }, "multipart/form-data")
 
@@ -57,11 +53,11 @@ Parser.add(
 Parser.add(async message => {
 	let result = { ...message, body: await message.body?.json() }
 	if (
-		Response.is(message) &&
-		Array.isArray(result.body) &&
-		Array.isArray(result.header.link) &&
-		result.header.link.length == 2 &&
-		result.header.link[1] == 'rel="next"'
+		Response.is(message)
+		&& Array.isArray(result.body)
+		&& Array.isArray(result.header.link)
+		&& result.header.link.length == 2
+		&& result.header.link[1] == 'rel="next"'
 	)
 		result = { ...result, body: Continuable.create(result.body, result.header.link[0]) }
 	return result
@@ -88,5 +84,5 @@ export {
 	Response,
 	Search,
 	Serializer,
-	Socket,
+	Socket
 }

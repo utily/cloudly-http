@@ -6,9 +6,9 @@ export namespace Continuable {
 		isItem?: (item: T | any) => item is T
 	): value is Continuable<T> {
 		return (
-			Array.isArray(value) &&
-			(!isItem || value.every(isItem)) &&
-			(!("cursor" in value) || typeof value.cursor == "string")
+			Array.isArray(value)
+			&& (!isItem || value.every(isItem))
+			&& (!("cursor" in value) || typeof value.cursor == "string")
 		)
 	}
 	export function hasCursor<T = any>(
@@ -22,8 +22,7 @@ export namespace Continuable {
 	}
 	export function modify<T>(continuable: Continuable<T> | T[], cursor?: string): Continuable<T> {
 		const result: Continuable<T> = continuable
-		if (!cursor && is(continuable))
-			cursor = continuable.cursor
+		if (!cursor && is(continuable)) cursor = continuable.cursor
 		if (cursor) {
 			result.cursor = cursor
 			const map = result.map

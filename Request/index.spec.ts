@@ -8,7 +8,7 @@ describe("Request", () => {
 		search: {},
 		header: {},
 		remote: undefined,
-		body: undefined,
+		body: undefined
 	}
 	it("create url string", () => {
 		expect(http.Request.create("http://example.com/collection/resource")).toMatchObject(output)
@@ -19,7 +19,7 @@ describe("Request", () => {
 	it("create method url", () => {
 		expect(http.Request.create({ method: "post", url: "http://example.com/collection/resource" })).toMatchObject({
 			...output,
-			method: "POST",
+			method: "POST"
 		})
 	})
 	it("create method url object", () => {
@@ -27,13 +27,13 @@ describe("Request", () => {
 			http.Request.create({
 				method: "post",
 				url: "http://example.com/collection/resource",
-				body: { property: "value" },
+				body: { property: "value" }
 			})
 		).toMatchObject({
 			...output,
 			method: "POST",
 			header: { contentType: "application/json; charset=utf-8" },
-			body: { property: "value" },
+			body: { property: "value" }
 		})
 	})
 	it("is", () => {
@@ -42,7 +42,7 @@ describe("Request", () => {
 			method: "POST",
 			url: new URL("http://example.com/collection/resource?key=value"),
 			header: { contentType: "application/json; charset=utf-8" },
-			body: { resource: "resource", name: "Resource" },
+			body: { resource: "resource", name: "Resource" }
 		})
 		expect(request).toEqual({ ...request, search: { key: "value" } })
 		expect(http.Request.is(request)).toEqual(true)
@@ -52,17 +52,14 @@ describe("Request", () => {
 			method: "POST",
 			url: new URL("http://example.com/collection/resource?key=value"),
 			header: { contentType: "application/json; charset=utf-8" },
-			body: { resource: "resource", name: "Resource" },
+			body: { resource: "resource", name: "Resource" }
 		})
 		expect((await http.Request.to(json)).headers).toEqual({ "Content-Type": "application/json; charset=utf-8" })
 		const formData = http.Request.create({
 			method: "POST",
 			url: new URL("http://example.com/collection/resource?key=value"),
-			header: {
-				contentType: "multipart/form-data; boundary = asdasdasdasd",
-				authorization: "placeholderValue",
-			},
-			body: new FormData(),
+			header: { contentType: "multipart/form-data; boundary = asdasdasdasd", authorization: "placeholderValue" },
+			body: new FormData()
 		})
 		expect((await http.Request.to(formData)).headers).toEqual({ Authorization: "placeholderValue" })
 	})
