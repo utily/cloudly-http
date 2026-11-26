@@ -1,4 +1,4 @@
-import { http } from "./index"
+import { http } from "../index"
 
 describe("http.Search", () => {
 	it("stringify", async () => {

@@ -1,5 +1,5 @@
-import type { Request } from "./Request"
-import type { Response } from "./Response"
+import type { Request } from "../Request"
+import type { Response } from "../Response"
 
 type Serialize = (
 	message: Request<any> | Response<any>,

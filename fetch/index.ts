@@ -1,7 +1,7 @@
-import { Middleware } from "./Middleware"
-import * as Platform from "./Platform"
-import { Request } from "./Request"
-import { Response } from "./Response"
+import { Middleware } from "../Middleware"
+import * as Platform from "../Platform"
+import { Request } from "../Request"
+import { Response } from "../Response"
 
 export type Fetch = (request: Request.Like | string) => Promise<Response>
 export type GlobalFetch = (url: string, init: RequestInit) => Promise<Platform.Response>

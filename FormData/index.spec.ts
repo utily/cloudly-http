@@ -1,4 +1,4 @@
-import { http } from "./index"
+import { http } from "../index"
 
 describe("form data", () => {
 	const file = new Blob([JSON.stringify({ test: "testing", tester: "potato" }, null, 2)], { type: "application/json" })

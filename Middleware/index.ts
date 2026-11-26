@@ -1,7 +1,7 @@
-import { Parser } from "./Parser"
-import { Request } from "./Request"
-import { Response } from "./Response"
-import { Serializer } from "./Serializer"
+import { Parser } from "../Parser"
+import { Request } from "../Request"
+import { Response } from "../Response"
+import { Serializer } from "../Serializer"
 
 export type Middleware<ResponseOut = any, ResponseIn = any, RequestOut = any, RequestIn = any> = (
 	request: Request<RequestIn>,

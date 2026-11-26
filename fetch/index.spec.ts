@@ -1,4 +1,4 @@
-import { http } from "./index"
+import { http } from "../index"
 
 describe("fetch", () => {
 	const methods = ["GET", "HEAD", "POST", "DELETE", "OPTIONS", "TRACE", "PATCH"] //CONNECT and PUT will timeout
