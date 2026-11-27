@@ -1,6 +1,6 @@
 {
 	"name": "cloudly-http",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"description": "Improved handling of HTTP Requests and Responses.",
 	"author": "Utily Contributors",
 	"license": "MIT",
@@ -27,9 +27,6 @@
 		"LICENSE",
 		"README.md"
 	],
-	"github": {
-		"release": true
-	},
 	"scripts": {
 		"build": "tsc -p tsconfig.build.json",
 		"lint": "biome format .",
