@@ -1,6 +1,6 @@
 {
 	"name": "cloudly-http",
-	"version": "0.1.0",
+	"version": "1.1.0",
 	"description": "Improved handling of HTTP Requests and Responses.",
 	"author": "Utily Contributors",
 	"license": "MIT",
