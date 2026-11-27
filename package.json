@@ -27,9 +27,6 @@
 		"LICENSE",
 		"README.md"
 	],
-	"git": {
-		"tagName": "release-${version}"
-	},
 	"github": {
 		"release": true
 	},
